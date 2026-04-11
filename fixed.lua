@@ -195,6 +195,9 @@ local PlayerStats = {}
 -- key = playerName (lowercase), value = userId
 local PlayerNameToId = {}
 
+-- // CACHE DISCORD MENTION (username/displayname -> discordId) //
+local MentionCache = {}
+
 -- // STATS WEBHOOK SENDER //
 local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
     local requestFunc = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
@@ -622,6 +625,14 @@ local function StartMonitoring()
         PlayerStats[p.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name }
         PlayerNameToId[string.lower(p.Name)] = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
+        -- Build mention cache untuk username dan displayname
+        for rbxName, dId in pairs(MemberList) do
+            if string.lower(rbxName) == string.lower(p.Name) or
+               string.lower(rbxName) == string.lower(p.DisplayName) then
+                MentionCache[string.lower(p.Name)] = dId
+                MentionCache[string.lower(p.DisplayName)] = dId
+            end
+        end
     end
     Players.PlayerAdded:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
@@ -635,6 +646,14 @@ local function StartMonitoring()
         PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = player.Name }
         PlayerNameToId[string.lower(player.Name)] = player.UserId
         PlayerNameToId[string.lower(player.DisplayName)] = player.UserId
+        -- Build mention cache
+        for rbxName, dId in pairs(MemberList) do
+            if string.lower(rbxName) == string.lower(player.Name) or
+               string.lower(rbxName) == string.lower(player.DisplayName) then
+                MentionCache[string.lower(player.Name)] = dId
+                MentionCache[string.lower(player.DisplayName)] = dId
+            end
+        end
 
         task.spawn(function()
             task.wait(1)
