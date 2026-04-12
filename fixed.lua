@@ -64,7 +64,7 @@ local SecretFishList = {
 
 -- // DATABASE FORGOTTEN TIER //
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca,
+    "Sea Eater", "Thunderzilla", "Iridesca",
 }
 
 
