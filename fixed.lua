@@ -59,12 +59,12 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant",
     -- Forgotten Tier
-    "Sea Eater", "Thunderzilla"
+    "Sea Eater", "Thunderzilla", "Iridesca",
 }
 
 -- // DATABASE FORGOTTEN TIER //
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla"
+    "Sea Eater", "Thunderzilla", "Iridesca,
 }
 
 
@@ -124,6 +124,7 @@ local FishChanceData = {
     ["Bonemaw Tyrant"] = "1 in 2.5M",
     ["Sea Eater"] = "1 in 25M",
     ["Thunderzilla"] = "1 in 30M",
+    ["Iridesca"] = "1 in 25M",
 }
 
 -- // DATABASE RUBY GEMSTONE //
@@ -178,6 +179,7 @@ local FishImageURL = {
     ["Thunderzilla"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Thunderzilla.png",
     ["Strawberry Orca"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Strawberry%20Orca.png",
     ["Worm Fish"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Worm%20Fish.png",
+    ["Iridesca"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Iridesca.png",
 }
 
 -- // CACHE TAMBAHAN DARI BACKPACK MONITOR //
