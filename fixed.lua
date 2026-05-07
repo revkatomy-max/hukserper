@@ -51,6 +51,7 @@ local MemberList = {
     { username = "Reverned99", display = "Reverned99", id = "870201488218157107" },
     { username = "Leale716", display = "leaa", id = "1408658812424028182" },
 }
+
 -- ============================================================
 --  DATABASE
 -- ============================================================
@@ -292,10 +293,10 @@ end
 local function GetMention(robloxName)
     if not robloxName then return "" end
     local lower = string.lower(robloxName)
-    if MentionCache[lower] then return "<@" .. MentionCache[lower] .. "> " end
+    if MentionCache[lower] then return "<@" .. MentionCache[lower] .. ">" end
     for _, member in ipairs(MemberList) do
         if string.lower(member.username) == lower or string.lower(member.display) == lower then
-            return "<@" .. member.id .. "> "
+            return "<@" .. member.id .. ">"
         end
     end
     return ""
@@ -415,28 +416,44 @@ local function PostWebhook(url, body)
     end)
 end
 
-local function SendWebhook(title, description, color, fields, imageUrl, thumbUrl, mention)
+-- captionType: "secret" | "forgotten" | "join" | "leave" | "notback" | nil
+local function BuildContent(mention, captionType)
+    if not mention or mention == "" then return nil end
+    local m = Trim(mention)
+    if captionType == "secret" or captionType == "forgotten" then
+        return "ini hasil mancing kamu " .. m
+    elseif captionType == "leave" then
+        return "ke disconect ya? " .. m
+    elseif captionType == "join" then
+        return "alhamdulilah kembali " .. m
+    elseif captionType == "notback" then
+        return "kamu kemana pergi kemana selama ini " .. m
+    end
+    return m
+end
+
+local function SendWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    if mention and mention ~= "" then
-        table.insert(f, { name = "📣 Mention", value = Trim(mention), inline = true })
-    end
+    local content = BuildContent(mention, captionType)
     PostWebhook(WEBHOOK_URL, {
         username   = "BLOX Gank",
         avatar_url = WEBHOOK_AVATAR,
+        content    = content,
         embeds     = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) },
     })
 end
 
-local function SendFishWebhook(title, description, color, fields, imageUrl, thumbUrl, mention)
+local function SendFishWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local url = (WEBHOOK_FISH ~= "") and WEBHOOK_FISH or WEBHOOK_URL
     if url == "" then return end
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    if mention and mention ~= "" then
-        table.insert(f, { name = "📣 Mention", value = Trim(mention), inline = true })
-    end
-    PostWebhook(url, { embeds = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) } })
+    local content = BuildContent(mention, captionType)
+    PostWebhook(url, {
+        content = content,
+        embeds  = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) },
+    })
 end
 
 local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
@@ -544,7 +561,7 @@ local function CheckAndSend(rawMsg)
             { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = "Mutasi", value = "✨ Crystalized",             inline = true },
             { name = "Berat",  value = data.weight,                  inline = true },
-        }, imageUrl, avatarUrl, GetMention(data.player))
+        }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
 
@@ -557,7 +574,7 @@ local function CheckAndSend(rawMsg)
             { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = "Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = "Berat",  value = data.weight,                  inline = true },
-        }, imageUrl, avatarUrl, GetMention(data.player))
+        }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
 
@@ -589,11 +606,11 @@ local function CheckAndSend(rawMsg)
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("⚜️ FORGOTTEN TIER DETECTED!", nil, 16777215, fields, imageUrl, avatarUrl, GetMention(data.player))
+            SendFishWebhook("⚜️ FORGOTTEN TIER DETECTED!", nil, 16777215, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("🦕 SECRET FISH DETECTED!", nil, 1752220, fields, imageUrl, avatarUrl, GetMention(data.player))
+            SendFishWebhook("🦕 SECRET FISH DETECTED!", nil, 1752220, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
         end
         return
     end
@@ -606,7 +623,7 @@ local function CheckAndSend(rawMsg)
             { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = "Mutasi", value = "🌀 " .. mutasiDetected,     inline = true },
             { name = "Berat",  value = data.weight,                  inline = true },
-        }, nil, avatarUrl, GetMention(data.player))
+        }, nil, avatarUrl, GetMention(data.player), "secret")
     end
 end
 
@@ -773,7 +790,7 @@ local function StartMonitoring()
             SendWebhook("✅ PLAYER JOINED SERVER", nil, 65280, {
                 { name = "Username", value = "**" .. player.Name .. "**",              inline = true },
                 { name = "Total",    value = "👥 " .. tostring(#Players:GetPlayers()), inline = true },
-            }, nil, AvatarCache[player.UserId], GetMention(player.Name))
+            }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
 
         WatchForFish(player)
@@ -787,6 +804,7 @@ local function StartMonitoring()
         local avatarUrl = AvatarCache[pId] or GetAvatarUrl(player)
         local stats    = PlayerStats[pId] or { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil }
         local totalNow = #Players:GetPlayers() - 1
+        local mentionStr = GetMention(pName)
 
         -- Clear caches
         AvatarCache[pId]             = nil
@@ -795,25 +813,25 @@ local function StartMonitoring()
         for k, v in pairs(PlayerNameToId) do if v == pId then PlayerNameToId[k] = nil end end
         MentionCache[string.lower(pName)]   = nil
 
-        local lastFishStr = "Tidak ada"
-        if stats.lastFishTime then
-            local diff = os.time() - stats.lastFishTime
-            lastFishStr = math.floor(diff / 60) .. "m " .. (diff % 60) .. "s yang lalu"
-        end
-
         SendWebhook("👋 PLAYER LEFT SERVER", nil, 16729344, {
             { name = "Username", value = "**" .. pName .. "**",       inline = true },
             { name = "Total",    value = "👥 " .. tostring(totalNow), inline = true },
-        }, nil, avatarUrl, GetMention(pName))
+        }, nil, avatarUrl, mentionStr, "leave")
 
         LeaveTimers[pId] = true
         task.spawn(function()
             task.wait(600)
             if LeaveTimers[pId] then
                 LeaveTimers[pId] = nil
-                SendWebhook("⏰ PLAYER TIDAK KEMBALI", nil, 16711680, {
-                    { name = "Username", value = "**" .. pName .. "**",               inline = true },
-                    { name = "Info",     value = "Tidak kembali selama **10 menit**", inline = true },
+                local notBackContent = BuildContent(mentionStr, "notback")
+                PostWebhook(WEBHOOK_URL, {
+                    username   = "BLOX Gank",
+                    avatar_url = WEBHOOK_AVATAR,
+                    content    = notBackContent,
+                    embeds     = { BuildEmbed("⏰ PLAYER TIDAK KEMBALI", nil, 16711680, {
+                        { name = "Username", value = "**" .. pName .. "**",               inline = true },
+                        { name = "Info",     value = "Tidak kembali selama **10 menit**", inline = true },
+                    }, nil, nil) },
                 })
             end
         end)
@@ -853,7 +871,7 @@ local function CreateUI()
     topBar.Parent           = frame
     Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 8)
 
-    local topBarFix = Instance.new("Frame")   -- hide bottom-round on topBar
+    local topBarFix = Instance.new("Frame")
     topBarFix.Size             = UDim2.new(1, 0, 0, 8)
     topBarFix.Position         = UDim2.new(0, 0, 1, -8)
     topBarFix.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -871,7 +889,6 @@ local function CreateUI()
     title.TextXAlignment    = Enum.TextXAlignment.Left
     title.Parent            = topBar
 
-    -- Window buttons
     local function MakeWinBtn(text, xOffset, bgColor)
         local btn = Instance.new("TextButton")
         btn.Text             = text
@@ -890,7 +907,6 @@ local function CreateUI()
     local minBtn   = MakeWinBtn("—", -58, Color3.fromRGB(60, 60, 60))
     local closeBtn = MakeWinBtn("✕", -28, Color3.fromRGB(200, 50, 50))
 
-    -- Minimize / Close logic
     local isMinimized = false
     local fullSize    = UDim2.new(0, 300, 0, 360)
     local miniSize    = UDim2.new(0, 300, 0, 36)
@@ -956,7 +972,6 @@ local function CreateUI()
     statusLabel.TextXAlignment    = Enum.TextXAlignment.Left
     statusLabel.Parent            = frame
 
-    -- Input helpers
     local function MakeLabel(text, yPos)
         local lbl = Instance.new("TextLabel")
         lbl.Text              = text
@@ -1023,7 +1038,6 @@ local function CreateUI()
     startBtn.MouseButton1Click:Connect(function()
         if SCRIPT_ACTIVE then return end
 
-        -- Validate join webhook
         if not inputJoin.Text:find("discord.com/api/webhooks") then
             startBtn.Text             = "❌ WEBHOOK JOIN INVALID!"
             startBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
