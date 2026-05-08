@@ -421,13 +421,13 @@ local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
     if captionType == "secret" or captionType == "forgotten" then
-        return "ini hasil mancing kamu " .. m
+        return "Ingfokan spot pliss " .. m
     elseif captionType == "leave" then
         return "ke disconect ya? " .. m
     elseif captionType == "join" then
         return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then
-        return "kamu kemana pergi kemana selama ini " .. m
+        return "lah kok ngilang " .. m
     end
     return m
 end
