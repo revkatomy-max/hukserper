@@ -81,8 +81,8 @@ local ForgottenList = {
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn",
-    "Galaxy", "Midnight", "BloodMoon", "Binary", "Lightning", "Disco", "Festive",
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Fozen", 
+    "Galaxy", "Midnight", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive",
 }
 
 local LegendaryCrystalList = {
