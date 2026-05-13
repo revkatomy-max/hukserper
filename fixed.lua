@@ -30,7 +30,7 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 -- ============================================================
 
 local MemberList = {
-    { username = "zupzupzuppasup", display = "RISKAMAUFORGOTTEN", id = "766292778501275678" },
+    --{ username = "zupzupzuppasup", display = "RISKAMAUFORGOTTEN", id = "766292778501275678" },
     { username = "natadecxco", display = "nata", id = "638355599574171668" },
     { username = "NNOON412", display = "412", id = "1125668364489080933" },
     { username = "kdryvka", display = "YIYA", id = "1312729486067761162" },
@@ -49,7 +49,7 @@ local MemberList = {
     { username = "hawaish01", display = "ilywaa", id = "1392909983678595244" },
     { username = "ocheanyx", display = "Michiko", id = "1299617626309263381" },
     { username = "Reverned99", display = "Reverned99", id = "870201488218157107" },
-    { username = "Leale716", display = "leaa", id = "1408658812424028182" },
+    { username = "Leale716", display = "leaa", id = "1408658812424028182" },--
 }
 
 -- ============================================================
@@ -60,7 +60,7 @@ local SecretFishList = {
     "Crystal Crab", "Orca", "Zombie Shark", "Zombie Megalodon", "Dead Zombie Shark",
     "Blob Shark", "Ghost Shark", "Skeleton Narwhal", "Ghost Worm Fish", "Worm Fish",
     "Megalodon", "1x1x1x1 Comet Shark", "Bloodmoon Whale", "Lochness Monster",
-    "Monster Shark", "Eerie Shark", "Great Whale", "Frostborn Shark", "Thin Armored Shark",
+    "Monster Shark", "Eerie Shark", "Great Whale", "Frostborn Shark", "Thin Armor Shark",
     "Scare", "Queen Crab", "King Crab", "Cryoshade Glider", "Panther Eel",
     "Giant Squid", "Depthseeker Ray", "Robot Kraken", "Mosasaur Shark", "King Jelly",
     "Bone Whale", "Elshark Gran Maja", "Elpirate Gran Maja", "Ancient Whale",
