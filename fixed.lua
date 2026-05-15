@@ -30,7 +30,26 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 -- ============================================================
 
 local MemberList = {
- 
+   { username = "zupzupzuppasup", display = "RISKAMAUFORGOTTEN", id = "766292778501275678" },
+    { username = "natadecxco", display = "nata", id = "638355599574171668" },
+    { username = "pyciieegirls", display = "Pyciiiii", id = "1182254978904109138" },
+    { username = "kdryvka", display = "YIYA", id = "1312729486067761162" },
+    { username = "1nhanss", display = "han", id = "1438046472179548190" },
+    { username = "cjmin131", display = "Karaadino", id = "1406639996127154246" },
+    { username = "x_ibo21", display = "wowo", id = "954296542406246400" },
+    { username = "evosudin", display = "Bluuism", id = "875656564931956766" },
+    { username = "minxing_kim", display = "minxing", id = "484295718765461515" },
+    { username = "w4terhyacinth", display = "ReVWater", id = "1309945598409048076" },
+    { username = "rexlepwz", display = "reeamore", id = "1205780304753725492" },
+    { username = "dekadekadekk", display = "dekadee", id = "692735562817470494" },
+    { username = "ceriseciscake", display = "ciscake", id = "786950836034994216" },
+    { username = "mnikndy", display = "prettyv", id = "1478607686345035880" },
+    { username = "BEJOD06", display = "masw", id = "1222390041951600640" },
+    { username = "flucidious", display = "fluc", id = "279691238494699530" },
+    { username = "hawaish01", display = "ilywaa", id = "1392909983678595244" },
+    { username = "AcidReign07", display = "kiixlau", id = "1393120438594437161" },
+    { username = "minyaktalon9990", display = "Revv2", id = "870201488218157107" },
+    { username = "alleThetwin", display = "LikeAvillain", id = "870201488218157107" },
 }
 
 -- ============================================================
@@ -62,8 +81,8 @@ local ForgottenList = {
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Fozen", 
-    "Galaxy", "Midnight", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive",
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen", 
+    "Galaxy", "Gold", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive",
 }
 
 local LegendaryCrystalList = {
@@ -600,7 +619,7 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 4. Mutasi non-secret only
+    -- 4. Mutasi non-secret only (no mention)
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
         SendFishWebhook("✨ MUTASI DETECTED!", nil, 16776960, {
@@ -608,7 +627,7 @@ local function CheckAndSend(rawMsg)
             { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = "Mutasi", value = "🌀 " .. mutasiDetected,     inline = true },
             { name = "Berat",  value = data.weight,                  inline = true },
-        }, nil, avatarUrl, GetMention(data.player), "secret")
+        }, nil, avatarUrl, nil, nil)
     end
 end
 
