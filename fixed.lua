@@ -73,11 +73,11 @@ local SecretFishList = {
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon",
     -- Forgotten Tier
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan","Fluorivane",
 }
 
 local MutasiList = {
@@ -154,7 +154,8 @@ local FishChanceData = {
     ["Frostbite Leviathan"]      = "1 in 12M",
     ["Aurelion"]                 = "1 in 3M",
     ["Runic Enchant Stone"]      = "1 in 1.50M",
-    ["Frogalloon"]                = "1 in 1,50M",
+    ["Frogalloon"]               = "1 in 1,50M",
+    ["Fluorivane"]               = "1 in 15M",
 }
 
 local FishImageURL = {
