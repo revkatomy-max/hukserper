@@ -80,7 +80,7 @@ local SecretFishList = {
     "Rainbow Comet Shark", "Love Nessie", "Broken Heart Nessie",
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
-    "Runic Enchant Stone", "Frogalloon", "Coral Whale",
+    "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant",
     -- Forgotten Tier
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
 }
@@ -91,7 +91,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen", 
-    "Galaxy", "Gold", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive",
+    "Galaxy", "Gold", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Sandy",
 }
 
 local LegendaryCrystalList = {
@@ -166,6 +166,7 @@ local FishChanceData = {
     ["Frogalloon"]               = "1 in 1,50M",
     ["Fluorivane"]               = "1 in 15M",
     ["Coral Whale"]              = "1 in 2M",
+    ["Flame Tyrant"]             = "1 in 5M",
 }
 
 local FishImageURL = {
