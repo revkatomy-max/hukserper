@@ -59,6 +59,15 @@ local MemberList = {
     { username = "Matchafav17", display = "Macaaa", id = "1478634976990859304" },
     { username = "Matchafav17", display = "Macaaa", id = "1478634976990859304" },
     { username = "cobadulumogaseru", display = "lah", id = "1451975194397638676" },
+    { username = "Avochildoo", display = "Avo", id = "1203622473955024896" },
+    { username = "renjunundip", display = "aleale", id = "1428266616763977811" },
+    { username = "kuromingitis", display = "MING", id = "1428266616763977811" },
+    { username = "aaireell", display = "ellyaaa", id = "1392909983678595244" },
+    { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
+    { username = "longisimusdorsii", display = "strawberry", id = "1506324307423526913" },
+    { username = "Thismeann", display = "Oceann", id = "1463858926394015838" },
+    { username = "dekadekadekk", display = "dekadeee", id = "692735562817470494" },
+    { username = "hynad27", display = "jisoo", id = "1217043654909366323",
 }
 
 -- ============================================================
