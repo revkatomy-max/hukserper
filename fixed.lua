@@ -67,7 +67,7 @@ local MemberList = {
     { username = "longisimusdorsii", display = "strawberry", id = "1506324307423526913" },
     { username = "Thismeann", display = "Oceann", id = "1463858926394015838" },
     { username = "dekadekadekk", display = "dekadeee", id = "692735562817470494" },
-    { username = "hynad27", display = "jisoo", id = "1217043654909366323",
+    { username = "hynad27", display = "jisoo", id = "1217043654909366323"},
 }
 
 -- ============================================================
