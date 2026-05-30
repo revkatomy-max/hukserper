@@ -62,7 +62,7 @@ local MemberList = {
     { username = "Avochildoo", display = "Avo", id = "1203622473955024896" },
     { username = "renjunundip", display = "aleale", id = "1428266616763977811" },
     { username = "iloafieus", display = "mavis", id = "1440589079086628998" },
-    { username = "aaireell", display = "ellyaaa", id = "1392909983678595244" },
+    { username = "aaireell", display = "ellyaaa", id = "" },
     { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
     { username = "longisimusdorsii", display = "strawberry", id = "1506324307423526913" },
     { username = "Thismeann", display = "Oceann", id = "1463858926394015838" },
