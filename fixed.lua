@@ -30,7 +30,7 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 -- ============================================================
 
 local MemberList = {
-   { username = "zupzupzuppasup", display = "RISKAMAUFORGOTTEN", id = "766292778501275678" },
+   { username = "zupzupzuppasup", display = "RISKAAA", id = "766292778501275678" },
     { username = "natadecxco", display = "nata", id = "638355599574171668" },
     { username = "pyciieegirls", display = "Pyciiiii", id = "1182254978904109138" },
     { username = "kdryvka", display = "YIYA", id = "1312729486067761162" },
@@ -57,17 +57,18 @@ local MemberList = {
     { username = "choalyn_2", display = "Alyn_ikaa", id = "1467390946357416060" },
     { username = "zyr_xi", display = "fii", id = "1181609363236999289" },
     { username = "Matchafav17", display = "Macaaa", id = "1478634976990859304" },
-    { username = "Matchafav17", display = "Macaaa", id = "1478634976990859304" },
+    { username = "0_Aurorain", display = "Aurorain", id = "574581489912643603" },
     { username = "cobadulumogaseru", display = "lah", id = "1451975194397638676" },
     { username = "Avochildoo", display = "Avo", id = "1203622473955024896" },
     { username = "renjunundip", display = "aleale", id = "1428266616763977811" },
-    { username = "kuromingitis", display = "MING", id = "1428266616763977811" },
+    { username = "iloafieus", display = "mavis", id = "1440589079086628998" },
     { username = "aaireell", display = "ellyaaa", id = "1392909983678595244" },
     { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
     { username = "longisimusdorsii", display = "strawberry", id = "1506324307423526913" },
     { username = "Thismeann", display = "Oceann", id = "1463858926394015838" },
-    { username = "dekadekadekk", display = "dekadeee", id = "692735562817470494" },
+    { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
     { username = "hynad27", display = "jisoo", id = "1217043654909366323"},
+    { username = "Bintanggg_1111", display = "niss", id = "574581489912643603"},
 }
 
 -- ============================================================
@@ -100,7 +101,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen", 
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Sandy",
+    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
 }
 
 local LegendaryCrystalList = {
