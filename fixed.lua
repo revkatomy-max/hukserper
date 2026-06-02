@@ -14,9 +14,9 @@ local TweenService       = game:GetService("TweenService")
 -- ============================================================
 
 local WEBHOOK_URL       = ""
-local WEBHOOK_STATS     = "https://discord.com/api/webhooks/1488003996026273893/4v2Z-a838D17SL7qn03o8s2PKX3oN2quVIui1g4GmYjrIkgnONbtQUlOGqxkLQLD5eIm"
-local WEBHOOK_FISH      = "https://discord.com/api/webhooks/1488485636024307784/s0tXIAmlnx2OosodZm6FiC3Ny9YT4PzcIDFqUeHXymdVvcKOyuIRVxLPcxE7lsK1IZgb"
-local WEBHOOK_CHAT      = "https://discord.com/api/webhooks/1498573795118678176/oxD9a1iqw2Id7GPY5Qk077bhcN0awn_LWeblphJYUtu6UV7SeH1T_7zP_fhN3yjqCgh2"
+local WEBHOOK_STATS     = ""
+local WEBHOOK_FISH      = ""
+local WEBHOOK_CHAT      = ""
 local DISCORD_ROLE_ID   = "1489557585764810802"
 local WEBHOOK_AVATAR    = ""
 local PROXY             = "https://square-haze-a007.remediashop.workers.dev"
