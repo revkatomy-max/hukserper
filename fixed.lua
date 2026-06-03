@@ -28,44 +28,52 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 -- ============================================================
 
 local MemberList = {
-    { username = "zupzupzuppasup",   display = "RISKAAA",          id = "766292778501275678" },
-    { username = "natadecxco",       display = "nata",             id = "638355599574171668" },
-    { username = "pyciieegirls",     display = "Pyciiiii",         id = "1182254978904109138" },
-    { username = "kdryvka",          display = "YIYA",             id = "1312729486067761162" },
-    { username = "1nhanss",          display = "han",              id = "1438046472179548190" },
-    { username = "cjmin131",         display = "Karaadino",        id = "1406639996127154246" },
-    { username = "x_ibo21",          display = "wowo",             id = "954296542406246400" },
-    { username = "evosudin",         display = "Bluuism",          id = "875656564931956766" },
-    { username = "minxing_kim",      display = "minxing",          id = "484295718765461515" },
-    { username = "w4terhyacinth",    display = "ReVWater",         id = "1309945598409048076" },
-    { username = "rexlepwz",         display = "reeamore",         id = "1205780304753725492" },
-    { username = "dekadekadekk",     display = "dekadee",          id = "692735562817470494" },
-    { username = "ceriseciscake",    display = "ciscake",          id = "786950836034994216" },
-    { username = "mnikndy",          display = "prettyv",          id = "1478607686345035880" },
-    { username = "BEJOD06",          display = "masw",             id = "1222390041951600640" },
-    { username = "flucidious",       display = "fluc",             id = "279691238494699530" },
-    { username = "hawaish01",        display = "ilywaa",           id = "1392909983678595244" },
-    { username = "AcidReign07",      display = "kiixlau",          id = "1393120438594437161" },
-    { username = "minyaktalon9990",  display = "Revv2",            id = "870201488218157107" },
-    { username = "alleThetwin",      display = "LikeAvillain",     id = "870201488218157107" }, -- [NOTE] sama ID dgn Revv2
-    { username = "fzallzall",        display = "Ziell",            id = "462346945441038337" },
-    { username = "cecillionz1",      display = "ceceyy",           id = "1404117087303110877" },
-    { username = "klerra_Asu",       display = "Nightmare_scare",  id = "1467390946357416060" },
-    { username = "theromantasy",     display = "star",             id = "1461593359318650880" },
-    { username = "choalyn_2",        display = "Alyn_ikaa",        id = "1467390946357416060" }, -- [NOTE] sama ID dgn klerra_Asu
-    { username = "zyr_xi",           display = "fii",              id = "1181609363236999289" },
-    { username = "Matchafav17",      display = "Macaaa",           id = "1478634976990859304" },
-    { username = "0_Aurorain",       display = "Aurorain",         id = "574581489912643603" },
-    { username = "cobadulumogaseru", display = "lah",              id = "1451975194397638676" },
-    { username = "Avochildoo",       display = "Avo",              id = "1203622473955024896" },
-    { username = "renjunundip",      display = "aleale",           id = "1428266616763977811" },
-    { username = "iloafieus",        display = "mavis",            id = "1440589079086628998" },
-    { username = "aaireell",         display = "ellyaaa",          id = "" },
-    { username = "trianayaa23",      display = "tiarkive",         id = "1425223281686085713" }, -- [NOTE] duplikat dihapus
-    { username = "longisimusdorsii", display = "strawberry",       id = "1506324307423526913" },
-    { username = "Thismeann",        display = "Oceann",           id = "1463858926394015838" },
-    { username = "hynad27",          display = "jisoo",            id = "1217043654909366323" },
-    { username = "Bintanggg_1111",   display = "niss",             id = "574581489912643603" }, -- [NOTE] sama ID dgn Aurorain
+    -- ── Existing members (updated) ───────────────────────────────────────────────
+    { username = "zupzupzuppasup",   display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" }, -- updated display
+    { username = "natadecxco",       display = "natarebus",            id = "638355599574171668" }, -- updated display
+    { username = "pyciieegirls",     display = "pyciiiii",             id = "1182254978904109138" },
+    { username = "kdryvka",          display = "YIYA",                 id = "1312729486067761162" },
+    { username = "1nhanss",          display = "han",                  id = "1438046472179548190" }, -- ID dipertahankan (data baru konflik dgn pyciieegirls)
+    { username = "cjmin131",         display = "Karaadino",            id = "1406639996127154246" },
+    { username = "x_ibo21",          display = "wowo",                 id = "954296542406246400" },
+    { username = "evosudin",         display = "Bluuism",              id = "875656564931956766" },
+    { username = "minxing_kim",      display = "Minxing",              id = "484295718765461515" }, -- updated display
+    { username = "w4terhyacinth",    display = "waterrr",              id = "1309945598409048076" }, -- updated display
+    { username = "rexlepwz",         display = "Reeamore",             id = "1205780304753725492" }, -- updated display
+    { username = "dekadekadekk",     display = "dekadee",              id = "692735562817470494" },
+    { username = "ceriseciscake",    display = "ciscake",              id = "786950836034994216" },
+    { username = "mnikndy",          display = "prettyv",              id = "1478607686345035880" },
+    { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" }, -- updated display
+    { username = "flucidious",       display = "fluc",                 id = "279691238494699530" },
+    { username = "hawaish01",        display = "ilywaa",               id = "1392909983678595244" },
+    { username = "AcidReign07",      display = "kiixlau",              id = "1393120438594437161" },
+    { username = "minyaktalon9990",  display = "Revv2",                id = "870201488218157107" },
+    { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" }, -- sama ID dgn Revv2
+    { username = "fzallzall",        display = "Ziell",                id = "462346945441038337" },
+    { username = "cecillionz1",      display = "ceceyy",               id = "1404117087303110877" },
+    { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" }, -- updated display & ID
+    { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
+    { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
+    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" }, -- akun alt choalyn
+    { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
+    { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
+    { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
+    { username = "cobadulumogaseru", display = "lah",                  id = "1451975194397638676" },
+    { username = "Avochildoo",       display = "Avo",                  id = "1203622473955024896" },
+    { username = "renjunundip",      display = "aleale",               id = "1428266616763977811" },
+    { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
+    { username = "aaireell",         display = "ellyaaa",              id = "" },
+    { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
+    { username = "longisimusdorsii", display = "strawberry",           id = "638355599574171668" }, -- updated ID (data baru)
+    { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
+    { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
+    { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
+    -- ── New members ──────────────────────────────────────────────────────────────
+    { username = "Baeforlife",       display = "Jaemin_choa",          id = "1467390946357416060" }, -- akun alt Alyn_ikaa
+    { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" }, -- akun alt Klerra_Asu
+    { username = "kathzeu",          display = "katzu",                id = "669806652375040022" }, -- username tanpa @ (tidak valid di Roblox)
+    { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
+    { username = "prada2296",        display = "Prada",                id = "757111417919766648" }, -- sama ID dgn tantecungkring
 }
 
 -- ============================================================
