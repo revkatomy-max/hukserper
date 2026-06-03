@@ -16,8 +16,6 @@ local TweenService       = game:GetService("TweenService")
 local WEBHOOK_URL       = ""
 local WEBHOOK_STATS     = ""
 local WEBHOOK_FISH      = ""
-local WEBHOOK_CHAT      = ""
-local DISCORD_ROLE_ID   = "1489557585764810802"
 local WEBHOOK_AVATAR    = ""
 local PROXY             = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE     = false
@@ -30,45 +28,44 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 -- ============================================================
 
 local MemberList = {
-   { username = "zupzupzuppasup", display = "RISKAAA", id = "766292778501275678" },
-    { username = "natadecxco", display = "nata", id = "638355599574171668" },
-    { username = "pyciieegirls", display = "Pyciiiii", id = "1182254978904109138" },
-    { username = "kdryvka", display = "YIYA", id = "1312729486067761162" },
-    { username = "1nhanss", display = "han", id = "1438046472179548190" },
-    { username = "cjmin131", display = "Karaadino", id = "1406639996127154246" },
-    { username = "x_ibo21", display = "wowo", id = "954296542406246400" },
-    { username = "evosudin", display = "Bluuism", id = "875656564931956766" },
-    { username = "minxing_kim", display = "minxing", id = "484295718765461515" },
-    { username = "w4terhyacinth", display = "ReVWater", id = "1309945598409048076" },
-    { username = "rexlepwz", display = "reeamore", id = "1205780304753725492" },
-    { username = "dekadekadekk", display = "dekadee", id = "692735562817470494" },
-    { username = "ceriseciscake", display = "ciscake", id = "786950836034994216" },
-    { username = "mnikndy", display = "prettyv", id = "1478607686345035880" },
-    { username = "BEJOD06", display = "masw", id = "1222390041951600640" },
-    { username = "flucidious", display = "fluc", id = "279691238494699530" },
-    { username = "hawaish01", display = "ilywaa", id = "1392909983678595244" },
-    { username = "AcidReign07", display = "kiixlau", id = "1393120438594437161" },
-    { username = "minyaktalon9990", display = "Revv2", id = "870201488218157107" },
-    { username = "alleThetwin", display = "LikeAvillain", id = "870201488218157107" },
-    { username = "fzallzall", display = "Ziell", id = "462346945441038337" },
-    { username = "cecillionz1", display = "ceceyy", id = "1404117087303110877" },
-    { username = "klerra_Asu", display = "Nightmare_scare", id = "1467390946357416060" },
-    { username = "theromantasy", display = "star", id = "1461593359318650880" },
-    { username = "choalyn_2", display = "Alyn_ikaa", id = "1467390946357416060" },
-    { username = "zyr_xi", display = "fii", id = "1181609363236999289" },
-    { username = "Matchafav17", display = "Macaaa", id = "1478634976990859304" },
-    { username = "0_Aurorain", display = "Aurorain", id = "574581489912643603" },
-    { username = "cobadulumogaseru", display = "lah", id = "1451975194397638676" },
-    { username = "Avochildoo", display = "Avo", id = "1203622473955024896" },
-    { username = "renjunundip", display = "aleale", id = "1428266616763977811" },
-    { username = "iloafieus", display = "mavis", id = "1440589079086628998" },
-    { username = "aaireell", display = "ellyaaa", id = "" },
-    { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
-    { username = "longisimusdorsii", display = "strawberry", id = "1506324307423526913" },
-    { username = "Thismeann", display = "Oceann", id = "1463858926394015838" },
-    { username = "trianayaa23", display = "tiarkive", id = "1425223281686085713" },
-    { username = "hynad27", display = "jisoo", id = "1217043654909366323"},
-    { username = "Bintanggg_1111", display = "niss", id = "574581489912643603"},
+    { username = "zupzupzuppasup",   display = "RISKAAA",          id = "766292778501275678" },
+    { username = "natadecxco",       display = "nata",             id = "638355599574171668" },
+    { username = "pyciieegirls",     display = "Pyciiiii",         id = "1182254978904109138" },
+    { username = "kdryvka",          display = "YIYA",             id = "1312729486067761162" },
+    { username = "1nhanss",          display = "han",              id = "1438046472179548190" },
+    { username = "cjmin131",         display = "Karaadino",        id = "1406639996127154246" },
+    { username = "x_ibo21",          display = "wowo",             id = "954296542406246400" },
+    { username = "evosudin",         display = "Bluuism",          id = "875656564931956766" },
+    { username = "minxing_kim",      display = "minxing",          id = "484295718765461515" },
+    { username = "w4terhyacinth",    display = "ReVWater",         id = "1309945598409048076" },
+    { username = "rexlepwz",         display = "reeamore",         id = "1205780304753725492" },
+    { username = "dekadekadekk",     display = "dekadee",          id = "692735562817470494" },
+    { username = "ceriseciscake",    display = "ciscake",          id = "786950836034994216" },
+    { username = "mnikndy",          display = "prettyv",          id = "1478607686345035880" },
+    { username = "BEJOD06",          display = "masw",             id = "1222390041951600640" },
+    { username = "flucidious",       display = "fluc",             id = "279691238494699530" },
+    { username = "hawaish01",        display = "ilywaa",           id = "1392909983678595244" },
+    { username = "AcidReign07",      display = "kiixlau",          id = "1393120438594437161" },
+    { username = "minyaktalon9990",  display = "Revv2",            id = "870201488218157107" },
+    { username = "alleThetwin",      display = "LikeAvillain",     id = "870201488218157107" }, -- [NOTE] sama ID dgn Revv2
+    { username = "fzallzall",        display = "Ziell",            id = "462346945441038337" },
+    { username = "cecillionz1",      display = "ceceyy",           id = "1404117087303110877" },
+    { username = "klerra_Asu",       display = "Nightmare_scare",  id = "1467390946357416060" },
+    { username = "theromantasy",     display = "star",             id = "1461593359318650880" },
+    { username = "choalyn_2",        display = "Alyn_ikaa",        id = "1467390946357416060" }, -- [NOTE] sama ID dgn klerra_Asu
+    { username = "zyr_xi",           display = "fii",              id = "1181609363236999289" },
+    { username = "Matchafav17",      display = "Macaaa",           id = "1478634976990859304" },
+    { username = "0_Aurorain",       display = "Aurorain",         id = "574581489912643603" },
+    { username = "cobadulumogaseru", display = "lah",              id = "1451975194397638676" },
+    { username = "Avochildoo",       display = "Avo",              id = "1203622473955024896" },
+    { username = "renjunundip",      display = "aleale",           id = "1428266616763977811" },
+    { username = "iloafieus",        display = "mavis",            id = "1440589079086628998" },
+    { username = "aaireell",         display = "ellyaaa",          id = "" },
+    { username = "trianayaa23",      display = "tiarkive",         id = "1425223281686085713" }, -- [NOTE] duplikat dihapus
+    { username = "longisimusdorsii", display = "strawberry",       id = "1506324307423526913" },
+    { username = "Thismeann",        display = "Oceann",           id = "1463858926394015838" },
+    { username = "hynad27",          display = "jisoo",            id = "1217043654909366323" },
+    { username = "Bintanggg_1111",   display = "niss",             id = "574581489912643603" }, -- [NOTE] sama ID dgn Aurorain
 }
 
 -- ============================================================
@@ -96,11 +93,11 @@ local SecretFishList = {
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan","Fluorivane", "Cerulean Dragon",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen", 
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
     "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
 }
 
@@ -112,73 +109,76 @@ local LegendaryCrystalList = {
 local RubyList = { "Ruby" }
 
 local FishChanceData = {
-    ["Crystal Crab"]             = "1 in 750K",
-    ["Orca"]                     = "1 in 1.5M",
-    ["Zombie Shark"]             = "1 in 250K",
-    ["Zombie Megalodon"]         = "1 in 4M",
-    ["Dead Zombie Shark"]        = "1 in 500K",
-    ["Blob Shark"]               = "1 in 250K",
-    ["Ghost Shark"]              = "1 in 500K",
-    ["Skeleton Narwhal"]         = "1 in 600K",
-    ["Ghost Worm Fish"]          = "1 in 1M",
-    ["Worm Fish"]                = "1 in 3M",
-    ["Megalodon"]                = "1 in 4M",
-    ["1x1x1x1 Comet Shark"]      = "1 in 4M",
-    ["Bloodmoon Whale"]          = "1 in 5M",
-    ["Lochness Monster"]         = "1 in 3M",
-    ["Monster Shark"]            = "1 in 2.5M",
-    ["Eerie Shark"]              = "1 in 250K",
-    ["Great Whale"]              = "1 in 900K",
-    ["Frostborn Shark"]          = "1 in 500K",
-    ["Thin Armored Shark"]       = "1 in 300K",
-    ["Scare"]                    = "1 in 3M",
-    ["Queen Crab"]               = "1 in 800K",
-    ["King Crab"]                = "1 in 1.2M",
-    ["Cryoshade Glider"]         = "1 in 450K",
-    ["Panther Eel"]              = "1 in 750K",
-    ["Giant Squid"]              = "1 in 800K",
-    ["Depthseeker Ray"]          = "1 in 1.2M",
-    ["Robot Kraken"]             = "1 in 3.5M",
-    ["Mosasaur Shark"]           = "1 in 800K",
-    ["King Jelly"]               = "1 in 1.5M",
-    ["Bone Whale"]               = "1 in 2M",
-    ["Elshark Gran Maja"]        = "1 in 4M",
-    ["Elpirate Gran Maja"]       = "1 in 4M",
-    ["ElRetro Gran Maja"]        = "1 in 4M",
-    ["Ancient Whale"]            = "1 in 2.75M",
-    ["Gladiator Shark"]          = "1 in 1M",
-    ["Ancient Lochness Monster"] = "1 in 3M",
-    ["Talon Serpent"]            = "1 in 3M",
-    ["Hacker Shark"]             = "1 in 2M",
-    ["Strawberry Choc Megalodon"]= "1 in 4M",
-    ["Krampus Shark"]            = "1 in 1M",
-    ["Emerald Winter Whale"]     = "1 in 1.5M",
-    ["Winter Frost Shark"]       = "1 in 3M",
-    ["Icebreaker Whale"]         = "1 in 4M",
-    ["Cursed Kraken"]            = "1 in 3M",
-    ["Pirate Megalodon"]         = "1 in 4M",
-    ["Leviathan"]                = "1 in 5M",
-    ["Viridis Lurker"]           = "1 in 1.4M",
-    ["Ancient Magma Whale"]      = "1 in 5M",
-    ["Mutant Runic Koi"]         = "1 in ??",
-    ["Cosmic Mutant Shark"]      = "1 in 2M",
-    ["Strawberry Orca"]          = "1 in 3M",
-    ["Bonemaw Tyrant"]           = "1 in 2.5M",
-    ["Sea Eater"]                = "1 in 25M",
-    ["Thunderzilla"]             = "1 in 30M",
-    ["Iridesca"]                 = "1 in 25M",
-    ["Eggy Enchant Stone"]       = "1 in 100K",
-    ["Deepsea Monster Axolotl"]  = "1 in 2M",
-    ["Blocky Lochness Monster"]  = "1 in 3M",
-    ["Frostbite Leviathan"]      = "1 in 12M",
-    ["Aurelion"]                 = "1 in 3M",
-    ["Runic Enchant Stone"]      = "1 in 1.50M",
-    ["Frogalloon"]               = "1 in 1,50M",
-    ["Fluorivane"]               = "1 in 15M",
-    ["Coral Whale"]              = "1 in 2M",
-    ["Flame Tyrant"]             = "1 in 5M",
-    ["Cerulean Dragon"]          = "1 in 25M",
-    ["Withering Core"]           = "1 in ??",
+    ["Crystal Crab"]              = "1 in 750K",
+    ["Orca"]                      = "1 in 1.5M",
+    ["Zombie Shark"]              = "1 in 250K",
+    ["Zombie Megalodon"]          = "1 in 4M",
+    ["Dead Zombie Shark"]         = "1 in 500K",
+    ["Blob Shark"]                = "1 in 250K",
+    ["Ghost Shark"]               = "1 in 500K",
+    ["Skeleton Narwhal"]          = "1 in 600K",
+    ["Ghost Worm Fish"]           = "1 in 1M",
+    ["Worm Fish"]                 = "1 in 3M",
+    ["Megalodon"]                 = "1 in 4M",
+    ["1x1x1x1 Comet Shark"]       = "1 in 4M",
+    ["Bloodmoon Whale"]           = "1 in 5M",
+    ["Lochness Monster"]          = "1 in 3M",
+    ["Monster Shark"]             = "1 in 2.5M",
+    ["Eerie Shark"]               = "1 in 250K",
+    ["Great Whale"]               = "1 in 900K",
+    ["Frostborn Shark"]           = "1 in 500K",
+    ["Thin Armor Shark"]          = "1 in 300K",  -- FIX: was "Thin Armored Shark" (tidak cocok key SecretFishList)
+    ["Scare"]                     = "1 in 3M",
+    ["Queen Crab"]                = "1 in 800K",
+    ["King Crab"]                 = "1 in 1.2M",
+    ["Cryoshade Glider"]          = "1 in 450K",
+    ["Panther Eel"]               = "1 in 750K",
+    ["Giant Squid"]               = "1 in 800K",
+    ["Depthseeker Ray"]           = "1 in 1.2M",
+    ["Robot Kraken"]              = "1 in 3.5M",
+    ["Mosasaur Shark"]            = "1 in 800K",
+    ["King Jelly"]                = "1 in 1.5M",
+    ["Bone Whale"]                = "1 in 2M",
+    ["Elshark Gran Maja"]         = "1 in 4M",
+    ["Elpirate Gran Maja"]        = "1 in 4M",
+    ["ElRetro Gran Maja"]         = "1 in 4M",
+    ["Ancient Whale"]             = "1 in 2.75M",
+    ["Gladiator Shark"]           = "1 in 1M",
+    ["Ancient Lochness Monster"]  = "1 in 3M",
+    ["Talon Serpent"]             = "1 in 3M",
+    ["Hacker Shark"]              = "1 in 2M",
+    ["Strawberry Choc Megalodon"] = "1 in 4M",
+    ["Krampus Shark"]             = "1 in 1M",
+    ["Emerald Winter Whale"]      = "1 in 1.5M",
+    ["Winter Frost Shark"]        = "1 in 3M",
+    ["Icebreaker Whale"]          = "1 in 4M",
+    ["Cursed Kraken"]             = "1 in 3M",
+    ["Pirate Megalodon"]          = "1 in 4M",
+    ["Leviathan"]                 = "1 in 5M",
+    ["Viridis Lurker"]            = "1 in 1.4M",
+    ["Ancient Magma Whale"]       = "1 in 5M",
+    ["Mutant Runic Koi"]          = "1 in ??",
+    ["Cosmic Mutant Shark"]       = "1 in 2M",
+    ["Strawberry Orca"]           = "1 in 3M",
+    ["Bonemaw Tyrant"]            = "1 in 2.5M",
+    ["Rainbow Comet Shark"]       = "1 in ??",   -- FIX: ditambahkan (ada di SecretFishList tapi tidak ada di ChanceData)
+    ["Love Nessie"]               = "1 in ??",   -- FIX: ditambahkan
+    ["Broken Heart Nessie"]       = "1 in ??",   -- FIX: ditambahkan
+    ["Sea Eater"]                 = "1 in 25M",
+    ["Thunderzilla"]              = "1 in 30M",
+    ["Iridesca"]                  = "1 in 25M",
+    ["Eggy Enchant Stone"]        = "1 in 100K",
+    ["Deepsea Monster Axolotl"]   = "1 in 2M",
+    ["Blocky Lochness Monster"]   = "1 in 3M",
+    ["Frostbite Leviathan"]       = "1 in 12M",
+    ["Aurelion"]                  = "1 in 3M",
+    ["Runic Enchant Stone"]       = "1 in 1.5M",  -- FIX: was "1 in 1.50M" (konsistensi)
+    ["Frogalloon"]                = "1 in 1.5M",  -- FIX: was "1 in 1,50M" (koma → titik)
+    ["Fluorivane"]                = "1 in 15M",
+    ["Coral Whale"]               = "1 in 2M",
+    ["Flame Tyrant"]              = "1 in 5M",
+    ["Cerulean Dragon"]           = "1 in 25M",
+    ["Withering Core"]            = "1 in ??",
 }
 
 local FishImageURL = {
@@ -236,29 +236,55 @@ local FishImageURL = {
     ["Coral Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Coral%20Whale.png",
     ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Runic%20Enchant%20Stone.png",
     ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
-    ["Curelean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
+    ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",  -- FIX: typo "Curelean" → "Cerulean"
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
-
 }
 
 -- ============================================================
 --  STATE / CACHE
 -- ============================================================
 
-local MentionCache    = {}  -- roblox lowercase name → discord id
-local FishImageCache  = {}  -- baseName → asset id (dari backpack)
-local AvatarCache     = {}  -- userId → avatar url
-local LeaveTimers     = {}  -- userId → bool
-local PlayerStats     = {}  -- userId → { catchCount, secretList, joinTime, lastFishTime, name }
-local PlayerNameToId  = {}  -- lowercase name/display → userId
+local MentionCache    = {}
+local FishImageCache  = {}
+local AvatarCache     = {}
+local LeaveTimers     = {}
+local PlayerStats     = {}
+local PlayerNameToId  = {}
 
 local ServerStats = {
-    totalSecret   = 0,
+    totalSecret    = 0,
     totalForgotten = 0,
-    secretLog     = {},
-    forgottenLog  = {},
-    startTime     = 0,
+    secretLog      = {},
+    forgottenLog   = {},
+    startTime      = 0,
 }
+
+-- ============================================================
+--  SAVE CONFIG (writefile / readfile)
+-- ============================================================
+
+local CONFIG_FILE = "bloxgank_config.json"
+
+local function SaveConfig(joinUrl, fishUrl, statsUrl)
+    if not writefile then return end
+    local ok, err = pcall(function()
+        writefile(CONFIG_FILE, HttpService:JSONEncode({
+            webhook_join  = joinUrl  or "",
+            webhook_fish  = fishUrl  or "",
+            webhook_stats = statsUrl or "",
+        }))
+    end)
+    if not ok then warn("[BloxGank] Gagal simpan config: " .. tostring(err)) end
+end
+
+local function LoadConfig()
+    if not readfile or not isfile then return nil end
+    local ok, raw = pcall(function() return readfile(CONFIG_FILE) end)
+    if not ok or not raw or raw == "" then return nil end
+    local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
+    if ok2 and type(data) == "table" then return data end
+    return nil
+end
 
 -- ============================================================
 --  UTILITY
@@ -270,15 +296,6 @@ local function GetRequestFunc()
         or http_request
         or (fluxus and fluxus.request)
         or request
-end
-
-local function GetServerInfo()
-    local ok1, jobId   = pcall(function() return game.JobId end)
-    local ok2, placeId = pcall(function() return tostring(game.PlaceId) end)
-    local jobStr   = (ok1 and jobId ~= "") and jobId or "Unknown"
-    local placeStr = ok2 and placeId or "Unknown"
-    local rejoinLink = "roblox://experiences/start?placeId=" .. placeStr .. "&gameInstanceId=" .. jobStr
-    return jobStr, placeStr, rejoinLink
 end
 
 local function StripTags(str)
@@ -343,11 +360,9 @@ end
 
 local function FindSecretFish(fishName)
     local lower = string.lower(fishName)
-    -- Pass 1: exact match
     for _, baseName in ipairs(SecretFishList) do
         if lower == string.lower(baseName) then return baseName, nil end
     end
-    -- Pass 2: longest substring match
     local bestBase, bestLen, bestMutasi = nil, 0, nil
     for _, baseName in ipairs(SecretFishList) do
         local s = string.find(lower, string.lower(baseName), 1, true)
@@ -358,8 +373,8 @@ local function FindSecretFish(fishName)
                 if mutasi == "" then mutasi = nil end
             end
             if #baseName > bestLen then
-                bestLen   = #baseName
-                bestBase  = baseName
+                bestLen    = #baseName
+                bestBase   = baseName
                 bestMutasi = mutasi
             end
         end
@@ -404,8 +419,8 @@ end
 local function GetFishImageId(item)
     for _, desc in ipairs(item:GetDescendants()) do
         local ok, val = pcall(function()
-            if desc:IsA("SpecialMesh")                          then return desc.TextureId
-            elseif desc:IsA("Decal") or desc:IsA("Texture")    then return desc.Texture
+            if desc:IsA("SpecialMesh")                               then return desc.TextureId
+            elseif desc:IsA("Decal") or desc:IsA("Texture")         then return desc.Texture
             elseif desc:IsA("ImageLabel") or desc:IsA("ImageButton") then return desc.Image
             end
             return nil
@@ -451,7 +466,6 @@ local function PostWebhook(url, body)
     end)
 end
 
--- captionType: "secret" | "forgotten" | "join" | "leave" | "notback" | nil
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
@@ -531,9 +545,9 @@ local function SendLeaderboard()
 
     local uptime = os.time() - ServerStats.startTime
     SendStatsWebhook("🏆 LEADERBOARD SECRET FISH", table.concat(lines, "\n\n"), 16766720, {
-        { name = "⏱️ Uptime",          value = UptimeString(uptime),                                             inline = true },
-        { name = "🦕 Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",           inline = true },
-        { name = "⚜️ Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",        inline = true },
+        { name = "⏱️ Uptime",          value = UptimeString(uptime),                                      inline = true },
+        { name = "🦕 Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
+        { name = "⚜️ Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
     })
 end
 
@@ -577,12 +591,11 @@ local function CheckAndSend(rawMsg)
     local avatarUrl    = GetAvatarUrl(targetPlayer)
     local uid = targetPlayer and targetPlayer.UserId or PlayerNameToId[string.lower(data.player)]
 
-    -- Update player stats
     if uid then
         if not PlayerStats[uid] then
             PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = data.player }
         end
-        PlayerStats[uid].catchCount  = PlayerStats[uid].catchCount + 1
+        PlayerStats[uid].catchCount   = PlayerStats[uid].catchCount + 1
         PlayerStats[uid].lastFishTime = os.time()
     end
 
@@ -613,7 +626,7 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 3. Secret Fish (includes mutated variants)
+    -- 3. Secret Fish (termasuk mutated)
     local baseName, mutasi = FindSecretFish(data.fish)
     if baseName then
         local imageUrl = FishImageURL[baseName]
@@ -650,7 +663,7 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 4. Mutasi non-secret only (no mention)
+    -- 4. Mutasi non-secret (no mention)
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
         SendFishWebhook("✨ MUTASI DETECTED!", nil, 16776960, {
@@ -687,46 +700,20 @@ local function WatchForFish(player)
 end
 
 -- ============================================================
---  CHAT LOG
--- ============================================================
-
-local function SendChatLog(senderName, message)
-    if not SCRIPT_ACTIVE or not message or message == "" then return end
-    local url = (WEBHOOK_CHAT ~= "") and WEBHOOK_CHAT or WEBHOOK_URL
-    if url == "" then return end
-
-    local player   = FindPlayer(senderName)
-    local thumbUrl = player and (AvatarCache[player.UserId] or GetAvatarUrl(player)) or nil
-
-    PostWebhook(url, {
-        username   = "BLOX Gank",
-        avatar_url = WEBHOOK_AVATAR,
-        embeds = { BuildEmbed("💬 CHAT LOG", nil, 5793266, {
-            { name = "👤 Pemain", value = "**" .. senderName .. "**", inline = true  },
-            { name = "💬 Pesan",  value = message,                    inline = false },
-        }, nil, thumbUrl, "BLOX Gank Chat Log") },
-    })
-end
-
--- ============================================================
 --  HOOK CHAT
 -- ============================================================
 
 local function HookChat()
-    -- TextChatService (new system)
     if TextChatService then
         TextChatService.MessageReceived:Connect(function(msg)
             local text = msg.Text or ""
             if msg.TextSource == nil then
                 CheckAndSend(text)
-            else
-                local senderName = msg.TextSource and msg.TextSource.Name or "Unknown"
-                SendChatLog(senderName, text)
             end
+            -- Chat log dihapus sesuai permintaan
         end)
     end
 
-    -- Legacy chat system
     local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
     if chatEvents then
         local onMessage = chatEvents:FindFirstChild("OnMessageDoneFiltering")
@@ -737,10 +724,8 @@ local function HookChat()
                 local isServer = string.find(lowerMsg, "%[server%]") or string.find(lowerMsg, "obtained")
                 if isServer then
                     CheckAndSend(d.Message)
-                else
-                    local sender = d.FromSpeaker or d.SpeakerName or "Unknown"
-                    SendChatLog(sender, d.Message)
                 end
+                -- Chat log dihapus sesuai permintaan
             end)
         end
     end
@@ -765,7 +750,7 @@ local function StartMonitoring()
 
     HookChat()
 
-    -- Leaderboard every 30 minutes
+    -- Leaderboard setiap 30 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(LEADERBOARD_INTERVAL)
@@ -773,14 +758,13 @@ local function StartMonitoring()
         end
     end)
 
-    -- Server stats every 20 minutes
+    -- Server stats setiap 20 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(1200)
             if not SCRIPT_ACTIVE then break end
 
             local uptime = os.time() - ServerStats.startTime
-
             local recentSecret, recentForgotten = {}, {}
             for i = math.max(1, #ServerStats.secretLog - 4), #ServerStats.secretLog do
                 local e = ServerStats.secretLog[i]
@@ -792,11 +776,11 @@ local function StartMonitoring()
             end
 
             SendStatsWebhook("🌐 SERVER STATS", nil, 3447003, {
-                { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                         inline = true  },
-                { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",                     inline = true  },
-                { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",                  inline = true  },
-                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "-",          inline = false },
-                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "-",        inline = false },
+                { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                  inline = true  },
+                { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",               inline = true  },
+                { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",            inline = true  },
+                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "-",   inline = false },
+                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "-", inline = false },
             })
         end
     end)
@@ -804,9 +788,9 @@ local function StartMonitoring()
     -- Init existing players
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
-        AvatarCache[p.UserId]                    = GetAvatarUrl(p)
-        PlayerStats[p.UserId]                    = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name }
-        PlayerNameToId[string.lower(p.Name)]     = p.UserId
+        AvatarCache[p.UserId]                       = GetAvatarUrl(p)
+        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name }
+        PlayerNameToId[string.lower(p.Name)]        = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
         BuildMentionCache(p.Name, p.DisplayName)
     end
@@ -834,16 +818,14 @@ local function StartMonitoring()
     Players.PlayerRemoving:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
 
-        local pName    = player.Name
-        local pId      = player.UserId
+        local pName     = player.Name
+        local pId       = player.UserId
         local avatarUrl = AvatarCache[pId] or GetAvatarUrl(player)
-        local stats    = PlayerStats[pId] or { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil }
-        local totalNow = #Players:GetPlayers() - 1
+        local totalNow  = #Players:GetPlayers() - 1
         local mentionStr = GetMention(pName)
 
-        -- Clear caches
-        AvatarCache[pId]             = nil
-        PlayerStats[pId]             = nil
+        AvatarCache[pId]                    = nil
+        PlayerStats[pId]                    = nil
         PlayerNameToId[string.lower(pName)] = nil
         for k, v in pairs(PlayerNameToId) do if v == pId then PlayerNameToId[k] = nil end end
         MentionCache[string.lower(pName)]   = nil
@@ -883,10 +865,14 @@ local function CreateUI()
     gui.ResetOnSpawn = false
     gui.Parent       = (gethui and gethui()) or CoreGui
 
-    -- Main frame
+    -- Coba load config tersimpan
+    local savedConfig = LoadConfig()
+
+    -- Main frame (height dikurangi karena 2 input dihapus)
+    local FRAME_H = 300
     local frame = Instance.new("Frame")
     frame.Name              = "Main"
-    frame.Size              = UDim2.new(0, 300, 0, 360)
+    frame.Size              = UDim2.new(0, 300, 0, FRAME_H)
     frame.Position          = UDim2.new(0.5, -150, 0.5, -90)
     frame.BackgroundColor3  = Color3.fromRGB(20, 20, 20)
     frame.BorderSizePixel   = 0
@@ -914,15 +900,15 @@ local function CreateUI()
     topBarFix.Parent           = topBar
 
     local title = Instance.new("TextLabel")
-    title.Text              = "🎣 BLOX Gank Monitor"
-    title.Size              = UDim2.new(1, -80, 1, 0)
-    title.Position          = UDim2.new(0, 10, 0, 0)
+    title.Text                   = "🎣 BLOX Gank Monitor"
+    title.Size                   = UDim2.new(1, -80, 1, 0)
+    title.Position               = UDim2.new(0, 10, 0, 0)
     title.BackgroundTransparency = 1
-    title.TextColor3        = Color3.fromRGB(255, 255, 255)
-    title.Font              = Enum.Font.GothamBold
-    title.TextSize          = 13
-    title.TextXAlignment    = Enum.TextXAlignment.Left
-    title.Parent            = topBar
+    title.TextColor3             = Color3.fromRGB(255, 255, 255)
+    title.Font                   = Enum.Font.GothamBold
+    title.TextSize               = 13
+    title.TextXAlignment         = Enum.TextXAlignment.Left
+    title.Parent                 = topBar
 
     local function MakeWinBtn(text, xOffset, bgColor)
         local btn = Instance.new("TextButton")
@@ -943,7 +929,7 @@ local function CreateUI()
     local closeBtn = MakeWinBtn("✕", -28, Color3.fromRGB(200, 50, 50))
 
     local isMinimized = false
-    local fullSize    = UDim2.new(0, 300, 0, 360)
+    local fullSize    = UDim2.new(0, 300, 0, FRAME_H)
     local miniSize    = UDim2.new(0, 300, 0, 36)
 
     minBtn.MouseButton1Click:Connect(function()
@@ -962,11 +948,11 @@ local function CreateUI()
     end)
 
     local function HoverTween(btn, hoverColor, baseColor)
-        btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = hoverColor}):Play() end)
-        btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = baseColor}):Play()  end)
+        btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = hoverColor }):Play() end)
+        btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = baseColor  }):Play() end)
     end
-    HoverTween(minBtn,   Color3.fromRGB(80, 80, 80),   Color3.fromRGB(60, 60, 60))
-    HoverTween(closeBtn, Color3.fromRGB(230, 70, 70),  Color3.fromRGB(200, 50, 50))
+    HoverTween(minBtn,   Color3.fromRGB(80, 80, 80),  Color3.fromRGB(60, 60, 60))
+    HoverTween(closeBtn, Color3.fromRGB(230, 70, 70), Color3.fromRGB(200, 50, 50))
 
     -- Drag
     local dragging, dragStart, startPos
@@ -982,7 +968,7 @@ local function CreateUI()
     end)
     game:GetService("UserInputService").InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta   = input.Position - dragStart
+            local delta    = input.Position - dragStart
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
@@ -997,27 +983,27 @@ local function CreateUI()
     Instance.new("UICorner", statusDot).CornerRadius = UDim.new(1, 0)
 
     local statusLabel = Instance.new("TextLabel")
-    statusLabel.Text              = "Tidak Aktif"
-    statusLabel.Size              = UDim2.new(1, -40, 0, 20)
-    statusLabel.Position          = UDim2.new(0, 30, 0, 38)
+    statusLabel.Text                   = "Tidak Aktif"
+    statusLabel.Size                   = UDim2.new(1, -40, 0, 20)
+    statusLabel.Position               = UDim2.new(0, 30, 0, 38)
     statusLabel.BackgroundTransparency = 1
-    statusLabel.TextColor3        = Color3.fromRGB(180, 180, 180)
-    statusLabel.Font              = Enum.Font.Gotham
-    statusLabel.TextSize          = 11
-    statusLabel.TextXAlignment    = Enum.TextXAlignment.Left
-    statusLabel.Parent            = frame
+    statusLabel.TextColor3             = Color3.fromRGB(180, 180, 180)
+    statusLabel.Font                   = Enum.Font.Gotham
+    statusLabel.TextSize               = 11
+    statusLabel.TextXAlignment         = Enum.TextXAlignment.Left
+    statusLabel.Parent                 = frame
 
     local function MakeLabel(text, yPos)
         local lbl = Instance.new("TextLabel")
-        lbl.Text              = text
-        lbl.Size              = UDim2.new(1, -24, 0, 14)
-        lbl.Position          = UDim2.new(0, 12, 0, yPos)
+        lbl.Text                   = text
+        lbl.Size                   = UDim2.new(1, -24, 0, 14)
+        lbl.Position               = UDim2.new(0, 12, 0, yPos)
         lbl.BackgroundTransparency = 1
-        lbl.TextColor3        = Color3.fromRGB(130, 130, 130)
-        lbl.Font              = Enum.Font.Gotham
-        lbl.TextSize          = 10
-        lbl.TextXAlignment    = Enum.TextXAlignment.Left
-        lbl.Parent            = frame
+        lbl.TextColor3             = Color3.fromRGB(130, 130, 130)
+        lbl.Font                   = Enum.Font.Gotham
+        lbl.TextSize               = 10
+        lbl.TextXAlignment         = Enum.TextXAlignment.Left
+        lbl.Parent                 = frame
         return lbl
     end
 
@@ -1044,22 +1030,83 @@ local function CreateUI()
         return box
     end
 
+    -- Input fields (3 webhook saja, tanpa Role dan Chat)
     MakeLabel("👋 Webhook Join / Leave", 58)
     local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
+
     MakeLabel("🐋 Webhook Secret Fish", 110)
     local inputFish  = MakeInput("Paste webhook secret fish...", 124)
+
     MakeLabel("📊 Webhook Stats", 162)
     local inputStats = MakeInput("Paste webhook stats...", 176)
-    MakeLabel("💬 Webhook Chat Log", 214)
-    local inputChat  = MakeInput("Paste webhook chat log...", 228)
-    MakeLabel("🔔 Discord Role ID (opsional)", 252)
-    local inputRole  = MakeInput("Masukkan Role ID...", 266)
 
-    -- Start button
+    -- ── Toggle Save Config ──────────────────────────────────
+    local saveEnabled = false
+
+    local toggleBg = Instance.new("Frame")
+    toggleBg.Size             = UDim2.new(0, 36, 0, 18)
+    toggleBg.Position         = UDim2.new(1, -48, 0, 215)
+    toggleBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    toggleBg.BorderSizePixel  = 0
+    toggleBg.Parent           = frame
+    Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
+
+    local toggleKnob = Instance.new("Frame")
+    toggleKnob.Size             = UDim2.new(0, 14, 0, 14)
+    toggleKnob.Position         = UDim2.new(0, 2, 0.5, -7)
+    toggleKnob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    toggleKnob.BorderSizePixel  = 0
+    toggleKnob.Parent           = toggleBg
+    Instance.new("UICorner", toggleKnob).CornerRadius = UDim.new(1, 0)
+
+    local toggleLabel = Instance.new("TextLabel")
+    toggleLabel.Text                   = "💾 Simpan Config"
+    toggleLabel.Size                   = UDim2.new(1, -60, 0, 18)
+    toggleLabel.Position               = UDim2.new(0, 12, 0, 213)
+    toggleLabel.BackgroundTransparency = 1
+    toggleLabel.TextColor3             = Color3.fromRGB(130, 130, 130)
+    toggleLabel.Font                   = Enum.Font.Gotham
+    toggleLabel.TextSize               = 10
+    toggleLabel.TextXAlignment         = Enum.TextXAlignment.Left
+    toggleLabel.Parent                 = frame
+
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size                   = UDim2.new(0, 36, 0, 18)
+    toggleBtn.Position               = UDim2.new(1, -48, 0, 215)
+    toggleBtn.BackgroundTransparency = 1
+    toggleBtn.Text                   = ""
+    toggleBtn.BorderSizePixel        = 0
+    toggleBtn.Parent                 = frame
+
+    local function SetToggle(enabled)
+        saveEnabled = enabled
+        TweenService:Create(toggleKnob, TweenInfo.new(0.15), {
+            Position         = enabled and UDim2.new(0, 20, 0.5, -7) or UDim2.new(0, 2, 0.5, -7),
+            BackgroundColor3 = enabled and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(200, 200, 200),
+        }):Play()
+        TweenService:Create(toggleBg, TweenInfo.new(0.15), {
+            BackgroundColor3 = enabled and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(60, 60, 60),
+        }):Play()
+        toggleLabel.TextColor3 = enabled and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(130, 130, 130)
+    end
+
+    toggleBtn.MouseButton1Click:Connect(function()
+        SetToggle(not saveEnabled)
+    end)
+
+    -- Auto-load saved config jika ada
+    if savedConfig then
+        if savedConfig.webhook_join  and savedConfig.webhook_join  ~= "" then inputJoin.Text  = savedConfig.webhook_join  end
+        if savedConfig.webhook_fish  and savedConfig.webhook_fish  ~= "" then inputFish.Text  = savedConfig.webhook_fish  end
+        if savedConfig.webhook_stats and savedConfig.webhook_stats ~= "" then inputStats.Text = savedConfig.webhook_stats end
+        SetToggle(true)
+    end
+
+    -- ── Start Button ────────────────────────────────────────
     local startBtn = Instance.new("TextButton")
     startBtn.Text             = "START MONITORING"
     startBtn.Size             = UDim2.new(1, -24, 0, 34)
-    startBtn.Position         = UDim2.new(0, 12, 0, 304)
+    startBtn.Position         = UDim2.new(0, 12, 0, 250)
     startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
     startBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
     startBtn.Font             = Enum.Font.GothamBold
@@ -1085,21 +1132,23 @@ local function CreateUI()
         WEBHOOK_URL = inputJoin.Text
         if inputFish.Text:find("discord.com/api/webhooks")  then WEBHOOK_FISH  = inputFish.Text  end
         if inputStats.Text:find("discord.com/api/webhooks") then WEBHOOK_STATS = inputStats.Text end
-        if inputChat.Text:find("discord.com/api/webhooks")  then WEBHOOK_CHAT  = inputChat.Text  end
 
-        local roleText = Trim(inputRole.Text)
-        if roleText ~= "" then DISCORD_ROLE_ID = roleText end
+        -- Simpan config jika toggle aktif
+        if saveEnabled then
+            SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS)
+        end
 
         SCRIPT_ACTIVE = true
-        statusDot.BackgroundColor3  = Color3.fromRGB(0, 220, 100)
-        statusLabel.Text            = "Aktif — Monitoring..."
-        statusLabel.TextColor3      = Color3.fromRGB(0, 220, 100)
-        startBtn.Text               = "✅ MONITORING AKTIF"
-        startBtn.BackgroundColor3   = Color3.fromRGB(30, 30, 30)
+        statusDot.BackgroundColor3 = Color3.fromRGB(0, 220, 100)
+        statusLabel.Text           = "Aktif — Monitoring..."
+        statusLabel.TextColor3     = Color3.fromRGB(0, 220, 100)
+        startBtn.Text              = "✅ MONITORING AKTIF"
+        startBtn.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
 
-        for _, box in ipairs({inputJoin, inputFish, inputStats, inputChat, inputRole}) do
+        for _, box in ipairs({ inputJoin, inputFish, inputStats }) do
             box.TextEditable = false
         end
+        toggleBtn.Active = false
 
         StartMonitoring()
     end)
