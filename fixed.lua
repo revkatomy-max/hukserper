@@ -90,7 +90,7 @@ local SecretFishList = {
     "Rainbow Comet Shark", "Love Nessie", "Broken Heart Nessie",
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
-    "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant",
+    "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     -- Forgotten Tier
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
 }
@@ -178,6 +178,7 @@ local FishChanceData = {
     ["Coral Whale"]              = "1 in 2M",
     ["Flame Tyrant"]             = "1 in 5M",
     ["Cerulean Dragon"]          = "1 in 25M",
+    ["Withering Core"]           = "1 in ??",
 }
 
 local FishImageURL = {
@@ -236,6 +237,7 @@ local FishImageURL = {
     ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Runic%20Enchant%20Stone.png",
     ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
     ["Curelean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
+    ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
 
 }
 
