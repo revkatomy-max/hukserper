@@ -16,6 +16,7 @@ local TweenService       = game:GetService("TweenService")
 local WEBHOOK_URL       = ""
 local WEBHOOK_STATS     = ""
 local WEBHOOK_FISH      = ""
+local WEBHOOK_EVENT     = ""   -- ← WEBHOOK EVENT HUNT (baru)
 local WEBHOOK_AVATAR    = ""
 local PROXY             = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE     = false
@@ -29,32 +30,32 @@ local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
 
 local MemberList = {
     -- ── Existing members (updated) ───────────────────────────────────────────────
-    { username = "zupzupzuppasup",   display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" }, -- updated display
-    { username = "natadecxco",       display = "natarebus",            id = "638355599574171668" }, -- updated display
+    { username = "zupzupzuppasup",   display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" },
+    { username = "natadecxco",       display = "natarebus",            id = "638355599574171668" },
     { username = "pyciieegirls",     display = "pyciiiii",             id = "1182254978904109138" },
     { username = "kdryvka",          display = "YIYA",                 id = "1312729486067761162" },
-    { username = "1nhanss",          display = "han",                  id = "1438046472179548190" }, -- ID dipertahankan (data baru konflik dgn pyciieegirls)
+    { username = "1nhanss",          display = "han",                  id = "1438046472179548190" },
     { username = "cjmin131",         display = "Karaadino",            id = "1406639996127154246" },
     { username = "x_ibo21",          display = "wowo",                 id = "954296542406246400" },
     { username = "evosudin",         display = "Bluuism",              id = "875656564931956766" },
-    { username = "minxing_kim",      display = "Minxing",              id = "484295718765461515" }, -- updated display
-    { username = "w4terhyacinth",    display = "waterrr",              id = "1309945598409048076" }, -- updated display
-    { username = "rexlepwz",         display = "Reeamore",             id = "1205780304753725492" }, -- updated display
+    { username = "minxing_kim",      display = "Minxing",              id = "484295718765461515" },
+    { username = "w4terhyacinth",    display = "waterrr",              id = "1309945598409048076" },
+    { username = "rexlepwz",         display = "Reeamore",             id = "1205780304753725492" },
     { username = "dekadekadekk",     display = "dekadee",              id = "692735562817470494" },
     { username = "ceriseciscake",    display = "ciscake",              id = "786950836034994216" },
     { username = "mnikndy",          display = "prettyv",              id = "1478607686345035880" },
-    { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" }, -- updated display
+    { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" },
     { username = "flucidious",       display = "fluc",                 id = "279691238494699530" },
     { username = "hawaish01",        display = "ilywaa",               id = "1392909983678595244" },
     { username = "AcidReign07",      display = "kiixlau",              id = "1393120438594437161" },
     { username = "minyaktalon9990",  display = "Revv2",                id = "870201488218157107" },
-    { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" }, -- sama ID dgn Revv2
+    { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" },
     { username = "fzallzall",        display = "Ziell",                id = "462346945441038337" },
     { username = "cecillionz1",      display = "ceceyy",               id = "1404117087303110877" },
-    { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" }, -- updated display & ID
+    { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" },
     { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
     { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
-    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" }, -- akun alt choalyn
+    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" },
     { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
     { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
     { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
@@ -64,16 +65,15 @@ local MemberList = {
     { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
     { username = "aaireell",         display = "ellyaaa",              id = "" },
     { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
-    { username = "longisimusdorsii", display = "strawberry",           id = "638355599574171668" }, -- updated ID (data baru)
+    { username = "longisimusdorsii", display = "strawberry",           id = "638355599574171668" },
     { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
     { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
     { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
-    -- ── New members ──────────────────────────────────────────────────────────────
-    { username = "Baeforlife",       display = "Jaemin_choa",          id = "1467390946357416060" }, -- akun alt Alyn_ikaa
-    { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" }, -- akun alt Klerra_Asu
-    { username = "kathzeu",          display = "katzu",                id = "669806652375040022" }, -- username tanpa @ (tidak valid di Roblox)
+    { username = "Baeforlife",       display = "Jaemin_choa",          id = "1467390946357416060" },
+    { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" },
+    { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
-    { username = "prada2296",        display = "Prada",                id = "757111417919766648" }, -- sama ID dgn tantecungkring
+    { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
 }
 
 -- ============================================================
@@ -135,7 +135,7 @@ local FishChanceData = {
     ["Eerie Shark"]               = "1 in 250K",
     ["Great Whale"]               = "1 in 900K",
     ["Frostborn Shark"]           = "1 in 500K",
-    ["Thin Armor Shark"]          = "1 in 300K",  -- FIX: was "Thin Armored Shark" (tidak cocok key SecretFishList)
+    ["Thin Armor Shark"]          = "1 in 300K",
     ["Scare"]                     = "1 in 3M",
     ["Queen Crab"]                = "1 in 800K",
     ["King Crab"]                 = "1 in 1.2M",
@@ -169,9 +169,9 @@ local FishChanceData = {
     ["Cosmic Mutant Shark"]       = "1 in 2M",
     ["Strawberry Orca"]           = "1 in 3M",
     ["Bonemaw Tyrant"]            = "1 in 2.5M",
-    ["Rainbow Comet Shark"]       = "1 in ??",   -- FIX: ditambahkan (ada di SecretFishList tapi tidak ada di ChanceData)
-    ["Love Nessie"]               = "1 in ??",   -- FIX: ditambahkan
-    ["Broken Heart Nessie"]       = "1 in ??",   -- FIX: ditambahkan
+    ["Rainbow Comet Shark"]       = "1 in ??",
+    ["Love Nessie"]               = "1 in ??",
+    ["Broken Heart Nessie"]       = "1 in ??",
     ["Sea Eater"]                 = "1 in 25M",
     ["Thunderzilla"]              = "1 in 30M",
     ["Iridesca"]                  = "1 in 25M",
@@ -180,8 +180,8 @@ local FishChanceData = {
     ["Blocky Lochness Monster"]   = "1 in 3M",
     ["Frostbite Leviathan"]       = "1 in 12M",
     ["Aurelion"]                  = "1 in 3M",
-    ["Runic Enchant Stone"]       = "1 in 1.5M",  -- FIX: was "1 in 1.50M" (konsistensi)
-    ["Frogalloon"]                = "1 in 1.5M",  -- FIX: was "1 in 1,50M" (koma → titik)
+    ["Runic Enchant Stone"]       = "1 in 1.5M",
+    ["Frogalloon"]                = "1 in 1.5M",
     ["Fluorivane"]                = "1 in 15M",
     ["Coral Whale"]               = "1 in 2M",
     ["Flame Tyrant"]              = "1 in 5M",
@@ -244,8 +244,77 @@ local FishImageURL = {
     ["Coral Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Coral%20Whale.png",
     ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Runic%20Enchant%20Stone.png",
     ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
-    ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",  -- FIX: typo "Curelean" → "Cerulean"
+    ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
+}
+
+-- ============================================================
+--  EVENT HUNT DATABASE
+--  Deteksi via RE/ReplicateTextEffect (MNA style) + workspace scan
+--
+--  workspaceNames : nama Part/Model di workspace yang muncul saat event aktif
+--                   (sama persis dengan eventTPData di MNA HUB)
+--  effectTypes    : nilai EffectType dari RE/ReplicateTextEffect yang dikirim
+--                   game saat event dimulai
+-- ============================================================
+
+local EventHuntData = {
+    {
+        -- Megalodon Hunt
+        -- Workspace: model bernama "Megalodon Hunt" muncul di area tertentu
+        -- EffectType: "MegalodonHunt" atau "Megalodon" (broadcast ke semua player)
+        workspaceNames = { "Megalodon Hunt" },
+        effectTypes    = { "MegalodonHunt", "Megalodon", "MegalodonSpawn" },
+        title       = "🦈 MEGALODON HUNT DIMULAI!",
+        description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
+        color       = 3447003,
+        emoji       = "🦈",
+        imageUrl    = FishImageURL["Megalodon"] or nil,
+    },
+    {
+        -- Treasure Hunt
+        -- Workspace: model bernama "Treasure" / "TreasureChest" / "Treasure Hunt"
+        -- EffectType: "TreasureHunt" atau "Treasure"
+        workspaceNames = { "Treasure Hunt", "TreasureHunt", "Treasure", "TreasureChest" },
+        effectTypes    = { "TreasureHunt", "Treasure", "TreasureSpawn" },
+        title       = "💰 TREASURE HUNT DIMULAI!",
+        description = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
+        color       = 16766720,
+        emoji       = "💰",
+        imageUrl    = nil,
+    },
+    {
+        -- Thunderzilla Hunt
+        -- Workspace: model bernama "Shocked" (persis di eventTPData MNA)
+        -- EffectType: "Thunderzilla" atau "ThunderzillaHunt"
+        workspaceNames = { "Shocked", "Thunderzilla Hunt", "ThunderzillaHunt", "Thunderzilla" },
+        effectTypes    = { "ThunderzillaHunt", "Thunderzilla", "ThunderzillaSpawn", "Shocked" },
+        title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
+        description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
+        color       = 16776960,
+        emoji       = "⚡",
+        imageUrl    = FishImageURL["Thunderzilla"] or nil,
+    },
+}
+
+-- Cooldown anti-spam per event (detik)
+local EventCooldown          = {}
+local EVENT_COOLDOWN_SECONDS = 120
+
+-- Posisi acuan event (sama seperti MNA eventTPData) untuk validasi workspace scan
+-- agar tidak false-positive dari objek lain yang kebetulan sama namanya
+local EventCheckRadius = 2000   -- radius lebar karena kita cuma butuh tahu "ada/nggak"
+
+local EventWorkspaceLocations = {
+    ["Megalodon Hunt"]  = {
+        Vector3.new(-1076.3,-1.4,1676.2),
+        Vector3.new(-1191.8,-1.4,3597.3),
+        Vector3.new(412.7,-1.4,4134.4),
+    },
+    ["Shocked"]         = {
+        Vector3.new(2071.847,-2.673,15.144),
+    },
+    -- Treasure tidak punya lokasi fixed, scan tanpa filter posisi
 }
 
 -- ============================================================
@@ -273,13 +342,14 @@ local ServerStats = {
 
 local CONFIG_FILE = "bloxgank_config.json"
 
-local function SaveConfig(joinUrl, fishUrl, statsUrl)
+local function SaveConfig(joinUrl, fishUrl, statsUrl, eventUrl)
     if not writefile then return end
     local ok, err = pcall(function()
         writefile(CONFIG_FILE, HttpService:JSONEncode({
             webhook_join  = joinUrl  or "",
             webhook_fish  = fishUrl  or "",
             webhook_stats = statsUrl or "",
+            webhook_event = eventUrl or "",
         }))
     end)
     if not ok then warn("[BloxGank] Gagal simpan config: " .. tostring(err)) end
@@ -520,6 +590,183 @@ local function SendStatsWebhook(title, description, color, fields, imageUrl, thu
 end
 
 -- ============================================================
+--  EVENT HUNT WEBHOOK  ← BARU
+--  Kirim ke WEBHOOK_EVENT (fallback ke WEBHOOK_URL) dengan @everyone
+-- ============================================================
+
+local function SendEventWebhook(eventData, rawMsg)
+    local url = (WEBHOOK_EVENT ~= "") and WEBHOOK_EVENT or WEBHOOK_URL
+    if url == "" then return end
+
+    local allPlayers = Players:GetPlayers()
+    local names = {}
+    for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
+
+    local fields = {
+        { name = "🌐 Server",         value = "**" .. tostring(game.PlaceId) .. "**",           inline = true  },
+        { name = "👥 Player Online",  value = "**" .. tostring(#allPlayers) .. "** orang",       inline = true  },
+        { name = "🎮 Host",           value = "**" .. Players.LocalPlayer.Name .. "**",          inline = true  },
+        { name = "📢 Pesan Server",   value = "```" .. rawMsg:sub(1, 200) .. "```",             inline = false },
+    }
+
+    PostWebhook(url, {
+        username   = "BLOX Gank Event",
+        avatar_url = WEBHOOK_AVATAR,
+        content    = "@everyone\n" .. eventData.emoji .. " **" .. eventData.title .. "**\n" .. eventData.description,
+        embeds     = {
+            BuildEmbed(
+                eventData.title,
+                eventData.description,
+                eventData.color,
+                fields,
+                eventData.imageUrl,
+                nil,
+                "BLOX Gank Event"
+            )
+        },
+    })
+end
+
+-- ============================================================
+--  EVENT HUNT DETECTION  (MNA style)
+--
+--  Dua metode deteksi, sama persis cara MNA HUB:
+--
+--  [1] HookEventRemote  — listen RE/ReplicateTextEffect
+--      Game broadcast remote ini ke semua client saat event muncul.
+--      Data berisi tabel dengan field EffectType (string).
+--      Contoh MNA: exclaimEvent.OnClientEvent → data.TextData.EffectType
+--
+--  [2] StartWorkspaceScan — loop cek workspace setiap 2 detik
+--      Sama persis cara MNA eventTPData mendeteksi model event:
+--      cari Part/Model dengan nama tertentu di workspace,
+--      validasi posisi agar tidak false-positive.
+-- ============================================================
+
+-- ── [1] Hook RE/ReplicateTextEffect ──────────────────────────
+local function HookEventRemote()
+    -- Coba dua cara seperti MNA (GetServerRemote / FindFirstChild langsung)
+    local xr = nil
+    pcall(function()
+        -- cara MNA: iterasi net children, cari label lalu ambil i+1
+        local all = ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net:GetChildren()
+        for i, r in ipairs(all) do
+            if r.Name == "RE/ReplicateTextEffect" then
+                xr = all[i + 1]; break
+            end
+        end
+    end)
+    if not xr then
+        pcall(function()
+            xr = ReplicatedStorage
+                :WaitForChild("Packages", 8)
+                :WaitForChild("_Index",   8)
+                :WaitForChild("sleitnick_net@0.2.0", 8)
+                :WaitForChild("net", 8)
+        end)
+        if xr then
+            local all = xr:GetChildren()
+            xr = nil
+            for i, r in ipairs(all) do
+                if r.Name == "RE/ReplicateTextEffect" then
+                    xr = all[i + 1]; break
+                end
+            end
+        end
+    end
+
+    if not xr then
+        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan — event hook dilewati")
+        return
+    end
+
+    xr.OnClientEvent:Connect(function(data)
+        if not SCRIPT_ACTIVE then return end
+        -- Data dari game bisa berupa tabel flat atau bersarang (TextData)
+        local effectType = ""
+        if type(data) == "table" then
+            effectType = tostring(data.EffectType or (data.TextData and data.TextData.EffectType) or "")
+        elseif type(data) == "string" then
+            effectType = data
+        end
+        if effectType == "" then return end
+
+        local lower = effectType:lower()
+        for _, eventData in ipairs(EventHuntData) do
+            for _, et in ipairs(eventData.effectTypes) do
+                if lower == et:lower() or lower:find(et:lower(), 1, true) then
+                    local now = os.time()
+                    if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
+                        EventCooldown[eventData.title] = now
+                        SendEventWebhook(eventData, "EffectType: " .. effectType)
+                    end
+                    return
+                end
+            end
+        end
+    end)
+end
+
+-- ── [2] Workspace Scan Loop ───────────────────────────────────
+-- Scan workspace setiap 2 detik, cari nama model/part yang cocok.
+-- Validasi posisi jika ada lokasi acuan (EventWorkspaceLocations).
+local function StartWorkspaceScan()
+    task.spawn(function()
+        while true do
+            task.wait(2)
+            if not SCRIPT_ACTIVE then continue end
+
+            for _, eventData in ipairs(EventHuntData) do
+                -- Skip jika masih dalam cooldown
+                local now = os.time()
+                if (now - (EventCooldown[eventData.title] or 0)) < EVENT_COOLDOWN_SECONDS then
+                    continue
+                end
+
+                for _, targetName in ipairs(eventData.workspaceNames) do
+                    -- Cari di seluruh workspace (GetDescendants) seperti MNA
+                    local found = false
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj.Name == targetName then
+                            -- Validasi posisi jika ada data lokasi
+                            local refLocs = EventWorkspaceLocations[targetName]
+                            if refLocs then
+                                local pos = nil
+                                if obj:IsA("BasePart") then
+                                    pos = obj.Position
+                                elseif obj:IsA("Model") and obj.PrimaryPart then
+                                    pos = obj.PrimaryPart.Position
+                                elseif obj:IsA("Model") then
+                                    local cf = pcall(function() return obj:GetModelCFrame() end)
+                                    if cf then pos = cf.Position end
+                                end
+                                if pos then
+                                    for _, loc in ipairs(refLocs) do
+                                        if (pos - loc).Magnitude <= EventCheckRadius then
+                                            found = true; break
+                                        end
+                                    end
+                                end
+                            else
+                                -- Tanpa lokasi acuan (Treasure), langsung dianggap valid
+                                found = true
+                            end
+                        end
+                        if found then break end
+                    end
+
+                    if found then
+                        EventCooldown[eventData.title] = now
+                        SendEventWebhook(eventData, "Workspace: " .. targetName)
+                        break  -- sudah ketemu satu nama, lanjut ke event berikutnya
+                    end
+                end
+            end
+        end
+    end)
+end
+
+-- ============================================================
 --  LEADERBOARD
 -- ============================================================
 
@@ -718,7 +965,6 @@ local function HookChat()
             if msg.TextSource == nil then
                 CheckAndSend(text)
             end
-            -- Chat log dihapus sesuai permintaan
         end)
     end
 
@@ -730,10 +976,10 @@ local function HookChat()
                 if not (d and d.Message) then return end
                 local lowerMsg = string.lower(d.Message)
                 local isServer = string.find(lowerMsg, "%[server%]") or string.find(lowerMsg, "obtained")
+                    
                 if isServer then
                     CheckAndSend(d.Message)
                 end
-                -- Chat log dihapus sesuai permintaan
             end)
         end
     end
@@ -757,6 +1003,16 @@ local function StartMonitoring()
     })
 
     HookChat()
+
+    -- Hook RE/ReplicateTextEffect untuk deteksi event (MNA style)
+    task.spawn(function()
+        task.wait(2)
+        HookEventRemote()
+    end)
+
+    -- Workspace scan untuk deteksi event model (MNA style)
+    StartWorkspaceScan()
+
 
     -- Leaderboard setiap 30 menit
     task.spawn(function()
@@ -876,8 +1132,8 @@ local function CreateUI()
     -- Coba load config tersimpan
     local savedConfig = LoadConfig()
 
-    -- Main frame (height dikurangi karena 2 input dihapus)
-    local FRAME_H = 300
+    -- Main frame (height ditambah untuk input event webhook)
+    local FRAME_H = 350  -- ← naik 50px dari 300
     local frame = Instance.new("Frame")
     frame.Name              = "Main"
     frame.Size              = UDim2.new(0, 300, 0, FRAME_H)
@@ -1038,7 +1294,7 @@ local function CreateUI()
         return box
     end
 
-    -- Input fields (3 webhook saja, tanpa Role dan Chat)
+    -- Input fields (4 webhook: join, fish, stats, event)
     MakeLabel("👋 Webhook Join / Leave", 58)
     local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
 
@@ -1048,12 +1304,16 @@ local function CreateUI()
     MakeLabel("📊 Webhook Stats", 162)
     local inputStats = MakeInput("Paste webhook stats...", 176)
 
+    -- ← BARU: input webhook event hunt
+    MakeLabel("🎯 Webhook Event Hunt (@everyone)", 214)
+    local inputEvent = MakeInput("Paste webhook event hunt...", 228)
+
     -- ── Toggle Save Config ──────────────────────────────────
     local saveEnabled = false
 
     local toggleBg = Instance.new("Frame")
     toggleBg.Size             = UDim2.new(0, 36, 0, 18)
-    toggleBg.Position         = UDim2.new(1, -48, 0, 215)
+    toggleBg.Position         = UDim2.new(1, -48, 0, 268)  -- turun 53px
     toggleBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     toggleBg.BorderSizePixel  = 0
     toggleBg.Parent           = frame
@@ -1070,7 +1330,7 @@ local function CreateUI()
     local toggleLabel = Instance.new("TextLabel")
     toggleLabel.Text                   = "💾 Simpan Config"
     toggleLabel.Size                   = UDim2.new(1, -60, 0, 18)
-    toggleLabel.Position               = UDim2.new(0, 12, 0, 213)
+    toggleLabel.Position               = UDim2.new(0, 12, 0, 266)  -- turun 53px
     toggleLabel.BackgroundTransparency = 1
     toggleLabel.TextColor3             = Color3.fromRGB(130, 130, 130)
     toggleLabel.Font                   = Enum.Font.Gotham
@@ -1080,7 +1340,7 @@ local function CreateUI()
 
     local toggleBtn = Instance.new("TextButton")
     toggleBtn.Size                   = UDim2.new(0, 36, 0, 18)
-    toggleBtn.Position               = UDim2.new(1, -48, 0, 215)
+    toggleBtn.Position               = UDim2.new(1, -48, 0, 268)
     toggleBtn.BackgroundTransparency = 1
     toggleBtn.Text                   = ""
     toggleBtn.BorderSizePixel        = 0
@@ -1107,6 +1367,7 @@ local function CreateUI()
         if savedConfig.webhook_join  and savedConfig.webhook_join  ~= "" then inputJoin.Text  = savedConfig.webhook_join  end
         if savedConfig.webhook_fish  and savedConfig.webhook_fish  ~= "" then inputFish.Text  = savedConfig.webhook_fish  end
         if savedConfig.webhook_stats and savedConfig.webhook_stats ~= "" then inputStats.Text = savedConfig.webhook_stats end
+        if savedConfig.webhook_event and savedConfig.webhook_event ~= "" then inputEvent.Text = savedConfig.webhook_event end
         SetToggle(true)
     end
 
@@ -1114,7 +1375,7 @@ local function CreateUI()
     local startBtn = Instance.new("TextButton")
     startBtn.Text             = "START MONITORING"
     startBtn.Size             = UDim2.new(1, -24, 0, 34)
-    startBtn.Position         = UDim2.new(0, 12, 0, 250)
+    startBtn.Position         = UDim2.new(0, 12, 0, 300)  -- turun 50px
     startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
     startBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
     startBtn.Font             = Enum.Font.GothamBold
@@ -1140,10 +1401,12 @@ local function CreateUI()
         WEBHOOK_URL = inputJoin.Text
         if inputFish.Text:find("discord.com/api/webhooks")  then WEBHOOK_FISH  = inputFish.Text  end
         if inputStats.Text:find("discord.com/api/webhooks") then WEBHOOK_STATS = inputStats.Text end
+        -- ← BARU: simpan webhook event
+        if inputEvent.Text:find("discord.com/api/webhooks") then WEBHOOK_EVENT = inputEvent.Text end
 
         -- Simpan config jika toggle aktif
         if saveEnabled then
-            SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS)
+            SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS, WEBHOOK_EVENT)
         end
 
         SCRIPT_ACTIVE = true
@@ -1153,7 +1416,7 @@ local function CreateUI()
         startBtn.Text              = "✅ MONITORING AKTIF"
         startBtn.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
 
-        for _, box in ipairs({ inputJoin, inputFish, inputStats }) do
+        for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent }) do
             box.TextEditable = false
         end
         toggleBtn.Active = false
