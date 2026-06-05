@@ -258,8 +258,8 @@ local FishImageURL = {
 
 local EventHuntData = {
     {
-        -- Teks konfirmasi: "megalodon hunt event has started"
-        textTriggers = { "megalodon hunt event has started", "megalodon hunt" },
+        -- Confirmed: Text = "Megalodon Hunt"
+        textTriggers = { "megalodon hunt" },
         title       = "🦈 MEGALODON HUNT DIMULAI!",
         description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
         color       = 3447003,
@@ -267,8 +267,8 @@ local EventHuntData = {
         imageUrl    = FishImageURL["Megalodon"] or nil,
     },
     {
-        -- Teks konfirmasi: "treasure hunt event has started"
-        textTriggers = { "treasure hunt event has started", "treasure hunt" },
+        -- Confirmed: Text = "Treasure Hunt"
+        textTriggers = { "treasure hunt" },
         title       = "💰 TREASURE HUNT DIMULAI!",
         description = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
         color       = 16766720,
@@ -276,13 +276,22 @@ local EventHuntData = {
         imageUrl    = nil,
     },
     {
-        -- Teks thunderzilla belum dikonfirmasi, pakai pola serupa
-        textTriggers = { "thunderzilla hunt event has started", "thunderzilla hunt" },
+        -- Confirmed: Text = "Thunderzilla Hunt"
+        textTriggers = { "thunderzilla hunt" },
         title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
         description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
         color       = 16776960,
         emoji       = "⚡",
         imageUrl    = FishImageURL["Thunderzilla"] or nil,
+    },
+    {
+        -- Confirmed: Text = "Mutated" — event mutasi ikan
+        textTriggers = { "mutated" },
+        title       = "🌀 MUTATED EVENT!",
+        description = "Mutated Event sedang berlangsung di server ini!\nChance mutasi ikan meningkat!",
+        color       = 11534336,
+        emoji       = "🌀",
+        imageUrl    = nil,
     },
 }
 
@@ -616,76 +625,69 @@ end
 --  Cooldown 120 detik per event supaya tidak spam.
 -- ============================================================
 
--- ── Helper: ambil semua teks dari data remote (rekursif) ─────
-local function ExtractTexts(data, results)
-    results = results or {}
-    if type(data) == "string" then
-        table.insert(results, data:lower())
-    elseif type(data) == "table" then
-        for _, v in pairs(data) do
-            ExtractTexts(v, results)
-        end
-    end
-    return results
-end
 
--- ── Hook RE/ReplicateTextEffect ──────────────────────────────
+-- ── Hook Event Remote (hash confirmed dari F9 console) ───────
+-- Remote: RE/efd0c381412e8b9fde4ca02bf77c7305b7d0637a01c7798724d30a83cea5c72d
+-- Data format: { CustomDuration=12, Text="Megalodon Hunt", Type="Event", TextColor={...} }
+-- Field yang dicek: Text (lowercase)
+local EVENT_REMOTE_NAME = "RE/efd0c381412e8b9fde4ca02bf77c7305b7d0637a01c7798724d30a83cea5c72d"
+
 local function HookEventRemote()
     local xr = nil
 
-    -- Cara MNA: iterasi net children, cari label "RE/ReplicateTextEffect" lalu ambil i+1
-    pcall(function()
-        local net = ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net
+    -- Cari remote lewat net children (cara MNA)
+    local function findInNet(net)
+        if not net then return nil end
         local all = net:GetChildren()
         for i, r in ipairs(all) do
-            if r.Name == "RE/ReplicateTextEffect" then
-                xr = all[i + 1]; break
+            if r.Name == EVENT_REMOTE_NAME then
+                return all[i + 1]  -- label di i, remote di i+1
             end
         end
-    end)
+        -- Fallback: cari langsung by name
+        return net:FindFirstChild(EVENT_REMOTE_NAME)
+    end
 
-    -- Fallback: coba _index (huruf kecil) seperti versi MNA lain
+    pcall(function()
+        xr = findInNet(ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net)
+    end)
     if not xr then
         pcall(function()
-            local net = ReplicatedStorage
-                :WaitForChild("Packages", 8)
-                :WaitForChild("_index",   8)
-                :WaitForChild("sleitnick_net@0.2.0", 8)
-                :WaitForChild("net", 8)
-            local all = net:GetChildren()
-            for i, r in ipairs(all) do
-                if r.Name == "RE/ReplicateTextEffect" then
-                    xr = all[i + 1]; break
-                end
-            end
+            xr = findInNet(ReplicatedStorage.Packages._index["sleitnick_net@0.2.0"].net)
+        end)
+    end
+    -- Fallback langsung ke ReplicatedStorage
+    if not xr then
+        pcall(function()
+            xr = ReplicatedStorage:FindFirstChild(EVENT_REMOTE_NAME, true)
         end)
     end
 
     if not xr then
-        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan")
+        warn("[BloxGank] Event remote tidak ditemukan — event hook dilewati")
         return
     end
 
-    xr.OnClientEvent:Connect(function(...)
+    xr.OnClientEvent:Connect(function(data)
         if not SCRIPT_ACTIVE then return end
+        if type(data) ~= "table" then return end
 
-        -- Kumpulkan semua string dari semua argumen remote
-        local texts = {}
-        for _, arg in ipairs({...}) do
-            ExtractTexts(arg, texts)
-        end
-        if #texts == 0 then return end
-        local combined = table.concat(texts, " ")
+        -- Ambil field Text dan Type
+        local text = tostring(data.Text or ""):lower()
+        local etype = tostring(data.Type or ""):lower()
+
+        -- Hanya proses kalau Type == "Event"
+        if etype ~= "event" then return end
+        if text == "" then return end
 
         -- Cocokkan dengan textTriggers setiap event
         for _, eventData in ipairs(EventHuntData) do
             for _, trigger in ipairs(eventData.textTriggers) do
-                if combined:find(trigger, 1, true) then
+                if text == trigger:lower() or text:find(trigger:lower(), 1, true) then
                     local now = os.time()
-                    -- Cooldown per event title — FIX SPAM
                     if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
                         EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, combined)
+                        SendEventWebhook(eventData, data.Text or text)
                     end
                     return
                 end
@@ -694,7 +696,7 @@ local function HookEventRemote()
     end)
 end
 
--- StartWorkspaceScan tidak dipakai — deteksi sudah via remote teks
+-- StartWorkspaceScan tidak dipakai
 local function StartWorkspaceScan() end
 
 
