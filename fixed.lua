@@ -65,7 +65,7 @@ local MemberList = {
     { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
     { username = "aaireell",         display = "ellyaaa",              id = "" },
     { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
-    { username = "longisimusdorsii", display = "strawberry",           id = "638355599574171668" },
+    { username = "longisimusdorsii", display = "strawberry",           id = "1506324307423526913" },
     { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
     { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
     { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
@@ -73,7 +73,7 @@ local MemberList = {
     { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" },
     { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
-    { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
+    { username = "prada2296",        display = "Prada",                id = "757111417919766648" },
 }
 
 -- ============================================================
@@ -260,23 +260,17 @@ local FishImageURL = {
 
 local EventHuntData = {
     {
-        -- Megalodon Hunt
-        -- Workspace: model bernama "Megalodon Hunt" muncul di area tertentu
-        -- EffectType: "MegalodonHunt" atau "Megalodon" (broadcast ke semua player)
-        workspaceNames = { "Megalodon Hunt" },
-        effectTypes    = { "MegalodonHunt", "Megalodon", "MegalodonSpawn" },
+        -- Teks konfirmasi: "megalodon hunt event has started"
+        textTriggers = { "megalodon hunt event has started", "megalodon hunt" },
         title       = "🦈 MEGALODON HUNT DIMULAI!",
-        description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
+        description = "Megalodon Hunt sedang berlangsung di server ini!",
         color       = 3447003,
         emoji       = "🦈",
         imageUrl    = FishImageURL["Megalodon"] or nil,
     },
     {
-        -- Treasure Hunt
-        -- Workspace: model bernama "Treasure" / "TreasureChest" / "Treasure Hunt"
-        -- EffectType: "TreasureHunt" atau "Treasure"
-        workspaceNames = { "Treasure Hunt", "TreasureHunt", "Treasure", "TreasureChest" },
-        effectTypes    = { "TreasureHunt", "Treasure", "TreasureSpawn" },
+        -- Teks konfirmasi: "treasure hunt event has started"
+        textTriggers = { "treasure hunt event has started", "treasure hunt" },
         title       = "💰 TREASURE HUNT DIMULAI!",
         description = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
         color       = 16766720,
@@ -284,38 +278,19 @@ local EventHuntData = {
         imageUrl    = nil,
     },
     {
-        -- Thunderzilla Hunt
-        -- Workspace: model bernama "Shocked" (persis di eventTPData MNA)
-        -- EffectType: "Thunderzilla" atau "ThunderzillaHunt"
-        workspaceNames = { "Shocked", "Thunderzilla Hunt", "ThunderzillaHunt", "Thunderzilla" },
-        effectTypes    = { "ThunderzillaHunt", "Thunderzilla", "ThunderzillaSpawn", "Shocked" },
+        -- Teks thunderzilla belum dikonfirmasi, pakai pola serupa
+        textTriggers = { "thunderzilla hunt event has started", "thunderzilla hunt" },
         title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
+        description = "Thunderzilla Hunt sedang berlangsung di server ini!",
         color       = 16776960,
         emoji       = "⚡",
         imageUrl    = FishImageURL["Thunderzilla"] or nil,
     },
 }
 
--- Cooldown anti-spam per event (detik)
+-- Cooldown anti-spam 120 detik per event
 local EventCooldown          = {}
 local EVENT_COOLDOWN_SECONDS = 120
-
--- Posisi acuan event (sama seperti MNA eventTPData) untuk validasi workspace scan
--- agar tidak false-positive dari objek lain yang kebetulan sama namanya
-local EventCheckRadius = 2000   -- radius lebar karena kita cuma butuh tahu "ada/nggak"
-
-local EventWorkspaceLocations = {
-    ["Megalodon Hunt"]  = {
-        Vector3.new(-1076.3,-1.4,1676.2),
-        Vector3.new(-1191.8,-1.4,3597.3),
-        Vector3.new(412.7,-1.4,4134.4),
-    },
-    ["Shocked"]         = {
-        Vector3.new(2071.847,-2.673,15.144),
-    },
-    -- Treasure tidak punya lokasi fixed, scan tanpa filter posisi
-}
 
 -- ============================================================
 --  STATE / CACHE
@@ -548,7 +523,7 @@ local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
     if captionType == "secret" or captionType == "forgotten" then
-        return "Ingfokan spot pliss " .. m
+        return "Bersyukur ya dapet hasil apapun " .. m
     elseif captionType == "leave" then
         return "ke disconect ya? " .. m
     elseif captionType == "join" then
@@ -606,7 +581,7 @@ local function SendEventWebhook(eventData, rawMsg)
         { name = "🌐 Server",         value = "**" .. tostring(game.PlaceId) .. "**",           inline = true  },
         { name = "👥 Player Online",  value = "**" .. tostring(#allPlayers) .. "** orang",       inline = true  },
         { name = "🎮 Host",           value = "**" .. Players.LocalPlayer.Name .. "**",          inline = true  },
-        { name = "📢 Pesan Server",   value = "```" .. rawMsg:sub(1, 200) .. "```",             inline = false },
+        { name = "📢 Teks Event",     value = "```" .. rawMsg:sub(1, 200) .. "```",             inline = false },
     }
 
     PostWebhook(url, {
@@ -632,73 +607,87 @@ end
 --
 --  Dua metode deteksi, sama persis cara MNA HUB:
 --
---  [1] HookEventRemote  — listen RE/ReplicateTextEffect
---      Game broadcast remote ini ke semua client saat event muncul.
---      Data berisi tabel dengan field EffectType (string).
---      Contoh MNA: exclaimEvent.OnClientEvent → data.TextData.EffectType
+--  Deteksi via RE/ReplicateTextEffect (MNA style)
 --
---  [2] StartWorkspaceScan — loop cek workspace setiap 2 detik
---      Sama persis cara MNA eventTPData mendeteksi model event:
---      cari Part/Model dengan nama tertentu di workspace,
---      validasi posisi agar tidak false-positive.
+--  Game kirim teks event ke semua client lewat remote ini.
+--  Teks yang sudah dikonfirmasi:
+--    "treasure hunt event has started"
+--    "megalodon hunt event has started"
+--    "thunderzilla hunt event has started" (kemungkinan, belum konfirmasi)
+--
+--  Cooldown 120 detik per event supaya tidak spam.
 -- ============================================================
 
--- ── [1] Hook RE/ReplicateTextEffect ──────────────────────────
+-- ── Helper: ambil semua teks dari data remote (rekursif) ─────
+local function ExtractTexts(data, results)
+    results = results or {}
+    if type(data) == "string" then
+        table.insert(results, data:lower())
+    elseif type(data) == "table" then
+        for _, v in pairs(data) do
+            ExtractTexts(v, results)
+        end
+    end
+    return results
+end
+
+-- ── Hook RE/ReplicateTextEffect ──────────────────────────────
 local function HookEventRemote()
-    -- Coba dua cara seperti MNA (GetServerRemote / FindFirstChild langsung)
     local xr = nil
+
+    -- Cara MNA: iterasi net children, cari label "RE/ReplicateTextEffect" lalu ambil i+1
     pcall(function()
-        -- cara MNA: iterasi net children, cari label lalu ambil i+1
-        local all = ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net:GetChildren()
+        local net = ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net
+        local all = net:GetChildren()
         for i, r in ipairs(all) do
             if r.Name == "RE/ReplicateTextEffect" then
                 xr = all[i + 1]; break
             end
         end
     end)
+
+    -- Fallback: coba _index (huruf kecil) seperti versi MNA lain
     if not xr then
         pcall(function()
-            xr = ReplicatedStorage
+            local net = ReplicatedStorage
                 :WaitForChild("Packages", 8)
-                :WaitForChild("_Index",   8)
+                :WaitForChild("_index",   8)
                 :WaitForChild("sleitnick_net@0.2.0", 8)
                 :WaitForChild("net", 8)
-        end)
-        if xr then
-            local all = xr:GetChildren()
-            xr = nil
+            local all = net:GetChildren()
             for i, r in ipairs(all) do
                 if r.Name == "RE/ReplicateTextEffect" then
                     xr = all[i + 1]; break
                 end
             end
-        end
+        end)
     end
 
     if not xr then
-        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan — event hook dilewati")
+        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan")
         return
     end
 
-    xr.OnClientEvent:Connect(function(data)
+    xr.OnClientEvent:Connect(function(...)
         if not SCRIPT_ACTIVE then return end
-        -- Data dari game bisa berupa tabel flat atau bersarang (TextData)
-        local effectType = ""
-        if type(data) == "table" then
-            effectType = tostring(data.EffectType or (data.TextData and data.TextData.EffectType) or "")
-        elseif type(data) == "string" then
-            effectType = data
-        end
-        if effectType == "" then return end
 
-        local lower = effectType:lower()
+        -- Kumpulkan semua string dari semua argumen remote
+        local texts = {}
+        for _, arg in ipairs({...}) do
+            ExtractTexts(arg, texts)
+        end
+        if #texts == 0 then return end
+        local combined = table.concat(texts, " ")
+
+        -- Cocokkan dengan textTriggers setiap event
         for _, eventData in ipairs(EventHuntData) do
-            for _, et in ipairs(eventData.effectTypes) do
-                if lower == et:lower() or lower:find(et:lower(), 1, true) then
+            for _, trigger in ipairs(eventData.textTriggers) do
+                if combined:find(trigger, 1, true) then
                     local now = os.time()
+                    -- Cooldown per event title — FIX SPAM
                     if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
                         EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, "EffectType: " .. effectType)
+                        SendEventWebhook(eventData, combined)
                     end
                     return
                 end
@@ -707,64 +696,8 @@ local function HookEventRemote()
     end)
 end
 
--- ── [2] Workspace Scan Loop ───────────────────────────────────
--- Scan workspace setiap 2 detik, cari nama model/part yang cocok.
--- Validasi posisi jika ada lokasi acuan (EventWorkspaceLocations).
-local function StartWorkspaceScan()
-    task.spawn(function()
-        while true do
-            task.wait(2)
-            if not SCRIPT_ACTIVE then continue end
-
-            for _, eventData in ipairs(EventHuntData) do
-                -- Skip jika masih dalam cooldown
-                local now = os.time()
-                if (now - (EventCooldown[eventData.title] or 0)) < EVENT_COOLDOWN_SECONDS then
-                    continue
-                end
-
-                for _, targetName in ipairs(eventData.workspaceNames) do
-                    -- Cari di seluruh workspace (GetDescendants) seperti MNA
-                    local found = false
-                    for _, obj in ipairs(workspace:GetDescendants()) do
-                        if obj.Name == targetName then
-                            -- Validasi posisi jika ada data lokasi
-                            local refLocs = EventWorkspaceLocations[targetName]
-                            if refLocs then
-                                local pos = nil
-                                if obj:IsA("BasePart") then
-                                    pos = obj.Position
-                                elseif obj:IsA("Model") and obj.PrimaryPart then
-                                    pos = obj.PrimaryPart.Position
-                                elseif obj:IsA("Model") then
-                                    local cf = pcall(function() return obj:GetModelCFrame() end)
-                                    if cf then pos = cf.Position end
-                                end
-                                if pos then
-                                    for _, loc in ipairs(refLocs) do
-                                        if (pos - loc).Magnitude <= EventCheckRadius then
-                                            found = true; break
-                                        end
-                                    end
-                                end
-                            else
-                                -- Tanpa lokasi acuan (Treasure), langsung dianggap valid
-                                found = true
-                            end
-                        end
-                        if found then break end
-                    end
-
-                    if found then
-                        EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, "Workspace: " .. targetName)
-                        break  -- sudah ketemu satu nama, lanjut ke event berikutnya
-                    end
-                end
-            end
-        end
-    end)
-end
+-- StartWorkspaceScan tidak dipakai — deteksi sudah via remote teks
+local function StartWorkspaceScan() end
 
 -- ============================================================
 --  LEADERBOARD
