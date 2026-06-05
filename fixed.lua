@@ -72,6 +72,7 @@ local MemberList = {
     { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
     { username = "prada2296",        display = "Prada",                id = "757111417919766648" },
+    { username = "bluesjjong",        display = "raxye",               id = "1205780304753725492" },
 }
 
 -- ============================================================
@@ -626,26 +627,26 @@ end
 -- ============================================================
 
 
--- ── Hook Event Remote (hash confirmed dari F9 console) ───────
--- Remote: RE/efd0c381412e8b9fde4ca02bf77c7305b7d0637a01c7798724d30a83cea5c72d
--- Data format: { CustomDuration=12, Text="Megalodon Hunt", Type="Event", TextColor={...} }
--- Field yang dicek: Text (lowercase)
-local EVENT_REMOTE_NAME = "RE/efd0c381412e8b9fde4ca02bf77c7305b7d0637a01c7798724d30a83cea5c72d"
+-- ── Hook RE/ReplicateTextEffect (confirmed dari F9 console) ──
+-- Remote: RE/ReplicateTextEffect
+-- Data format: { Channel="All", TextData={ AttachTo=nil, Text="Shark Hunt",
+--               EffectType="TextNotification", CustomDuration=12,
+--               Type="Event", TextColor={R,G,B} } }
+-- Field yang dicek: TextData.Text + TextData.Type == "Event"
 
 local function HookEventRemote()
     local xr = nil
 
-    -- Cari remote lewat net children (cara MNA)
-    local function findInNet(net)
-        if not net then return nil end
-        local all = net:GetChildren()
+    -- Cara MNA: cari label "RE/ReplicateTextEffect" di net, ambil i+1
+    local function findInNet(netFolder)
+        if not netFolder then return nil end
+        local all = netFolder:GetChildren()
         for i, r in ipairs(all) do
-            if r.Name == EVENT_REMOTE_NAME then
-                return all[i + 1]  -- label di i, remote di i+1
+            if r.Name == "RE/ReplicateTextEffect" then
+                return all[i + 1]
             end
         end
-        -- Fallback: cari langsung by name
-        return net:FindFirstChild(EVENT_REMOTE_NAME)
+        return netFolder:FindFirstChild("RE/ReplicateTextEffect")
     end
 
     pcall(function()
@@ -656,15 +657,14 @@ local function HookEventRemote()
             xr = findInNet(ReplicatedStorage.Packages._index["sleitnick_net@0.2.0"].net)
         end)
     end
-    -- Fallback langsung ke ReplicatedStorage
     if not xr then
         pcall(function()
-            xr = ReplicatedStorage:FindFirstChild(EVENT_REMOTE_NAME, true)
+            xr = ReplicatedStorage:FindFirstChild("RE/ReplicateTextEffect", true)
         end)
     end
 
     if not xr then
-        warn("[BloxGank] Event remote tidak ditemukan — event hook dilewati")
+        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan — event hook dilewati")
         return
     end
 
@@ -672,9 +672,12 @@ local function HookEventRemote()
         if not SCRIPT_ACTIVE then return end
         if type(data) ~= "table" then return end
 
-        -- Ambil field Text dan Type
-        local text = tostring(data.Text or ""):lower()
-        local etype = tostring(data.Type or ""):lower()
+        -- Data ada di dalam TextData (confirmed dari F9 output)
+        local td = data.TextData
+        if type(td) ~= "table" then return end
+
+        local text  = tostring(td.Text  or ""):lower()
+        local etype = tostring(td.Type  or ""):lower()
 
         -- Hanya proses kalau Type == "Event"
         if etype ~= "event" then return end
@@ -687,7 +690,7 @@ local function HookEventRemote()
                     local now = os.time()
                     if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
                         EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, data.Text or text)
+                        SendEventWebhook(eventData, td.Text or text)
                     end
                     return
                 end
