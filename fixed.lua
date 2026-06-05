@@ -21,8 +21,6 @@ local WEBHOOK_AVATAR    = ""
 local PROXY             = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE     = false
 
-local LEADERBOARD_INTERVAL = 1800  -- 30 menit (detik)
-
 -- ============================================================
 --  MEMBER LIST
 --  Format: { username = "RobloxUsername", display = "DisplayName", id = "DiscordID" }
@@ -65,7 +63,7 @@ local MemberList = {
     { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
     { username = "aaireell",         display = "ellyaaa",              id = "" },
     { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
-    { username = "longisimusdorsii", display = "strawberry",           id = "1506324307423526913" },
+    { username = "longisimusdorsii", display = "strawberry",           id = "638355599574171668" },
     { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
     { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
     { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
@@ -263,7 +261,7 @@ local EventHuntData = {
         -- Teks konfirmasi: "megalodon hunt event has started"
         textTriggers = { "megalodon hunt event has started", "megalodon hunt" },
         title       = "🦈 MEGALODON HUNT DIMULAI!",
-        description = "Megalodon Hunt sedang berlangsung di server ini!",
+        description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
         color       = 3447003,
         emoji       = "🦈",
         imageUrl    = FishImageURL["Megalodon"] or nil,
@@ -281,7 +279,7 @@ local EventHuntData = {
         -- Teks thunderzilla belum dikonfirmasi, pakai pola serupa
         textTriggers = { "thunderzilla hunt event has started", "thunderzilla hunt" },
         title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description = "Thunderzilla Hunt sedang berlangsung di server ini!",
+        description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
         color       = 16776960,
         emoji       = "⚡",
         imageUrl    = FishImageURL["Thunderzilla"] or nil,
@@ -523,7 +521,7 @@ local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
     if captionType == "secret" or captionType == "forgotten" then
-        return "Bersyukur ya dapet hasil apapun " .. m
+        return "Ingfokan spot pliss " .. m
     elseif captionType == "leave" then
         return "ke disconect ya? " .. m
     elseif captionType == "join" then
@@ -699,45 +697,7 @@ end
 -- StartWorkspaceScan tidak dipakai — deteksi sudah via remote teks
 local function StartWorkspaceScan() end
 
--- ============================================================
---  LEADERBOARD
--- ============================================================
 
-local function SendLeaderboard()
-    local leaderData = {}
-    for uid, stats in pairs(PlayerStats) do
-        local total, fishList = 0, {}
-        for fishName, count in pairs(stats.secretList) do
-            total = total + count
-            table.insert(fishList, fishName .. " x" .. count)
-        end
-        if total > 0 then
-            table.insert(leaderData, {
-                name    = stats.name or "Unknown",
-                total   = total,
-                fishStr = #fishList > 0 and table.concat(fishList, ", ") or "-",
-            })
-        end
-    end
-
-    table.sort(leaderData, function(a, b) return a.total > b.total end)
-    if #leaderData == 0 then return end
-
-    local medals = { "🥇", "🥈", "🥉" }
-    local lines  = {}
-    for i, entry in ipairs(leaderData) do
-        if i > 10 then break end
-        local medal = medals[i] or ("**#" .. i .. "**")
-        table.insert(lines, medal .. " **" .. entry.name .. "** — " .. entry.total .. " secret\n↳ " .. entry.fishStr)
-    end
-
-    local uptime = os.time() - ServerStats.startTime
-    SendStatsWebhook("🏆 LEADERBOARD SECRET FISH", table.concat(lines, "\n\n"), 16766720, {
-        { name = "⏱️ Uptime",          value = UptimeString(uptime),                                      inline = true },
-        { name = "🦕 Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
-        { name = "⚜️ Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
-    })
-end
 
 -- ============================================================
 --  CHAT PARSING & DETECTION
@@ -946,14 +906,6 @@ local function StartMonitoring()
     -- Workspace scan untuk deteksi event model (MNA style)
     StartWorkspaceScan()
 
-
-    -- Leaderboard setiap 30 menit
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(LEADERBOARD_INTERVAL)
-            if SCRIPT_ACTIVE then SendLeaderboard() end
-        end
-    end)
 
     -- Server stats setiap 20 menit
     task.spawn(function()
