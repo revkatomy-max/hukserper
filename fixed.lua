@@ -71,8 +71,8 @@ local MemberList = {
     { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" },
     { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
-    { username = "prada2296",        display = "Prada",                id = "757111417919766648" },
-    { username = "bluesjjong",        display = "raxye",               id = "1205780304753725492" },
+    { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
+    { username = "bluesjjong",        display = "raxye",                id = "1205780304753725492" },
 }
 
 -- ============================================================
@@ -259,39 +259,59 @@ local FishImageURL = {
 
 local EventHuntData = {
     {
-        -- Confirmed: Text = "Megalodon Hunt"
         textTriggers = { "megalodon hunt" },
         title       = "🦈 MEGALODON HUNT DIMULAI!",
-        description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
+        description = "Megalodon Hunt sedang berlangsung!",
         color       = 3447003,
         emoji       = "🦈",
         imageUrl    = FishImageURL["Megalodon"] or nil,
     },
     {
-        -- Confirmed: Text = "Treasure Hunt"
-        textTriggers = { "treasure hunt" },
-        title       = "💰 TREASURE HUNT DIMULAI!",
-        description = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
-        color       = 16766720,
-        emoji       = "💰",
-        imageUrl    = nil,
-    },
-    {
-        -- Confirmed: Text = "Thunderzilla Hunt"
-        textTriggers = { "thunderzilla hunt" },
+        textTriggers = { "thunderzilla hunt", "thunderzilla" },
         title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
+        description = "Thunderzilla Hunt sedang berlangsung!",
         color       = 16776960,
         emoji       = "⚡",
         imageUrl    = FishImageURL["Thunderzilla"] or nil,
     },
     {
-        -- Confirmed: Text = "Mutated" — event mutasi ikan
+        textTriggers = { "shark hunt" },
+        title       = "🦈 SHARK HUNT DIMULAI!",
+        description = "Shark Hunt sedang berlangsung di server ini!\nSegera join!",
+        color       = 15158332,
+        emoji       = "🦈",
+        imageUrl    = nil,
+    },
+    {
+        textTriggers = { "ghost shark hunt", "ghost shark" },
+        title       = "👻 GHOST SHARK HUNT DIMULAI!",
+        description = "Ghost Shark Hunt sedang berlangsung",
+        color       = 9807270,
+        emoji       = "👻",
+        imageUrl    = FishImageURL["Ghost Shark"] or nil,
+    },
+    {
+        textTriggers = { "increased luck", "incrased luck", "luck boost", "luck increased" },
+        title       = "🍀 INCREASED LUCK EVENT!",
+        description = "Increased Luck sedang aktif di server ini!!",
+        color       = 65280,
+        emoji       = "🍀",
+        imageUrl    = nil,
+    },
+    {
         textTriggers = { "mutated" },
         title       = "🌀 MUTATED EVENT!",
-        description = "Mutated Event sedang berlangsung di server ini!\nChance mutasi ikan meningkat!",
+        description = "Mutated Event sedang berlangsung!",
         color       = 11534336,
         emoji       = "🌀",
+        imageUrl    = nil,
+    },
+    {
+        textTriggers = { "treasure hunt" },
+        title       = "💰 TREASURE HUNT DIMULAI!",
+        description = "Treasure Hunt sedang berlangsung!",
+        color       = 16766720,
+        emoji       = "💰",
         imageUrl    = nil,
     },
 }
@@ -627,75 +647,96 @@ end
 -- ============================================================
 
 
--- ── Hook RE/ReplicateTextEffect (confirmed dari F9 console) ──
--- Remote: RE/ReplicateTextEffect
--- Data format: { Channel="All", TextData={ AttachTo=nil, Text="Shark Hunt",
---               EffectType="TextNotification", CustomDuration=12,
---               Type="Event", TextColor={R,G,B} } }
--- Field yang dicek: TextData.Text + TextData.Type == "Event"
+-- ── Monitor PlayerGui EventTile Label (confirmed dari debug) ─
+-- Path: PlayerGui.TextNotifications.Frame.EventTile.TextFrame.Label
+-- Text yang muncul: "Megalodon Hunt", "Treasure Hunt", "Shark Hunt", dll
+-- Type label langsung berubah saat event spawn (lokal, bukan remote)
 
 local function HookEventRemote()
-    local xr = nil
-
-    -- Cara MNA: cari label "RE/ReplicateTextEffect" di net, ambil i+1
-    local function findInNet(netFolder)
-        if not netFolder then return nil end
-        local all = netFolder:GetChildren()
-        for i, r in ipairs(all) do
-            if r.Name == "RE/ReplicateTextEffect" then
-                return all[i + 1]
-            end
-        end
-        return netFolder:FindFirstChild("RE/ReplicateTextEffect")
-    end
-
-    pcall(function()
-        xr = findInNet(ReplicatedStorage.Packages._Index["sleitnick_net@0.2.0"].net)
-    end)
-    if not xr then
-        pcall(function()
-            xr = findInNet(ReplicatedStorage.Packages._index["sleitnick_net@0.2.0"].net)
-        end)
-    end
-    if not xr then
-        pcall(function()
-            xr = ReplicatedStorage:FindFirstChild("RE/ReplicateTextEffect", true)
-        end)
-    end
-
-    if not xr then
-        warn("[BloxGank] RE/ReplicateTextEffect tidak ditemukan — event hook dilewati")
+    local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 10)
+    if not pg then
+        warn("[BloxGank] PlayerGui tidak ditemukan")
         return
     end
 
-    xr.OnClientEvent:Connect(function(data)
+    -- Fungsi cek teks apakah cocok dengan event
+    local function checkText(text)
         if not SCRIPT_ACTIVE then return end
-        if type(data) ~= "table" then return end
+        if not text or text == "" then return end
+        local lower = text:lower()
 
-        -- Data ada di dalam TextData (confirmed dari F9 output)
-        local td = data.TextData
-        if type(td) ~= "table" then return end
-
-        local text  = tostring(td.Text  or ""):lower()
-        local etype = tostring(td.Type  or ""):lower()
-
-        -- Hanya proses kalau Type == "Event"
-        if etype ~= "event" then return end
-        if text == "" then return end
-
-        -- Cocokkan dengan textTriggers setiap event
         for _, eventData in ipairs(EventHuntData) do
             for _, trigger in ipairs(eventData.textTriggers) do
-                if text == trigger:lower() or text:find(trigger:lower(), 1, true) then
+                if lower == trigger or lower:find(trigger, 1, true) then
                     local now = os.time()
                     if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
                         EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, td.Text or text)
+                        SendEventWebhook(eventData, text)
                     end
                     return
                 end
             end
         end
+    end
+
+    -- Hook label yang sudah ada
+    local function hookLabel(label)
+        checkText(label.Text)
+        label:GetPropertyChangedSignal("Text"):Connect(function()
+            checkText(label.Text)
+        end)
+    end
+
+    -- Rekursif hook semua TextLabel di suatu instance
+    local function hookAllLabels(parent)
+        for _, v in ipairs(parent:GetDescendants()) do
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                hookLabel(v)
+            end
+        end
+        parent.DescendantAdded:Connect(function(v)
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                task.wait(0.05)
+                hookLabel(v)
+            end
+        end)
+    end
+
+    -- Monitor TextNotifications GUI (path yang sudah dikonfirmasi)
+    local function tryHookTextNotif()
+        local tn = pg:FindFirstChild("TextNotifications")
+        if tn then
+            hookAllLabels(tn)
+            return true
+        end
+        return false
+    end
+
+    -- Langsung coba hook kalau sudah ada
+    if not tryHookTextNotif() then
+        -- Kalau belum ada, tunggu sampai muncul
+        pg.ChildAdded:Connect(function(child)
+            if child.Name == "TextNotifications" then
+                task.wait(0.1)
+                hookAllLabels(child)
+            end
+        end)
+    end
+
+    -- Fallback: monitor semua GUI baru di PlayerGui
+    pg.ChildAdded:Connect(function(child)
+        task.wait(0.1)
+        for _, v in ipairs(child:GetDescendants()) do
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                hookLabel(v)
+            end
+        end
+        child.DescendantAdded:Connect(function(v)
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                task.wait(0.05)
+                hookLabel(v)
+            end
+        end)
     end)
 end
 
