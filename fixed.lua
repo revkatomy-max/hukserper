@@ -1,8 +1,7 @@
 -- ============================================================
 --  BLOX Gank Server Monitor  |  Discord: @bloxgank
---  Event Monitor: Megalodon Hunt / Thunderzilla Hunt / Treasure Hunt
---  + Shark Hunt / Ghost Shark Hunt / Worm Hunt / Black Hole / Meteor Rain
---  Deteksi via PlayerGui.Texts.Frame.EventTile.TextFrame
+--  Event Monitor: Megalodon / Thunderzilla / Treasure / Shark Hunt dll
+--  Deteksi via PlayerGui (hook semua TextLabel perubahan teks)
 -- ============================================================
 
 local HttpService        = game:GetService("HttpService")
@@ -19,13 +18,13 @@ local TweenService       = game:GetService("TweenService")
 local WEBHOOK_URL    = ""
 local WEBHOOK_STATS  = ""
 local WEBHOOK_FISH   = ""
-local WEBHOOK_EVENT  = ""   -- khusus event @everyone, jika kosong pakai WEBHOOK_URL
+local WEBHOOK_EVENT  = ""
 local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
 
-local LEADERBOARD_INTERVAL = 1800  -- 30 menit
-local EVENT_COOLDOWN       = 180   -- cooldown per event (detik), cegah spam
+local LEADERBOARD_INTERVAL    = 1800
+local EVENT_COOLDOWN_SECONDS  = 120
 
 -- ============================================================
 --  MEMBER LIST
@@ -77,25 +76,23 @@ local MemberList = {
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
     { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
     { username = "bluesjjong",       display = "raxye",                id = "1205780304753725492" },
-    { username = "Rambo_4200",       display = "RTBxRamboMYST",                id = "1472822553830621362" },
-    { username = "iloafieus",          display = "mavis",          id = "1440589079086628998" },
-    { username = "PumpPump369",        display = "PumpPump",       id = "602890650345537555"  },
-    { username = "Rainoruby",          display = "rain",           id = "602890650345537555"  },
-    { username = "Reinoruby",          display = "ujan",           id = "602890650345537555"  },
-    { username = "Matchafav17",        display = "Macaaa",         id = "1478634976990859304" },
-    { username = "Binxxx22",           display = "BinxPVNK77",     id = "952992106421579796"  },
-    { username = "Lacherve",           display = "RaraPVNK77",     id = "952992106421579796"  },
-    { username = "biruneptunus",       display = "BiruKC",         id = "962866204203167774"  },
-    { username = "univastic",          display = "ciel",           id = "1356280326548230274" },
-    { username = "Rambo_4209",         display = "SHOPEFOOD",      id = "1472822553830621362" },
-    { username = "ZatzaMMay",          display = "TuyulGomenarai", id = "892353508160970773"  },
-    { username = "WaifunyaGomenarai",  display = "aci",            id = "892353508160970773"  },
+    { username = "Rambo_4200",       display = "RTBxRamboMYST",        id = "1472822553830621362" },
+    { username = "PumpPump369",      display = "PumpPump",             id = "602890650345537555"  },
+    { username = "Rainoruby",        display = "rain",                 id = "602890650345537555"  },
+    { username = "Reinoruby",        display = "ujan",                 id = "602890650345537555"  },
+    { username = "Binxxx22",         display = "BinxPVNK77",           id = "952992106421579796"  },
+    { username = "Lacherve",         display = "RaraPVNK77",           id = "952992106421579796"  },
+    { username = "biruneptunus",     display = "BiruKC",               id = "962866204203167774"  },
+    { username = "univastic",        display = "ciel",                 id = "1356280326548230274" },
+    { username = "Rambo_4209",       display = "SHOPEFOOD",            id = "1472822553830621362" },
+    { username = "ZatzaMMay",        display = "TuyulGomenarai",       id = "892353508160970773"  },
+    { username = "WaifunyaGomenarai",display = "aci",                  id = "892353508160970773"  },
 }
 
 -- ============================================================
 --  DATABASE
 -- ============================================================
- 
+
 local SecretFishList = {
     "Crystal Crab", "Orca", "Zombie Shark", "Zombie Megalodon", "Dead Zombie Shark",
     "Blob Shark", "Ghost Shark", "Skeleton Narwhal", "Ghost Worm Fish", "Worm Fish",
@@ -112,26 +109,22 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
-    -- Forgotten Tier
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
 }
- 
+
 local ForgottenList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
 }
- 
+
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
     "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
 }
- 
+
 local LegendaryCrystalList = {
-    "Blue Sea Dragon", "Star Snail", "Cute Dumbo",
-    "Blossom Jelly", "Bioluminescent Octopus",
+    "Blue Sea Dragon", "Star Snail", "Cute Dumbo", "Blossom Jelly", "Bioluminescent Octopus",
 }
- 
-local RubyList = { "Ruby" }
- 
+
 local FishChanceData = {
     ["Crystal Crab"]              = "1 in 750K",
     ["Orca"]                      = "1 in 1.5M",
@@ -204,7 +197,7 @@ local FishChanceData = {
     ["Cerulean Dragon"]           = "1 in 25M",
     ["Withering Core"]            = "1 in ??",
 }
- 
+
 local FishImageURL = {
     ["Monster Shark"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Monster%20Shark.png",
     ["Megalodon"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Megalodon.png",
@@ -263,91 +256,86 @@ local FishImageURL = {
     ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
 }
- 
+
 -- ============================================================
 --  EVENT HUNT DATABASE
---  Deteksi via RE/ReplicateTextEffect (MNA style) + workspace scan
---
---  workspaceNames : nama Part/Model di workspace yang muncul saat event aktif
---                   (sama persis dengan eventTPData di MNA HUB)
---  effectTypes    : nilai EffectType dari RE/ReplicateTextEffect yang dikirim
---                   game saat event dimulai
 -- ============================================================
- 
+
 local EventHuntData = {
     {
+        -- FIX: trigger harus cocok dengan teks Label saja ("Treasure Hunt")
+        -- bukan full sentence, karena Label & Header adalah 2 label terpisah
+        textTriggers = { "treasure hunt" },
+        title        = "💰 TREASURE HUNT DIMULAI!",
+        description  = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
+        color        = 16766720,
+        emoji        = "💰",
+        imageUrl     = nil,
+    },
+    {
         textTriggers = { "megalodon hunt" },
-        title       = "🦈 MEGALODON HUNT DIMULAI!",
-        description = "Megalodon Hunt sedang berlangsung di server ini!\nSegera join dan cari Megalodon sebelum habis!",
-        color       = 3447003,
-        emoji       = "🦈",
-        imageUrl    = FishImageURL["Megalodon"] or nil,
+        title        = "🦈 MEGALODON HUNT DIMULAI!",
+        description  = "Megalodon Hunt sedang berlangsung!\nSegera join sebelum habis!",
+        color        = 3447003,
+        emoji        = "🦈",
+        imageUrl     = FishImageURL["Megalodon"],
     },
     {
         textTriggers = { "thunderzilla hunt", "thunderzilla" },
-        title       = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description = "Thunderzilla Hunt sedang berlangsung di server ini!\nSegera join — ini Forgotten Tier!",
-        color       = 16776960,
-        emoji       = "⚡",
-        imageUrl    = FishImageURL["Thunderzilla"] or nil,
+        title        = "⚡ THUNDERZILLA HUNT DIMULAI!",
+        description  = "Thunderzilla Hunt sedang berlangsung!\nIni Forgotten Tier — jangan sampai miss!",
+        color        = 16776960,
+        emoji        = "⚡",
+        imageUrl     = FishImageURL["Thunderzilla"],
     },
     {
         textTriggers = { "shark hunt" },
-        title       = "🦈 SHARK HUNT DIMULAI!",
-        description = "Shark Hunt sedang berlangsung di server ini!\nSegera join!",
-        color       = 15158332,
-        emoji       = "🦈",
-        imageUrl    = nil,
+        title        = "🦈 SHARK HUNT DIMULAI!",
+        description  = "Shark Hunt sedang berlangsung di server ini!",
+        color        = 15158332,
+        emoji        = "🦈",
+        imageUrl     = nil,
     },
     {
-        textTriggers = { "ghost shark hunt", "ghost shark" },
-        title       = "👻 GHOST SHARK HUNT DIMULAI!",
-        description = "Ghost Shark Hunt sedang berlangsung di server ini!\nSegera join!",
-        color       = 9807270,
-        emoji       = "👻",
-        imageUrl    = FishImageURL["Ghost Shark"] or nil,
+        textTriggers = { "worm hunt" },
+        title        = "🪱 WORM HUNT DIMULAI!",
+        description  = "Worm Hunt sedang berlangsung di server ini!",
+        color        = 5763719,
+        emoji        = "🪱",
+        imageUrl     = FishImageURL["Worm Fish"],
     },
     {
-        textTriggers = { "increased luck", "incrased luck", "luck boost", "luck increased" },
-        title       = "🍀 INCREASED LUCK EVENT!",
-        description = "Increased Luck sedang aktif di server ini!\nChance dapat ikan langka meningkat!",
-        color       = 65280,
-        emoji       = "🍀",
-        imageUrl    = nil,
+        textTriggers = { "increased luck", "luck boost", "luck increased" },
+        title        = "🍀 INCREASED LUCK EVENT!",
+        description  = "Increased Luck sedang aktif!\nChance dapat ikan langka meningkat!",
+        color        = 65280,
+        emoji        = "🍀",
+        imageUrl     = nil,
     },
     {
         textTriggers = { "mutated" },
-        title       = "🌀 MUTATED EVENT!",
-        description = "Mutated Event sedang berlangsung di server ini!\nChance mutasi ikan meningkat!",
-        color       = 11534336,
-        emoji       = "🌀",
-        imageUrl    = nil,
-    },
-    {
-        textTriggers = { "treasure hunt" },
-        title       = "💰 TREASURE HUNT DIMULAI!",
-        description = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
-        color       = 16766720,
-        emoji       = "💰",
-        imageUrl    = nil,
+        title        = "🌀 MUTATED EVENT!",
+        description  = "Mutated Event sedang berlangsung!\nChance mutasi ikan meningkat!",
+        color        = 11534336,
+        emoji        = "🌀",
+        imageUrl     = nil,
     },
 }
- 
--- Cooldown anti-spam 120 detik per event
-local EventCooldown          = {}
-local EVENT_COOLDOWN_SECONDS = 120
- 
+
+-- Cooldown anti-spam per event
+local EventCooldown  = {}
+
 -- ============================================================
 --  STATE / CACHE
 -- ============================================================
- 
-local MentionCache    = {}
-local FishImageCache  = {}
-local AvatarCache     = {}
-local LeaveTimers     = {}
-local PlayerStats     = {}
-local PlayerNameToId  = {}
- 
+
+local MentionCache   = {}
+local FishImageCache = {}
+local AvatarCache    = {}
+local LeaveTimers    = {}
+local PlayerStats    = {}
+local PlayerNameToId = {}
+
 local ServerStats = {
     totalSecret    = 0,
     totalForgotten = 0,
@@ -355,16 +343,16 @@ local ServerStats = {
     forgottenLog   = {},
     startTime      = 0,
 }
- 
+
 -- ============================================================
---  SAVE CONFIG (writefile / readfile)
+--  SAVE CONFIG
 -- ============================================================
- 
+
 local CONFIG_FILE = "bloxgank_config.json"
- 
+
 local function SaveConfig(joinUrl, fishUrl, statsUrl, eventUrl)
     if not writefile then return end
-    local ok, err = pcall(function()
+    pcall(function()
         writefile(CONFIG_FILE, HttpService:JSONEncode({
             webhook_join  = joinUrl  or "",
             webhook_fish  = fishUrl  or "",
@@ -372,9 +360,8 @@ local function SaveConfig(joinUrl, fishUrl, statsUrl, eventUrl)
             webhook_event = eventUrl or "",
         }))
     end)
-    if not ok then warn("[BloxGank] Gagal simpan config: " .. tostring(err)) end
 end
- 
+
 local function LoadConfig()
     if not readfile or not isfile then return nil end
     local ok, raw = pcall(function() return readfile(CONFIG_FILE) end)
@@ -383,11 +370,11 @@ local function LoadConfig()
     if ok2 and type(data) == "table" then return data end
     return nil
 end
- 
+
 -- ============================================================
 --  UTILITY
 -- ============================================================
- 
+
 local function GetRequestFunc()
     return (syn and syn.request)
         or (http and http.request)
@@ -395,19 +382,19 @@ local function GetRequestFunc()
         or (fluxus and fluxus.request)
         or request
 end
- 
+
 local function StripTags(str)
     return string.gsub(str, "<[^>]+>", "")
 end
- 
+
 local function Trim(s)
     return s:match("^%s*(.-)%s*$") or s
 end
- 
+
 local function UptimeString(seconds)
     return math.floor(seconds / 3600) .. "h " .. math.floor((seconds % 3600) / 60) .. "m"
 end
- 
+
 local function FindPlayer(name)
     local p = Players:FindFirstChild(name)
     if p then return p end
@@ -423,11 +410,11 @@ local function FindPlayer(name)
     end
     return nil
 end
- 
+
 -- ============================================================
 --  MENTION HELPERS
 -- ============================================================
- 
+
 local function BuildMentionCache(rbxName, rbxDisplay)
     for _, member in ipairs(MemberList) do
         local uLower = string.lower(member.username)
@@ -439,7 +426,7 @@ local function BuildMentionCache(rbxName, rbxDisplay)
         end
     end
 end
- 
+
 local function GetMention(robloxName)
     if not robloxName then return "" end
     local lower = string.lower(robloxName)
@@ -451,11 +438,11 @@ local function GetMention(robloxName)
     end
     return ""
 end
- 
+
 -- ============================================================
 --  FISH DETECTION
 -- ============================================================
- 
+
 local function FindSecretFish(fishName)
     local lower = string.lower(fishName)
     for _, baseName in ipairs(SecretFishList) do
@@ -479,7 +466,7 @@ local function FindSecretFish(fishName)
     end
     return bestBase, bestMutasi
 end
- 
+
 local function FindMutasi(fishName)
     local lower = string.lower(fishName)
     for _, mutasiName in ipairs(MutasiList) do
@@ -488,23 +475,20 @@ local function FindMutasi(fishName)
         if s then
             local before = s == 1 and " " or lower:sub(s - 1, s - 1)
             local after  = lower:sub(s + #mutasiLower, s + #mutasiLower)
-            if (before == " " and after == " ")
-            or (s == 1 and after == " ") then
+            if (before == " " and after == " ") or (s == 1 and after == " ") then
                 return mutasiName
             end
         end
     end
     return nil
 end
- 
+
 local function FindRuby(fishName)
     local lower = string.lower(fishName)
-    if string.find(lower, "ruby") and string.find(lower, "gemstone") then
-        return "Ruby"
-    end
+    if string.find(lower, "ruby") and string.find(lower, "gemstone") then return "Ruby" end
     return nil
 end
- 
+
 local function FindLegendaryCrystal(fishName)
     local lower = string.lower(fishName)
     if not string.find(lower, "crystalized") then return nil end
@@ -513,7 +497,7 @@ local function FindLegendaryCrystal(fishName)
     end
     return nil
 end
- 
+
 local function GetFishImageId(item)
     for _, desc in ipairs(item:GetDescendants()) do
         local ok, val = pcall(function()
@@ -530,11 +514,11 @@ local function GetFishImageId(item)
     end
     return nil
 end
- 
+
 -- ============================================================
 --  WEBHOOK SENDERS
 -- ============================================================
- 
+
 local function BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, footerTag)
     local embed = {
         title       = title,
@@ -544,11 +528,11 @@ local function BuildEmbed(title, description, color, fields, imageUrl, thumbUrl,
         footer      = { text = (footerTag or "BLOX Gank Webhook") .. " | " .. os.date("%X") },
         timestamp   = os.date("!%Y-%m-%dT%H:%M:%SZ"),
     }
-    if imageUrl  then embed.image     = { url = imageUrl }  end
-    if thumbUrl  then embed.thumbnail = { url = thumbUrl }  end
+    if imageUrl then embed.image     = { url = imageUrl } end
+    if thumbUrl then embed.thumbnail = { url = thumbUrl } end
     return embed
 end
- 
+
 local function PostWebhook(url, body)
     local requestFunc = GetRequestFunc()
     if not requestFunc or url == "" then return end
@@ -563,224 +547,226 @@ local function PostWebhook(url, body)
         end)
     end)
 end
- 
+
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
-    if captionType == "secret" or captionType == "forgotten" then
-        return "Ingfokan spot pliss " .. m
-    elseif captionType == "leave" then
-        return "ke disconect ya? " .. m
-    elseif captionType == "join" then
-        return "alhamdulilah kembali " .. m
-    elseif captionType == "notback" then
-        return "lah kok ngilang " .. m
+    if captionType == "secret" or captionType == "forgotten" then return "Ingfokan spot pliss " .. m
+    elseif captionType == "leave"   then return "ke disconect ya? " .. m
+    elseif captionType == "join"    then return "alhamdulilah kembali " .. m
+    elseif captionType == "notback" then return "lah kok ngilang " .. m
     end
     return m
 end
- 
+
 local function SendWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    local content = BuildContent(mention, captionType)
     PostWebhook(WEBHOOK_URL, {
         username   = "BLOX Gank",
         avatar_url = WEBHOOK_AVATAR,
-        content    = content,
+        content    = BuildContent(mention, captionType),
         embeds     = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) },
     })
 end
- 
+
 local function SendFishWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local url = (WEBHOOK_FISH ~= "") and WEBHOOK_FISH or WEBHOOK_URL
     if url == "" then return end
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    local content = BuildContent(mention, captionType)
     PostWebhook(url, {
-        content = content,
+        content = BuildContent(mention, captionType),
         embeds  = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) },
     })
 end
- 
+
 local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
     PostWebhook(WEBHOOK_STATS, {
         embeds = { BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, "BLOX Gank Stats") }
     })
 end
- 
+
 -- ============================================================
---  EVENT HUNT WEBHOOK  ← BARU
---  Kirim ke WEBHOOK_EVENT (fallback ke WEBHOOK_URL) dengan @everyone
+--  EVENT WEBHOOK SENDER
 -- ============================================================
- 
-local function SendEventWebhook(eventData, rawMsg)
+
+local function SendEventWebhook(eventData, rawText)
     local url = (WEBHOOK_EVENT ~= "") and WEBHOOK_EVENT or WEBHOOK_URL
     if url == "" then return end
- 
-    local allPlayers = Players:GetPlayers()
-    local names = {}
-    for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
- 
-    local fields = {
-        { name = "🌐 Server",         value = "**" .. tostring(game.PlaceId) .. "**",           inline = true  },
-        { name = "👥 Player Online",  value = "**" .. tostring(#allPlayers) .. "** orang",       inline = true  },
-        { name = "🎮 Host",           value = "**" .. Players.LocalPlayer.Name .. "**",          inline = true  },
-        { name = "📢 Teks Event",     value = "```" .. rawMsg:sub(1, 200) .. "```",             inline = false },
-    }
- 
+
     PostWebhook(url, {
         username   = "BLOX Gank Event",
         avatar_url = WEBHOOK_AVATAR,
-        content    = "@everyone\n" .. eventData.emoji .. " **" .. eventData.title .. "**\n" .. eventData.description,
-        embeds     = {
-            BuildEmbed(
-                eventData.title,
-                eventData.description,
-                eventData.color,
-                fields,
-                eventData.imageUrl,
-                nil,
-                "BLOX Gank Event"
-            )
-        },
+        content    = "@everyone",
+        embeds     = { BuildEmbed(
+            eventData.title,
+            eventData.description,
+            eventData.color,
+            {
+                { name = "👥 Player", value = tostring(#Players:GetPlayers()) .. " orang", inline = true },
+                { name = "🕐 Waktu",  value = os.date("%H:%M:%S"),                          inline = true },
+            },
+            eventData.imageUrl, nil,
+            "BLOX Gank Event Monitor"
+        )},
     })
 end
- 
+
 -- ============================================================
---  EVENT HUNT DETECTION  (MNA style)
+--  EVENT DETECTION — FIX UTAMA
 --
---  Dua metode deteksi, sama persis cara MNA HUB:
+--  Masalah sebelumnya:
+--  1. Nama GUI dicari "TextNotifications" padahal aslinya "Texts"
+--  2. checkText dipanggil saat hookLabel (saat teks kosong / UI lain)
+--  3. task.defer tidak reliable
 --
---  Deteksi via RE/ReplicateTextEffect (MNA style)
---
---  Game kirim teks event ke semua client lewat remote ini.
---  Teks yang sudah dikonfirmasi:
---    "treasure hunt event has started"
---    "megalodon hunt event has started"
---    "thunderzilla hunt event has started" (kemungkinan, belum konfirmasi)
---
---  Cooldown 120 detik per event supaya tidak spam.
+--  Fix:
+--  - Hook SEMUA TextLabel di seluruh PlayerGui via DescendantAdded
+--  - checkText hanya dipanggil saat teks BERUBAH (GetPropertyChangedSignal)
+--  - Tidak cek teks saat hook awal (menghindari false positive UI lain)
+--  - Kecuali kalau teks sudah berisi keyword saat script pertama jalan
 -- ============================================================
- 
- 
--- ── Monitor PlayerGui TextNotifications (confirmed dari debug) ─
--- Path: PlayerGui.TextNotifications.Frame.EventTile.TextFrame.Label
--- Text confirmed: "Shark Hunt", "Megalodon Hunt", dll
--- Header: "Shark Hunt event has started!"
- 
-local _hookedLabels = {} -- track label yg sudah di-hook, hindari double hook
- 
-local function HookEventRemote()
-    local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 10)
-    if not pg then return end
- 
-    local function checkText(text)
-        if not SCRIPT_ACTIVE then return end
-        if not text or text == "" then return end
-        local lower = text:lower()
-        for _, eventData in ipairs(EventHuntData) do
-            for _, trigger in ipairs(eventData.textTriggers) do
-                if lower:find(trigger, 1, true) then
-                    local now = os.time()
-                    if (now - (EventCooldown[eventData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
-                        EventCooldown[eventData.title] = now
-                        SendEventWebhook(eventData, text)
-                    end
-                    return
+
+local _hookedLabels = {}
+
+local function ProcessEventText(text)
+    if not SCRIPT_ACTIVE then return end
+    if not text or text == "" then return end
+    local lower = text:lower()
+
+    -- FIX: hanya proses kalau ada kata "hunt", "started", "event", "luck", "mutated"
+    -- supaya tidak false positive dari UI lain
+    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("luck") or lower:find("mutated")
+    if not isRelevant then return end
+
+    for _, evData in ipairs(EventHuntData) do
+        for _, trigger in ipairs(evData.textTriggers) do
+            if lower:find(trigger, 1, true) then
+                local now = os.time()
+                if (now - (EventCooldown[evData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
+                    EventCooldown[evData.title] = now
+                    SendEventWebhook(evData, text)
                 end
+                return
             end
         end
     end
- 
-    local function hookLabel(v)
-        if _hookedLabels[v] then return end
-        _hookedLabels[v] = true
-        -- Cek teks saat ini langsung
-        checkText(v.Text)
-        -- Monitor perubahan teks
-        v:GetPropertyChangedSignal("Text"):Connect(function()
-            checkText(v.Text)
-        end)
-    end
- 
-    local function hookAll(parent)
-        -- Hook semua descendant yang sudah ada
-        for _, v in ipairs(parent:GetDescendants()) do
-            if v:IsA("TextLabel") or v:IsA("TextButton") then
-                hookLabel(v)
-            end
-        end
-        -- Hook descendant baru tanpa delay
-        parent.DescendantAdded:Connect(function(v)
-            if v:IsA("TextLabel") or v:IsA("TextButton") then
-                hookLabel(v)
-                -- Cek sekali lagi setelah 1 frame kalau teks belum keisi saat hook
-                task.defer(function()
-                    checkText(v.Text)
-                end)
-            end
-        end)
-    end
- 
-    -- Hook TextNotifications kalau sudah ada
-    local tn = pg:FindFirstChild("TextNotifications")
-    if tn then hookAll(tn) end
- 
-    -- Monitor semua GUI baru yang masuk ke PlayerGui
-    pg.ChildAdded:Connect(function(child)
-        hookAll(child)
-    end)
- 
-    -- Hook seluruh PlayerGui juga sebagai fallback
-    hookAll(pg)
 end
- 
--- StartWorkspaceScan tidak dipakai
-local function StartWorkspaceScan() end
- 
- 
- 
+
+local function HookLabel(label)
+    if _hookedLabels[label] then return end
+    _hookedLabels[label] = true
+
+    -- Cek teks saat ini dulu (kalau event sudah aktif sebelum script jalan)
+    ProcessEventText(label.Text)
+
+    -- Monitor setiap kali teks berubah
+    label:GetPropertyChangedSignal("Text"):Connect(function()
+        ProcessEventText(label.Text)
+    end)
+end
+
+local function StartEventMonitor()
+    task.spawn(function()
+        local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 30)
+        if not pg then return end
+
+        -- Hook semua TextLabel yang sudah ada di PlayerGui
+        for _, v in ipairs(pg:GetDescendants()) do
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                HookLabel(v)
+            end
+        end
+
+        -- Hook TextLabel baru yang ditambahkan ke PlayerGui
+        -- DescendantAdded jauh lebih reliable daripada ChildAdded + hookAll rekursif
+        pg.DescendantAdded:Connect(function(v)
+            if v:IsA("TextLabel") or v:IsA("TextButton") then
+                -- task.wait(0) untuk beri waktu game set teks sebelum kita cek
+                task.wait(0)
+                HookLabel(v)
+            end
+        end)
+    end)
+end
+
+-- ============================================================
+--  LEADERBOARD
+-- ============================================================
+
+local function SendLeaderboard()
+    local leaderData = {}
+    for _, stats in pairs(PlayerStats) do
+        local total, fishList = 0, {}
+        for fishName, count in pairs(stats.secretList) do
+            total = total + count
+            table.insert(fishList, fishName .. " x" .. count)
+        end
+        if total > 0 then
+            table.insert(leaderData, { name = stats.name or "Unknown", total = total,
+                fishStr = #fishList > 0 and table.concat(fishList, ", ") or "-" })
+        end
+    end
+    table.sort(leaderData, function(a, b) return a.total > b.total end)
+    if #leaderData == 0 then return end
+
+    local medals = { "🥇", "🥈", "🥉" }
+    local lines  = {}
+    for i, entry in ipairs(leaderData) do
+        if i > 10 then break end
+        local medal = medals[i] or ("**#" .. i .. "**")
+        table.insert(lines, medal .. " **" .. entry.name .. "** — " .. entry.total .. " secret\n↳ " .. entry.fishStr)
+    end
+
+    local uptime = os.time() - ServerStats.startTime
+    SendStatsWebhook("🏆 LEADERBOARD SECRET FISH", table.concat(lines, "\n\n"), 16766720, {
+        { name = "⏱️ Uptime",          value = UptimeString(uptime),                                      inline = true },
+        { name = "🦕 Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
+        { name = "⚜️ Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
+    })
+end
+
 -- ============================================================
 --  CHAT PARSING & DETECTION
 -- ============================================================
- 
+
 local function ParseChat(rawMsg)
     local msg = StripTags(rawMsg)
     msg = string.gsub(msg, "^%[Server%]:%s*", "")
- 
+
     local playerName, fishFull, weight = string.match(msg, "^(.-) obtained an? (.-) %(([%d%.%a]+ ?kg)%)")
     if not playerName then
         playerName, fishFull = string.match(msg, "^(.-) obtained an? (.+)")
         weight = "N/A"
     end
     if not playerName or not fishFull then return nil end
- 
+
     playerName = playerName:match("%[%a+%]:%s*(.+)") or playerName
     playerName = Trim(playerName)
     weight     = weight and Trim(weight) or "N/A"
     fishFull   = fishFull:match("^(.-)%s+with a 1 in") or fishFull
     fishFull   = fishFull:match("^(.-)%s*[!%.]?$")     or fishFull
     fishFull   = Trim(fishFull)
- 
+
     return { player = playerName, fish = fishFull, weight = weight }
 end
- 
+
 local function GetAvatarUrl(player)
     return player and (PROXY .. "/avatar/" .. tostring(player.UserId) .. "?t=" .. tostring(os.time())) or nil
 end
- 
+
 local function CheckAndSend(rawMsg)
     if not SCRIPT_ACTIVE then return end
     if not string.find(string.lower(rawMsg), "obtained") then return end
- 
+
     local data = ParseChat(rawMsg)
     if not data then return end
- 
+
     local targetPlayer = FindPlayer(data.player)
     local avatarUrl    = GetAvatarUrl(targetPlayer)
-    local uid = targetPlayer and targetPlayer.UserId or PlayerNameToId[string.lower(data.player)]
- 
+    local uid          = targetPlayer and targetPlayer.UserId or PlayerNameToId[string.lower(data.player)]
+
     if uid then
         if not PlayerStats[uid] then
             PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = data.player }
@@ -788,12 +774,10 @@ local function CheckAndSend(rawMsg)
         PlayerStats[uid].catchCount   = PlayerStats[uid].catchCount + 1
         PlayerStats[uid].lastFishTime = os.time()
     end
- 
-    -- 1. Crystalized Legendary
+
     local legendaryBase = FindLegendaryCrystal(data.fish)
     if legendaryBase then
-        local imageUrl = FishImageURL[legendaryBase]
-            or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
+        local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
         SendFishWebhook("☄️ CRYSTALIZED LEGENDARY!", nil, 3407871, {
             { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
@@ -802,12 +786,10 @@ local function CheckAndSend(rawMsg)
         }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
- 
-    -- 2. Ruby Gemstone
+
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
-        local imageUrl = FishImageURL[rubyBase]
-            or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
+        local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
         SendFishWebhook("💎 RUBY GEMSTONE!", nil, 16753920, {
             { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = "Item",   value = "**" .. data.fish .. "**",   inline = true },
@@ -815,22 +797,17 @@ local function CheckAndSend(rawMsg)
         }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
- 
-    -- 3. Secret Fish (termasuk mutated)
+
     local baseName, mutasi = FindSecretFish(data.fish)
     if baseName then
-        local imageUrl = FishImageURL[baseName]
-            or (FishImageCache[baseName] and (PROXY .. "/asset/" .. FishImageCache[baseName]))
- 
+        local imageUrl = FishImageURL[baseName] or (FishImageCache[baseName] and (PROXY .. "/asset/" .. FishImageCache[baseName]))
         local isForgotten = false
         for _, name in ipairs(ForgottenList) do
             if string.lower(baseName) == string.lower(name) then isForgotten = true; break end
         end
- 
         if uid and PlayerStats[uid] then
             PlayerStats[uid].secretList[baseName] = (PlayerStats[uid].secretList[baseName] or 0) + 1
         end
- 
         local chanceInfo  = FishChanceData[baseName] or "Unknown"
         local mutasiField = mutasi and ("*" .. mutasi .. "*") or "-"
         local fields = {
@@ -840,7 +817,6 @@ local function CheckAndSend(rawMsg)
             { name = "Berat",  value = data.weight,                  inline = true },
             { name = "Chance", value = "🎲 " .. chanceInfo,          inline = true },
         }
- 
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
@@ -852,8 +828,7 @@ local function CheckAndSend(rawMsg)
         end
         return
     end
- 
-    -- 4. Mutasi non-secret (no mention)
+
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
         SendFishWebhook("✨ MUTASI DETECTED!", nil, 16776960, {
@@ -864,11 +839,11 @@ local function CheckAndSend(rawMsg)
         }, nil, avatarUrl, nil, nil)
     end
 end
- 
+
 -- ============================================================
 --  BACKPACK MONITOR
 -- ============================================================
- 
+
 local function WatchBackpack(bp)
     bp.ChildAdded:Connect(function(item)
         task.wait(0.1)
@@ -879,7 +854,7 @@ local function WatchBackpack(bp)
         end
     end)
 end
- 
+
 local function WatchForFish(player)
     local bp = player:FindFirstChild("Backpack")
     if bp then WatchBackpack(bp) end
@@ -888,21 +863,18 @@ local function WatchForFish(player)
         if newBp then WatchBackpack(newBp) end
     end)
 end
- 
+
 -- ============================================================
 --  HOOK CHAT
 -- ============================================================
- 
+
 local function HookChat()
     if TextChatService then
         TextChatService.MessageReceived:Connect(function(msg)
             local text = msg.Text or ""
-            if msg.TextSource == nil then
-                CheckAndSend(text)
-            end
+            if msg.TextSource == nil then CheckAndSend(text) end
         end)
     end
- 
     local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
     if chatEvents then
         local onMessage = chatEvents:FindFirstChild("OnMessageDoneFiltering")
@@ -910,51 +882,49 @@ local function HookChat()
             onMessage.OnClientEvent:Connect(function(d)
                 if not (d and d.Message) then return end
                 local lowerMsg = string.lower(d.Message)
-                local isServer = string.find(lowerMsg, "%[server%]") or string.find(lowerMsg, "obtained")
-                    
-                if isServer then
+                if string.find(lowerMsg, "%[server%]") or string.find(lowerMsg, "obtained") then
                     CheckAndSend(d.Message)
                 end
             end)
         end
     end
 end
- 
+
 -- ============================================================
 --  START MONITORING
 -- ============================================================
- 
+
 local function StartMonitoring()
     ServerStats.startTime = os.time()
- 
+
     local allPlayers = Players:GetPlayers()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
- 
+
     SendWebhook("🎣 WEBHOOK STARTED", nil, 65280, {
         { name = "Host",          value = "👤 " .. Players.LocalPlayer.Name,            inline = true  },
         { name = "Total Player",  value = "👥 " .. tostring(#allPlayers),                inline = true  },
         { name = "Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
     })
- 
+
     HookChat()
- 
-    -- Hook RE/ReplicateTextEffect untuk deteksi event (MNA style)
+
+    -- Event Monitor via PlayerGui (FIX)
+    StartEventMonitor()
+
+    -- Leaderboard setiap 30 menit
     task.spawn(function()
-        task.wait(2)
-        HookEventRemote()
+        while SCRIPT_ACTIVE do
+            task.wait(LEADERBOARD_INTERVAL)
+            if SCRIPT_ACTIVE then SendLeaderboard() end
+        end
     end)
- 
-    -- Workspace scan untuk deteksi event model (MNA style)
-    StartWorkspaceScan()
- 
- 
+
     -- Server stats setiap 20 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(1200)
             if not SCRIPT_ACTIVE then break end
- 
             local uptime = os.time() - ServerStats.startTime
             local recentSecret, recentForgotten = {}, {}
             for i = math.max(1, #ServerStats.secretLog - 4), #ServerStats.secretLog do
@@ -965,17 +935,16 @@ local function StartMonitoring()
                 local e = ServerStats.forgottenLog[i]
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
- 
             SendStatsWebhook("🌐 SERVER STATS", nil, 3447003, {
-                { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                  inline = true  },
-                { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",               inline = true  },
-                { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",            inline = true  },
-                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "-",   inline = false },
-                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "-", inline = false },
+                { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
+                { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
+                { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
+                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "-",  inline = false },
+                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "-",inline = false },
             })
         end
     end)
- 
+
     -- Init existing players
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
@@ -985,7 +954,7 @@ local function StartMonitoring()
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
         BuildMentionCache(p.Name, p.DisplayName)
     end
- 
+
     Players.PlayerAdded:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
         LeaveTimers[player.UserId] = nil
@@ -993,7 +962,6 @@ local function StartMonitoring()
         PlayerNameToId[string.lower(player.Name)]        = player.UserId
         PlayerNameToId[string.lower(player.DisplayName)] = player.UserId
         BuildMentionCache(player.Name, player.DisplayName)
- 
         task.spawn(function()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrl(player)
@@ -1002,30 +970,28 @@ local function StartMonitoring()
                 { name = "Total",    value = "👥 " .. tostring(#Players:GetPlayers()), inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
- 
         WatchForFish(player)
     end)
- 
+
     Players.PlayerRemoving:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
- 
-        local pName     = player.Name
-        local pId       = player.UserId
-        local avatarUrl = AvatarCache[pId] or GetAvatarUrl(player)
-        local totalNow  = #Players:GetPlayers() - 1
+        local pName      = player.Name
+        local pId        = player.UserId
+        local avatarUrl  = AvatarCache[pId] or GetAvatarUrl(player)
+        local totalNow   = #Players:GetPlayers() - 1
         local mentionStr = GetMention(pName)
- 
+
         AvatarCache[pId]                    = nil
         PlayerStats[pId]                    = nil
         PlayerNameToId[string.lower(pName)] = nil
         for k, v in pairs(PlayerNameToId) do if v == pId then PlayerNameToId[k] = nil end end
         MentionCache[string.lower(pName)]   = nil
- 
+
         SendWebhook("👋 PLAYER LEFT SERVER", nil, 16729344, {
             { name = "Username", value = "**" .. pName .. "**",       inline = true },
             { name = "Total",    value = "👥 " .. tostring(totalNow), inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
- 
+
         LeaveTimers[pId] = true
         task.spawn(function()
             task.wait(600)
@@ -1045,113 +1011,82 @@ local function StartMonitoring()
         end)
     end)
 end
- 
+
 -- ============================================================
 --  UI
 -- ============================================================
- 
+
 local function CreateUI()
     local gui = Instance.new("ScreenGui")
     gui.Name         = "BloxGankUI"
     gui.ResetOnSpawn = false
     gui.Parent       = (gethui and gethui()) or CoreGui
- 
-    -- Coba load config tersimpan
+
     local savedConfig = LoadConfig()
- 
-    -- Main frame (height ditambah untuk input event webhook)
-    local FRAME_H = 350  -- ← naik 50px dari 300
+
+    local FRAME_H = 355
     local frame = Instance.new("Frame")
     frame.Name              = "Main"
     frame.Size              = UDim2.new(0, 300, 0, FRAME_H)
-    frame.Position          = UDim2.new(0.5, -150, 0.5, -90)
+    frame.Position          = UDim2.new(0.5, -150, 0.5, -120)
     frame.BackgroundColor3  = Color3.fromRGB(20, 20, 20)
     frame.BorderSizePixel   = 0
     frame.Parent            = gui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
- 
+
     local stroke = Instance.new("UIStroke")
-    stroke.Color     = Color3.fromRGB(50, 50, 50)
-    stroke.Thickness = 1
-    stroke.Parent    = frame
- 
-    -- Top bar
+    stroke.Color = Color3.fromRGB(50, 50, 50); stroke.Thickness = 1; stroke.Parent = frame
+
     local topBar = Instance.new("Frame")
-    topBar.Size             = UDim2.new(1, 0, 0, 36)
-    topBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    topBar.BorderSizePixel  = 0
-    topBar.Parent           = frame
+    topBar.Size = UDim2.new(1, 0, 0, 36); topBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    topBar.BorderSizePixel = 0; topBar.Parent = frame
     Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 8)
- 
+
     local topBarFix = Instance.new("Frame")
-    topBarFix.Size             = UDim2.new(1, 0, 0, 8)
-    topBarFix.Position         = UDim2.new(0, 0, 1, -8)
-    topBarFix.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    topBarFix.BorderSizePixel  = 0
-    topBarFix.Parent           = topBar
- 
+    topBarFix.Size = UDim2.new(1, 0, 0, 8); topBarFix.Position = UDim2.new(0, 0, 1, -8)
+    topBarFix.BackgroundColor3 = Color3.fromRGB(30, 30, 30); topBarFix.BorderSizePixel = 0; topBarFix.Parent = topBar
+
     local title = Instance.new("TextLabel")
-    title.Text                   = "🎣 BLOX Gank Monitor"
-    title.Size                   = UDim2.new(1, -80, 1, 0)
-    title.Position               = UDim2.new(0, 10, 0, 0)
-    title.BackgroundTransparency = 1
-    title.TextColor3             = Color3.fromRGB(255, 255, 255)
-    title.Font                   = Enum.Font.GothamBold
-    title.TextSize               = 13
-    title.TextXAlignment         = Enum.TextXAlignment.Left
-    title.Parent                 = topBar
- 
+    title.Text = "🎣 BLOX Gank Monitor"; title.Size = UDim2.new(1, -80, 1, 0); title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1; title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamBold; title.TextSize = 13; title.TextXAlignment = Enum.TextXAlignment.Left; title.Parent = topBar
+
     local function MakeWinBtn(text, xOffset, bgColor)
         local btn = Instance.new("TextButton")
-        btn.Text             = text
-        btn.Size             = UDim2.new(0, 28, 0, 22)
-        btn.Position         = UDim2.new(1, xOffset, 0.5, -11)
-        btn.BackgroundColor3 = bgColor
-        btn.TextColor3       = Color3.fromRGB(255, 255, 255)
-        btn.Font             = Enum.Font.GothamBold
-        btn.TextSize         = 12
-        btn.BorderSizePixel  = 0
-        btn.Parent           = topBar
+        btn.Text = text; btn.Size = UDim2.new(0, 28, 0, 22); btn.Position = UDim2.new(1, xOffset, 0.5, -11)
+        btn.BackgroundColor3 = bgColor; btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.Font = Enum.Font.GothamBold; btn.TextSize = 12; btn.BorderSizePixel = 0; btn.Parent = topBar
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
         return btn
     end
- 
+
     local minBtn   = MakeWinBtn("—", -58, Color3.fromRGB(60, 60, 60))
     local closeBtn = MakeWinBtn("✕", -28, Color3.fromRGB(200, 50, 50))
- 
     local isMinimized = false
-    local fullSize    = UDim2.new(0, 300, 0, FRAME_H)
-    local miniSize    = UDim2.new(0, 300, 0, 36)
- 
+    local fullSize = UDim2.new(0, 300, 0, FRAME_H)
+    local miniSize = UDim2.new(0, 300, 0, 36)
+
     minBtn.MouseButton1Click:Connect(function()
         isMinimized = not isMinimized
-        TweenService:Create(frame, TweenInfo.new(0.2), {
-            Size = isMinimized and miniSize or fullSize
-        }):Play()
+        TweenService:Create(frame, TweenInfo.new(0.2), { Size = isMinimized and miniSize or fullSize }):Play()
         minBtn.Text = isMinimized and "□" or "—"
     end)
- 
     closeBtn.MouseButton1Click:Connect(function()
-        TweenService:Create(frame, TweenInfo.new(0.15), {
-            Size = UDim2.new(0, 300, 0, 0), BackgroundTransparency = 1
-        }):Play()
+        TweenService:Create(frame, TweenInfo.new(0.15), { Size = UDim2.new(0,300,0,0), BackgroundTransparency=1 }):Play()
         task.wait(0.2); gui:Destroy()
     end)
- 
+
     local function HoverTween(btn, hoverColor, baseColor)
         btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = hoverColor }):Play() end)
         btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = baseColor  }):Play() end)
     end
-    HoverTween(minBtn,   Color3.fromRGB(80, 80, 80),  Color3.fromRGB(60, 60, 60))
-    HoverTween(closeBtn, Color3.fromRGB(230, 70, 70), Color3.fromRGB(200, 50, 50))
- 
-    -- Drag
+    HoverTween(minBtn,   Color3.fromRGB(80,80,80),   Color3.fromRGB(60,60,60))
+    HoverTween(closeBtn, Color3.fromRGB(230,70,70),  Color3.fromRGB(200,50,50))
+
     local dragging, dragStart, startPos
     topBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging  = true
-            dragStart = input.Position
-            startPos  = frame.Position
+            dragging = true; dragStart = input.Position; startPos = frame.Position
         end
     end)
     topBar.InputEnded:Connect(function(input)
@@ -1159,137 +1094,90 @@ local function CreateUI()
     end)
     game:GetService("UserInputService").InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta    = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset+delta.X, startPos.Y.Scale, startPos.Y.Offset+delta.Y)
         end
     end)
- 
-    -- Status dot + label
+
     local statusDot = Instance.new("Frame")
-    statusDot.Size             = UDim2.new(0, 8, 0, 8)
-    statusDot.Position         = UDim2.new(0, 16, 0, 46)
-    statusDot.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-    statusDot.BorderSizePixel  = 0
-    statusDot.Parent           = frame
-    Instance.new("UICorner", statusDot).CornerRadius = UDim.new(1, 0)
- 
+    statusDot.Size = UDim2.new(0,8,0,8); statusDot.Position = UDim2.new(0,16,0,46)
+    statusDot.BackgroundColor3 = Color3.fromRGB(255,60,60); statusDot.BorderSizePixel = 0; statusDot.Parent = frame
+    Instance.new("UICorner", statusDot).CornerRadius = UDim.new(1,0)
+
     local statusLabel = Instance.new("TextLabel")
-    statusLabel.Text                   = "Tidak Aktif"
-    statusLabel.Size                   = UDim2.new(1, -40, 0, 20)
-    statusLabel.Position               = UDim2.new(0, 30, 0, 38)
-    statusLabel.BackgroundTransparency = 1
-    statusLabel.TextColor3             = Color3.fromRGB(180, 180, 180)
-    statusLabel.Font                   = Enum.Font.Gotham
-    statusLabel.TextSize               = 11
-    statusLabel.TextXAlignment         = Enum.TextXAlignment.Left
-    statusLabel.Parent                 = frame
- 
+    statusLabel.Text = "Tidak Aktif"; statusLabel.Size = UDim2.new(1,-40,0,20); statusLabel.Position = UDim2.new(0,30,0,38)
+    statusLabel.BackgroundTransparency = 1; statusLabel.TextColor3 = Color3.fromRGB(180,180,180)
+    statusLabel.Font = Enum.Font.Gotham; statusLabel.TextSize = 11
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left; statusLabel.Parent = frame
+
     local function MakeLabel(text, yPos)
         local lbl = Instance.new("TextLabel")
-        lbl.Text                   = text
-        lbl.Size                   = UDim2.new(1, -24, 0, 14)
-        lbl.Position               = UDim2.new(0, 12, 0, yPos)
-        lbl.BackgroundTransparency = 1
-        lbl.TextColor3             = Color3.fromRGB(130, 130, 130)
-        lbl.Font                   = Enum.Font.Gotham
-        lbl.TextSize               = 10
-        lbl.TextXAlignment         = Enum.TextXAlignment.Left
-        lbl.Parent                 = frame
+        lbl.Text = text; lbl.Size = UDim2.new(1,-24,0,14); lbl.Position = UDim2.new(0,12,0,yPos)
+        lbl.BackgroundTransparency = 1; lbl.TextColor3 = Color3.fromRGB(130,130,130)
+        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10; lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.Parent = frame
         return lbl
     end
- 
+
     local function MakeInput(placeholder, yPos)
         local box = Instance.new("TextBox")
-        box.PlaceholderText   = placeholder
-        box.Size              = UDim2.new(1, -24, 0, 30)
-        box.Position          = UDim2.new(0, 12, 0, yPos)
-        box.BackgroundColor3  = Color3.fromRGB(35, 35, 35)
-        box.TextColor3        = Color3.fromRGB(220, 220, 220)
-        box.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
-        box.Font              = Enum.Font.Gotham
-        box.TextSize          = 10
-        box.ClearTextOnFocus  = false
-        box.BorderSizePixel   = 0
-        box.Text              = ""
-        box.TextXAlignment    = Enum.TextXAlignment.Left
-        box.ClipsDescendants  = true
-        box.Parent            = frame
-        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
-        local pad = Instance.new("UIPadding", box)
-        pad.PaddingLeft  = UDim.new(0, 8)
-        pad.PaddingRight = UDim.new(0, 8)
+        box.PlaceholderText = placeholder; box.Size = UDim2.new(1,-24,0,28); box.Position = UDim2.new(0,12,0,yPos)
+        box.BackgroundColor3 = Color3.fromRGB(35,35,35); box.TextColor3 = Color3.fromRGB(220,220,220)
+        box.PlaceholderColor3 = Color3.fromRGB(100,100,100); box.Font = Enum.Font.Gotham; box.TextSize = 10
+        box.ClearTextOnFocus = false; box.BorderSizePixel = 0; box.Text = ""
+        box.TextXAlignment = Enum.TextXAlignment.Left; box.ClipsDescendants = true; box.Parent = frame
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0,6)
+        local pad = Instance.new("UIPadding", box); pad.PaddingLeft = UDim.new(0,8); pad.PaddingRight = UDim.new(0,8)
         return box
     end
- 
-    -- Input fields (4 webhook: join, fish, stats, event)
+
     MakeLabel("👋 Webhook Join / Leave", 58)
     local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
- 
-    MakeLabel("🐋 Webhook Secret Fish", 110)
-    local inputFish  = MakeInput("Paste webhook secret fish...", 124)
- 
-    MakeLabel("📊 Webhook Stats", 162)
-    local inputStats = MakeInput("Paste webhook stats...", 176)
- 
-    -- ← BARU: input webhook event hunt
-    MakeLabel("🎯 Webhook Event Hunt (@everyone)", 214)
-    local inputEvent = MakeInput("Paste webhook event hunt...", 228)
- 
-    -- ── Toggle Save Config ──────────────────────────────────
+
+    MakeLabel("🐋 Webhook Secret Fish", 108)
+    local inputFish  = MakeInput("Paste webhook secret fish...", 122)
+
+    MakeLabel("📊 Webhook Stats", 158)
+    local inputStats = MakeInput("Paste webhook stats...", 172)
+
+    MakeLabel("🎯 Webhook Event Hunt (@everyone)", 208)
+    local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
+
     local saveEnabled = false
- 
+
     local toggleBg = Instance.new("Frame")
-    toggleBg.Size             = UDim2.new(0, 36, 0, 18)
-    toggleBg.Position         = UDim2.new(1, -48, 0, 268)  -- turun 53px
-    toggleBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    toggleBg.BorderSizePixel  = 0
-    toggleBg.Parent           = frame
-    Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
- 
+    toggleBg.Size = UDim2.new(0,36,0,18); toggleBg.Position = UDim2.new(1,-48,0,264)
+    toggleBg.BackgroundColor3 = Color3.fromRGB(60,60,60); toggleBg.BorderSizePixel = 0; toggleBg.Parent = frame
+    Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1,0)
+
     local toggleKnob = Instance.new("Frame")
-    toggleKnob.Size             = UDim2.new(0, 14, 0, 14)
-    toggleKnob.Position         = UDim2.new(0, 2, 0.5, -7)
-    toggleKnob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    toggleKnob.BorderSizePixel  = 0
-    toggleKnob.Parent           = toggleBg
-    Instance.new("UICorner", toggleKnob).CornerRadius = UDim.new(1, 0)
- 
+    toggleKnob.Size = UDim2.new(0,14,0,14); toggleKnob.Position = UDim2.new(0,2,0.5,-7)
+    toggleKnob.BackgroundColor3 = Color3.fromRGB(200,200,200); toggleKnob.BorderSizePixel = 0; toggleKnob.Parent = toggleBg
+    Instance.new("UICorner", toggleKnob).CornerRadius = UDim.new(1,0)
+
     local toggleLabel = Instance.new("TextLabel")
-    toggleLabel.Text                   = "💾 Simpan Config"
-    toggleLabel.Size                   = UDim2.new(1, -60, 0, 18)
-    toggleLabel.Position               = UDim2.new(0, 12, 0, 266)  -- turun 53px
-    toggleLabel.BackgroundTransparency = 1
-    toggleLabel.TextColor3             = Color3.fromRGB(130, 130, 130)
-    toggleLabel.Font                   = Enum.Font.Gotham
-    toggleLabel.TextSize               = 10
-    toggleLabel.TextXAlignment         = Enum.TextXAlignment.Left
-    toggleLabel.Parent                 = frame
- 
+    toggleLabel.Text = "💾 Simpan Config"; toggleLabel.Size = UDim2.new(1,-60,0,18); toggleLabel.Position = UDim2.new(0,12,0,262)
+    toggleLabel.BackgroundTransparency = 1; toggleLabel.TextColor3 = Color3.fromRGB(130,130,130)
+    toggleLabel.Font = Enum.Font.Gotham; toggleLabel.TextSize = 10
+    toggleLabel.TextXAlignment = Enum.TextXAlignment.Left; toggleLabel.Parent = frame
+
     local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size                   = UDim2.new(0, 36, 0, 18)
-    toggleBtn.Position               = UDim2.new(1, -48, 0, 268)
-    toggleBtn.BackgroundTransparency = 1
-    toggleBtn.Text                   = ""
-    toggleBtn.BorderSizePixel        = 0
-    toggleBtn.Parent                 = frame
- 
+    toggleBtn.Size = UDim2.new(0,36,0,18); toggleBtn.Position = UDim2.new(1,-48,0,264)
+    toggleBtn.BackgroundTransparency = 1; toggleBtn.Text = ""; toggleBtn.BorderSizePixel = 0; toggleBtn.Parent = frame
+
     local function SetToggle(enabled)
         saveEnabled = enabled
         TweenService:Create(toggleKnob, TweenInfo.new(0.15), {
-            Position         = enabled and UDim2.new(0, 20, 0.5, -7) or UDim2.new(0, 2, 0.5, -7),
-            BackgroundColor3 = enabled and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(200, 200, 200),
+            Position         = enabled and UDim2.new(0,20,0.5,-7) or UDim2.new(0,2,0.5,-7),
+            BackgroundColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(200,200,200),
         }):Play()
         TweenService:Create(toggleBg, TweenInfo.new(0.15), {
-            BackgroundColor3 = enabled and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(60, 60, 60),
+            BackgroundColor3 = enabled and Color3.fromRGB(0,100,50) or Color3.fromRGB(60,60,60),
         }):Play()
-        toggleLabel.TextColor3 = enabled and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(130, 130, 130)
+        toggleLabel.TextColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(130,130,130)
     end
- 
-    toggleBtn.MouseButton1Click:Connect(function()
-        SetToggle(not saveEnabled)
-    end)
- 
-    -- Auto-load saved config jika ada
+
+    toggleBtn.MouseButton1Click:Connect(function() SetToggle(not saveEnabled) end)
+
     if savedConfig then
         if savedConfig.webhook_join  and savedConfig.webhook_join  ~= "" then inputJoin.Text  = savedConfig.webhook_join  end
         if savedConfig.webhook_fish  and savedConfig.webhook_fish  ~= "" then inputFish.Text  = savedConfig.webhook_fish  end
@@ -1297,63 +1185,48 @@ local function CreateUI()
         if savedConfig.webhook_event and savedConfig.webhook_event ~= "" then inputEvent.Text = savedConfig.webhook_event end
         SetToggle(true)
     end
- 
-    -- ── Start Button ────────────────────────────────────────
+
     local startBtn = Instance.new("TextButton")
-    startBtn.Text             = "START MONITORING"
-    startBtn.Size             = UDim2.new(1, -24, 0, 34)
-    startBtn.Position         = UDim2.new(0, 12, 0, 300)  -- turun 50px
-    startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    startBtn.TextColor3       = Color3.fromRGB(255, 255, 255)
-    startBtn.Font             = Enum.Font.GothamBold
-    startBtn.TextSize         = 12
-    startBtn.BorderSizePixel  = 0
-    startBtn.Parent           = frame
-    Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0, 6)
- 
-    HoverTween(startBtn, Color3.fromRGB(0, 210, 120), Color3.fromRGB(0, 180, 100))
- 
+    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,298)
+    startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100); startBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    startBtn.Font = Enum.Font.GothamBold; startBtn.TextSize = 12; startBtn.BorderSizePixel = 0; startBtn.Parent = frame
+    Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0,6)
+    HoverTween(startBtn, Color3.fromRGB(0,210,120), Color3.fromRGB(0,180,100))
+
     startBtn.MouseButton1Click:Connect(function()
         if SCRIPT_ACTIVE then return end
- 
+
         if not inputJoin.Text:find("discord.com/api/webhooks") then
-            startBtn.Text             = "❌ WEBHOOK JOIN INVALID!"
-            startBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-            task.wait(2)
-            startBtn.Text             = "START MONITORING"
-            startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+            startBtn.Text = "❌ WEBHOOK JOIN INVALID!"; startBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+            task.wait(2); startBtn.Text = "START MONITORING"; startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100)
             return
         end
- 
+
         WEBHOOK_URL = inputJoin.Text
         if inputFish.Text:find("discord.com/api/webhooks")  then WEBHOOK_FISH  = inputFish.Text  end
         if inputStats.Text:find("discord.com/api/webhooks") then WEBHOOK_STATS = inputStats.Text end
-        -- ← BARU: simpan webhook event
         if inputEvent.Text:find("discord.com/api/webhooks") then WEBHOOK_EVENT = inputEvent.Text end
- 
-        -- Simpan config jika toggle aktif
-        if saveEnabled then
-            SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS, WEBHOOK_EVENT)
-        end
- 
+
+        if saveEnabled then SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS, WEBHOOK_EVENT) end
+
         SCRIPT_ACTIVE = true
-        statusDot.BackgroundColor3 = Color3.fromRGB(0, 220, 100)
+        statusDot.BackgroundColor3 = Color3.fromRGB(0,220,100)
         statusLabel.Text           = "Aktif — Monitoring..."
-        statusLabel.TextColor3     = Color3.fromRGB(0, 220, 100)
+        statusLabel.TextColor3     = Color3.fromRGB(0,220,100)
         startBtn.Text              = "✅ MONITORING AKTIF"
-        startBtn.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
- 
+        startBtn.BackgroundColor3  = Color3.fromRGB(30,30,30)
+
         for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent }) do
             box.TextEditable = false
         end
         toggleBtn.Active = false
- 
+
         StartMonitoring()
     end)
 end
- 
+
 -- ============================================================
 --  INIT
 -- ============================================================
- 
+
 CreateUI()
