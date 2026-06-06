@@ -1,6 +1,7 @@
 -- ============================================================
 --  BLOX Gank Server Monitor  |  Discord: @bloxgank
 --  Event Monitor: Megalodon Hunt / Thunderzilla Hunt / Treasure Hunt
+--  + Shark Hunt / Ghost Shark Hunt / Worm Hunt / Black Hole / Meteor Rain
 --  Deteksi via PlayerGui.Texts.Frame.EventTile.TextFrame
 -- ============================================================
 
@@ -75,7 +76,7 @@ local MemberList = {
     { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
     { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
-    { username = "bluesjjong",        display = "raxye",                id = "1205780304753725492" },
+    { username = "bluesjjong",       display = "raxye",                id = "1205780304753725492" },
 }
 
 -- ============================================================
@@ -247,30 +248,64 @@ local FishImageURL = {
 }
 
 -- ============================================================
---  EVENT DATA
---  Kata kunci dicocokkan ke teks Label di GUI popup
+--  EVENT DATA — UPDATED (semua event digabung)
 -- ============================================================
 
 local EventData = {
+    -- Event original
     {
-        keyword  = "megalodon hunt",
-        name     = "Megalodon Hunt",
-        emoji    = "🦈",
-        color    = 255,        -- biru
+        keyword = "megalodon hunt",
+        name    = "Megalodon Hunt",
+        emoji   = "🦈",
+        color   = 255,
     },
     {
-        keyword  = "thunderzilla hunt",
-        name     = "Thunderzilla Hunt",
-        emoji    = "⚡",
-        color    = 16776960,   -- kuning
+        keyword = "thunderzilla hunt",
+        name    = "Thunderzilla Hunt",
+        emoji   = "⚡",
+        color   = 16776960,
     },
     {
-        keyword  = "treasure hunt",
-        name     = "Treasure Hunt",
-        emoji    = "💰",
-        color    = 16753920,   -- oranye
+        keyword = "treasure hunt",
+        name    = "Treasure Hunt",
+        emoji   = "💰",
+        color   = 16753920,
+    },
+    -- Event tambahan
+    {
+        keyword = "ghost shark hunt",
+        name    = "Ghost Shark Hunt",
+        emoji   = "👻",
+        color   = 8947848,
+    },
+    {
+        keyword = "shark hunt",
+        name    = "Shark Hunt",
+        emoji   = "🦈",
+        color   = 255165,
+    },
+    {
+        keyword = "worm hunt",
+        name    = "Worm Hunt",
+        emoji   = "🪱",
+        color   = 5765632,
+    },
+    {
+        keyword = "black hole",
+        name    = "Black Hole",
+        emoji   = "🌑",
+        color   = 1644825,
+    },
+    {
+        keyword = "meteor rain",
+        name    = "Meteor Rain",
+        emoji   = "☄️",
+        color   = 16744272,
     },
 }
+
+-- CATATAN: "Ghost Shark Hunt" harus di atas "Shark Hunt"
+-- supaya tidak salah deteksi keyword
 
 local EventAlertCooldown = {}  -- { [eventName] = lastSentTime }
 
@@ -579,22 +614,25 @@ end
 
 local function StartEventMonitor()
     task.spawn(function()
-        -- Tunggu GUI tersedia
         local localPlayer = Players.LocalPlayer
         local playerGui   = localPlayer:WaitForChild("PlayerGui", 30)
-        if not playerGui then return end
+        if not playerGui then
+            warn("[BloxGank] PlayerGui tidak ditemukan")
+            return
+        end
 
-        -- Tunggu ScreenGui Texts muncul
         local textsGui = playerGui:WaitForChild("Texts", 60)
-        if not textsGui then return end
+        if not textsGui then
+            warn("[BloxGank] PlayerGui.Texts tidak ditemukan, event monitor dimatikan.")
+            return
+        end
 
-        -- Navigasi ke EventTile
         local ok, labelRef, headerRef = pcall(function()
-            local frame     = textsGui:WaitForChild("Frame",     15)
-            local eventTile = frame:WaitForChild("EventTile",    15)
+            local frame     = textsGui:WaitForChild("Frame",      15)
+            local eventTile = frame:WaitForChild("EventTile",     15)
             local textFrame = eventTile:WaitForChild("TextFrame", 15)
-            local lbl       = textFrame:WaitForChild("Label",    15)
-            local hdr       = textFrame:WaitForChild("Header",   15)
+            local lbl       = textFrame:WaitForChild("Label",     15)
+            local hdr       = textFrame:WaitForChild("Header",    15)
             return lbl, hdr
         end)
 
@@ -603,18 +641,17 @@ local function StartEventMonitor()
             return
         end
 
+        print("[BloxGank] Event Monitor aktif — memantau " .. #EventData .. " jenis event")
+
         local lastEventSeen = ""
 
-        -- Listen perubahan teks Label (nama event) dan Header ("event has started!")
         local function OnLabelChanged()
             if not SCRIPT_ACTIVE then return end
 
             local labelText  = string.lower(labelRef.Text  or "")
             local headerText = string.lower(headerRef.Text or "")
 
-            -- Hanya proses kalau header menunjukkan event baru dimulai
             if not string.find(headerText, "started") then return end
-            -- Hindari trigger berulang untuk event yang sama
             if labelText == lastEventSeen then return end
 
             for _, evData in ipairs(EventData) do
@@ -624,6 +661,19 @@ local function StartEventMonitor()
                     if now - lastAlert >= EVENT_COOLDOWN then
                         EventAlertCooldown[evData.name] = now
                         lastEventSeen                   = labelText
+
+                        print("[BloxGank] EVENT DETECTED: " .. evData.name)
+
+                        -- Popup di game
+                        pcall(function()
+                            game:GetService("StarterGui"):SetCore("SendNotification", {
+                                Title    = evData.emoji .. " EVENT STARTED!",
+                                Text     = evData.name .. " is now active!",
+                                Duration = 8,
+                            })
+                        end)
+
+                        -- Kirim ke Discord webhook
                         SendEventWebhook(evData)
                     end
                     break
@@ -634,7 +684,7 @@ local function StartEventMonitor()
         labelRef:GetPropertyChangedSignal("Text"):Connect(OnLabelChanged)
         headerRef:GetPropertyChangedSignal("Text"):Connect(OnLabelChanged)
 
-        -- Cek sekali saat pertama kali monitoring dimulai (jika event sudah aktif)
+        -- Cek sekali saat monitor pertama aktif (kalau event sudah berjalan)
         OnLabelChanged()
     end)
 end
@@ -723,7 +773,6 @@ local function CheckAndSend(rawMsg)
         PlayerStats[uid].lastFishTime = os.time()
     end
 
-    -- 1. Crystalized Legendary
     local legendaryBase = FindLegendaryCrystal(data.fish)
     if legendaryBase then
         local imageUrl = FishImageURL[legendaryBase]
@@ -737,7 +786,6 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 2. Ruby Gemstone
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
         local imageUrl = FishImageURL[rubyBase]
@@ -750,7 +798,6 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 3. Secret Fish
     local baseName, mutasi = FindSecretFish(data.fish)
     if baseName then
         local imageUrl = FishImageURL[baseName]
@@ -787,7 +834,6 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- 4. Mutasi non-secret
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
         SendFishWebhook("✨ MUTASI DETECTED!", nil, 16776960, {
@@ -998,7 +1044,6 @@ local function CreateUI()
     stroke.Thickness = 1
     stroke.Parent    = frame
 
-    -- Top bar
     local topBar = Instance.new("Frame")
     topBar.Size             = UDim2.new(1, 0, 0, 36)
     topBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -1124,7 +1169,6 @@ local function CreateUI()
         return box
     end
 
-    -- 4 Input webhook
     MakeLabel("👋 Webhook Join / Leave", 58)
     local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
 
@@ -1137,7 +1181,6 @@ local function CreateUI()
     MakeLabel("🎉 Webhook Event (@everyone) — opsional", 208)
     local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
 
-    -- Toggle Simpan Config
     local saveEnabled = false
 
     local toggleBg = Instance.new("Frame")
@@ -1174,7 +1217,6 @@ local function CreateUI()
 
     toggleBtn.MouseButton1Click:Connect(function() SetToggle(not saveEnabled) end)
 
-    -- Auto-load saved config
     if savedConfig then
         if savedConfig.webhook_join  and savedConfig.webhook_join  ~= "" then inputJoin.Text  = savedConfig.webhook_join  end
         if savedConfig.webhook_fish  and savedConfig.webhook_fish  ~= "" then inputFish.Text  = savedConfig.webhook_fish  end
@@ -1183,7 +1225,6 @@ local function CreateUI()
         SetToggle(true)
     end
 
-    -- Start Button
     local startBtn = Instance.new("TextButton")
     startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1, -24, 0, 34); startBtn.Position = UDim2.new(0, 12, 0, 294)
     startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100); startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1209,7 +1250,7 @@ local function CreateUI()
 
         SCRIPT_ACTIVE = true
         statusDot.BackgroundColor3 = Color3.fromRGB(0, 220, 100)
-        statusLabel.Text           = "Aktif — Monitoring..."
+        statusLabel.Text           = "Aktif — Monitoring " .. #EventData .. " events..."
         statusLabel.TextColor3     = Color3.fromRGB(0, 220, 100)
         startBtn.Text              = "✅ MONITORING AKTIF"
         startBtn.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
