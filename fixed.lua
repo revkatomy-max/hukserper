@@ -604,7 +604,8 @@ local function SendEventWebhook(eventData, rawText)
             eventData.description,
             eventData.color,
             {
-                { name = "👥 Player", value = tostring(#Players:GetPlayers()) .. " orang", inline = true },
+                { name = "🎮 Host",   value = Players.LocalPlayer.Name,                       inline = true },
+                { name = "👥 Player", value = tostring(#Players:GetPlayers()) .. " orang",  inline = true },
                 { name = "🕐 Waktu",  value = os.date("%H:%M:%S"),                          inline = true },
             },
             eventData.imageUrl, nil,
