@@ -87,6 +87,7 @@ local MemberList = {
     { username = "Rambo_4209",       display = "SHOPEFOOD",            id = "1472822553830621362" },
     { username = "ZatzaMMay",        display = "TuyulGomenarai",       id = "892353508160970773"  },
     { username = "WaifunyaGomenarai",display = "aci",                  id = "892353508160970773"  },
+{ username = "furinyawn",          display = "cipii",                 id = "1312729486067761162" },
 }
 
 -- ============================================================
