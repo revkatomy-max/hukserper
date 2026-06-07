@@ -109,7 +109,7 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw",
 }
 
 local ForgottenList = {
@@ -196,6 +196,8 @@ local FishChanceData = {
     ["Flame Tyrant"]              = "1 in 5M",
     ["Cerulean Dragon"]           = "1 in 25M",
     ["Withering Core"]            = "1 in ??",
+    ["Scorching Veinmaw"]         = "1 in 5M",
+    ["Machodon"]                  = "1 in 10M",
 }
 
 local FishImageURL = {
@@ -255,6 +257,8 @@ local FishImageURL = {
     ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
     ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
+    ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Machodon.png",
+    ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scorching%20Veinmaw.png",
 }
 
 -- ============================================================
