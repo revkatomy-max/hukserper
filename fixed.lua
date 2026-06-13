@@ -97,6 +97,7 @@ local MemberList = {
     { username = "23Skuy2", display = "BLAZE", id = "786950836034994216" },
     { username = "waynecalloipe", display = "ubuungi", id = "1407648190580133948" },
     { username = "xiaosanzhe", display = "san", id = "1407648190580133948" }
+    { username = "zielsalvatore", display = "salva", id = "1205780304753725492" }
 
 
 }
@@ -121,11 +122,11 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemeoth",
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon","Crystalline Behemeoth",
 }
 
 local MutasiList = {
@@ -210,6 +211,7 @@ local FishChanceData = {
     ["Withering Core"]            = "1 in ??",
     ["Scorching Veinmaw"]         = "1 in 5M",
     ["Machodon"]                  = "1 in 10M",
+    ["Crystalline Behemeoth"]     = "1 in 20M",
 }
 
 local FishImageURL = {
@@ -271,6 +273,7 @@ local FishImageURL = {
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Machodon.png",
     ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scorching%20Veinmaw.png",
+    ["Crystalline Behemeoth"]    = "",
 }
 
 -- ============================================================
