@@ -87,7 +87,14 @@ local MemberList = {
     { username = "Rambo_4209",       display = "SHOPEFOOD",            id = "1472822553830621362" },
     { username = "ZatzaMMay",        display = "TuyulGomenarai",       id = "892353508160970773"  },
     { username = "WaifunyaGomenarai",display = "aci",                  id = "892353508160970773"  },
-{ username = "furinyawn",          display = "cipii",                 id = "1312729486067761162" },
+    { username = "furinyawn",        display = "cipii",                id = "1312729486067761162" },
+    { username = "Blckwv3",          display = "Blackwave",            id = "494856245023604736" },
+    { username = "Leale716",         display = "Leaa",                 id = "1408658812424028182" },
+    { username = "aca_ri17",         display = "ricarica",             id = "1471486371377053768" },
+    { username = "keyrannn1",        display = "key",                  id = "1458430632370769972" },
+    { username = "shellssyyy",       display = "kenjoyyyyy",           id = "494856245023604736" },
+    { username = "Ninym_22N",        display = "Chipii",               id = "688544588830343274" },
+
 }
 
 -- ============================================================
