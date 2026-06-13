@@ -56,7 +56,6 @@ local MemberList = {
     { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" },
     { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
     { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
-    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" },
     { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
     { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
     { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
@@ -96,7 +95,7 @@ local MemberList = {
     { username = "Ninym_22N",        display = "Chipii",               id = "688544588830343274" },
     { username = "23Skuy2", display = "BLAZE", id = "786950836034994216" },
     { username = "waynecalloipe", display = "ubuungi", id = "1407648190580133948" },
-    { username = "xiaosanzhe", display = "san", id = "1407648190580133948" }
+    { username = "xiaosanzhe", display = "san", id = "1407648190580133948" },
     { username = "zielsalvatore", display = "salva", id = "1205780304753725492" },
 
 
@@ -131,7 +130,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
+    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "artic forest",
 }
 
 local LegendaryCrystalList = {
@@ -208,10 +207,10 @@ local FishChanceData = {
     ["Coral Whale"]               = "1 in 2M",
     ["Flame Tyrant"]              = "1 in 5M",
     ["Cerulean Dragon"]           = "1 in 25M",
-    ["Withering Core"]            = "1 in ??",
+    ["Withering Core"]            = "1 in 3M",
     ["Scorching Veinmaw"]         = "1 in 5M",
     ["Machodon"]                  = "1 in 10M",
-    ["Crystalline Behemeoth"]     = "1 in 20M",
+    ["Crystalline Behemoth"]     = "1 in 20M",
 }
 
 local FishImageURL = {
