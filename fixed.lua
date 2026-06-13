@@ -97,7 +97,7 @@ local MemberList = {
     { username = "23Skuy2", display = "BLAZE", id = "786950836034994216" },
     { username = "waynecalloipe", display = "ubuungi", id = "1407648190580133948" },
     { username = "xiaosanzhe", display = "san", id = "1407648190580133948" }
-    { username = "zielsalvatore", display = "salva", id = "1205780304753725492" }
+    { username = "zielsalvatore", display = "salva", id = "1205780304753725492" },
 
 
 }
