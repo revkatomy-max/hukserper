@@ -56,7 +56,6 @@ local MemberList = {
     { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" },
     { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
     { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
-    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" },
     { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
     { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
     { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
@@ -64,7 +63,7 @@ local MemberList = {
     { username = "Avochildoo",       display = "Avo",                  id = "1203622473955024896" },
     { username = "renjunundip",      display = "aleale",               id = "1428266616763977811" },
     { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
-    { username = "i95jminn",         display = "azkara",              id = "1506715872612585606" },
+    { username = "i95jminn",         display = "azkara",               id = "1506715872612585606" },
     { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
     { username = "longisimusdorsii", display = "strawberry",           id = "1506324307423526913" },
     { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
@@ -121,7 +120,10 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth", "Frostmoon Whale", "Crystal Goliath",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
+    "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
+    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone",
+}
 
 local ForgottenList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon","Crystalline Behemoth",
@@ -211,6 +213,8 @@ local FishChanceData = {
     ["Crystalline Behemoth"]      = "1 in 20M",
     ["Frostmoon Whale"]           = "1 in 5M",
     ["Crystal Goliath"]           = "1 in 3M",
+    ["Ketupat Whale"]             = "1 in ??",
+    ["Scorching Veinmaw"]         = "1 in 15M",
     [""]                          = "1 in 3M",
 }
 
