@@ -56,6 +56,7 @@ local MemberList = {
     { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" },
     { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
     { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
+    { username = "Alyn_ikaa",        display = "Choalyn_2",            id = "1467390946357416060" },
     { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
     { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
     { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
@@ -63,7 +64,7 @@ local MemberList = {
     { username = "Avochildoo",       display = "Avo",                  id = "1203622473955024896" },
     { username = "renjunundip",      display = "aleale",               id = "1428266616763977811" },
     { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
-    { username = "aaireell",         display = "ellyaaa",              id = "" },
+    { username = "i95jminn",         display = "azkara",              id = "1506715872612585606" },
     { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
     { username = "longisimusdorsii", display = "strawberry",           id = "1506324307423526913" },
     { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
@@ -93,13 +94,11 @@ local MemberList = {
     { username = "keyrannn1",        display = "key",                  id = "1458430632370769972" },
     { username = "shellssyyy",       display = "kenjoyyyyy",           id = "494856245023604736" },
     { username = "Ninym_22N",        display = "Chipii",               id = "688544588830343274" },
-    { username = "23Skuy2", display = "BLAZE", id = "786950836034994216" },
-    { username = "waynecalloipe", display = "ubuungi", id = "1407648190580133948" },
-    { username = "xiaosanzhe", display = "san", id = "1407648190580133948" },
-    { username = "zielsalvatore", display = "salva", id = "1205780304753725492" },
-    { username = "thispalls", display = "thispalls", id = "1311353388314923019" },
-
-
+    { username = "23Skuy2",          display = "BLAZE",                id = "786950836034994216" },
+    { username = "waynecalloipe",    display = "ubuungi",              id = "1407648190580133948" },
+    { username = "xiaosanzhe",       display = "san",                  id = "1407648190580133948" },
+    { username = "zielsalvatore",    display = "salva",                id = "1205780304753725492" },
+    { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
 }
 
 -- ============================================================
@@ -123,7 +122,6 @@ local SecretFishList = {
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth", "Frostmoon Whale", "Crystal Goliath",
-}
 
 local ForgottenList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon","Crystalline Behemoth",
@@ -131,7 +129,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "artic forest",
+    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
 }
 
 local LegendaryCrystalList = {
@@ -208,8 +206,7 @@ local FishChanceData = {
     ["Coral Whale"]               = "1 in 2M",
     ["Flame Tyrant"]              = "1 in 5M",
     ["Cerulean Dragon"]           = "1 in 25M",
-    ["Withering Core"]            = "1 in 3M",
-    ["Scorching Veinmaw"]         = "1 in 5M",
+    ["Withering Core"]            = "1 in ??",
     ["Machodon"]                  = "1 in 10M",
     ["Crystalline Behemoth"]      = "1 in 20M",
     ["Frostmoon Whale"]           = "1 in 5M",
@@ -252,7 +249,7 @@ local FishImageURL = {
     ["Queen Crab"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Queen%20Crab.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
     ["Robot Kraken"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Robot%20Kraken.png",
-    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ruby.png",
+    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ruby%20Gemstone.png",
     ["Sea Eater"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Sea%20Eater.png",
     ["Skeleton Narwhal"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Skeleton%20Narwhal.png",
     ["Thin Armor Shark"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Thin%20Armor%20Shark.png",
@@ -280,7 +277,6 @@ local FishImageURL = {
     ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/frostmoon%20whale.png",
     ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crystal%20Goliath.png",
     [""]                         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
-    
 }
 
 -- ============================================================
@@ -293,7 +289,7 @@ local EventHuntData = {
         -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
         title        = "💰 TREASURE HUNT DIMULAI!",
-        description  = "Treasure Hunt sedang berlangsung di server ini!",
+        description  = "Treasure Hunt sedang berlangsung di server ini",
         color        = 16766720,
         emoji        = "💰",
         imageUrl     = nil,
@@ -315,20 +311,12 @@ local EventHuntData = {
         imageUrl     = FishImageURL["Thunderzilla"],
     },
     {
-        textTriggers = { "shark hunt" },
-        title        = "🦈 SHARK HUNT DIMULAI!",
-        description  = "Shark Hunt sedang berlangsung",
-        color        = 15158332,
-        emoji        = "🦈",
+        textTriggers = { "crystals have spawned", "crystals have", "crystal" },
+        title        = "💎 CRYSTAL EVENT DIMULAI!",
+        description  = "Crystal sedang muncul",
+        color        = 1146986,
+        emoji        = "💎",
         imageUrl     = nil,
-    },
-    {
-        textTriggers = { "worm hunt" },
-        title        = "🪱 WORM HUNT DIMULAI!",
-        description  = "Worm Hunt sedang berlangsung di server ini!",
-        color        = 5763719,
-        emoji        = "🪱",
-        imageUrl     = FishImageURL["Worm Fish"],
     },
     {
         textTriggers = { "increased luck", "luck boost", "luck increased" },
@@ -341,7 +329,7 @@ local EventHuntData = {
     {
         textTriggers = { "mutated" },
         title        = "🌀 MUTATED EVENT!",
-        description  = "Mutated Event sedang berlangsung!\nChance mutasi ikan meningkat!",
+        description  = "Mutated Event sedang berlangsung!",
         color        = 11534336,
         emoji        = "🌀",
         imageUrl     = nil,
@@ -577,7 +565,7 @@ end
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
-    if captionType == "secret" or captionType == "forgotten" then return "Bersyukur iya " .. m
+    if captionType == "secret" or captionType == "forgotten" then return "Ingfokan spot pliss " .. m
     elseif captionType == "leave"   then return "ke disconect ya? " .. m
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
@@ -664,7 +652,7 @@ local function ProcessEventText(text)
 
     -- FIX: hanya proses kalau ada kata "hunt", "started", "event", "luck", "mutated"
     -- supaya tidak false positive dari UI lain
-    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("luck") or lower:find("mutated")
+    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("luck") or lower:find("mutated") or lower:find("crystal") or lower:find("spawned")
     if not isRelevant then return end
 
     for _, evData in ipairs(EventHuntData) do
