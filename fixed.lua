@@ -97,6 +97,7 @@ local MemberList = {
     { username = "waynecalloipe", display = "ubuungi", id = "1407648190580133948" },
     { username = "xiaosanzhe", display = "san", id = "1407648190580133948" },
     { username = "zielsalvatore", display = "salva", id = "1205780304753725492" },
+    { username = "thispalls", display = "thispalls", id = "1311353388314923019" },
 
 
 }
@@ -121,7 +122,7 @@ local SecretFishList = {
     "Mutant Runic Koi", "Ketupat Whale", "Cosmic Mutant Shark", "Strawberry Orca",
     "Bonemaw Tyrant", "Deepsea Monster Axolotl", "Blocky Lochness Monster", "Aurelion",
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemeoth",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth", "Frostmoon Whale", "Crystal Goliath",
 }
 
 local ForgottenList = {
@@ -210,7 +211,10 @@ local FishChanceData = {
     ["Withering Core"]            = "1 in 3M",
     ["Scorching Veinmaw"]         = "1 in 5M",
     ["Machodon"]                  = "1 in 10M",
-    ["Crystalline Behemoth"]     = "1 in 20M",
+    ["Crystalline Behemoth"]      = "1 in 20M",
+    ["Frostmoon Whale"]           = "1 in 5M",
+    ["Crystal Goliath"]           = "1 in 3M",
+    [""]                          = "1 in 3M",
 }
 
 local FishImageURL = {
@@ -272,7 +276,11 @@ local FishImageURL = {
     ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Machodon.png",
     ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scorching%20Veinmaw.png",
-    ["Crystalline Behemeoth"]    = "",
+    ["Crystalline Behemoth"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crisstalline%20behemoth.png",
+    ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/frostmoon%20whale.png",
+    ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crystal%20Goliath.png",
+    [""]                         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
+    
 }
 
 -- ============================================================
@@ -285,7 +293,7 @@ local EventHuntData = {
         -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
         title        = "💰 TREASURE HUNT DIMULAI!",
-        description  = "Treasure Hunt sedang berlangsung di server ini!\nSegera join dan ambil hadiahnya!",
+        description  = "Treasure Hunt sedang berlangsung di server ini!",
         color        = 16766720,
         emoji        = "💰",
         imageUrl     = nil,
@@ -293,7 +301,7 @@ local EventHuntData = {
     {
         textTriggers = { "megalodon hunt" },
         title        = "🦈 MEGALODON HUNT DIMULAI!",
-        description  = "Megalodon Hunt sedang berlangsung!\nSegera join sebelum habis!",
+        description  = "Megalodon Hunt sedang berlangsung",
         color        = 3447003,
         emoji        = "🦈",
         imageUrl     = FishImageURL["Megalodon"],
@@ -301,7 +309,7 @@ local EventHuntData = {
     {
         textTriggers = { "thunderzilla hunt", "thunderzilla" },
         title        = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description  = "Thunderzilla Hunt sedang berlangsung!\nIni Forgotten Tier — jangan sampai miss!",
+        description  = "Thunderzilla Hunt sedang berlangsung!",
         color        = 16776960,
         emoji        = "⚡",
         imageUrl     = FishImageURL["Thunderzilla"],
@@ -309,7 +317,7 @@ local EventHuntData = {
     {
         textTriggers = { "shark hunt" },
         title        = "🦈 SHARK HUNT DIMULAI!",
-        description  = "Shark Hunt sedang berlangsung di server ini!",
+        description  = "Shark Hunt sedang berlangsung",
         color        = 15158332,
         emoji        = "🦈",
         imageUrl     = nil,
@@ -325,7 +333,7 @@ local EventHuntData = {
     {
         textTriggers = { "increased luck", "luck boost", "luck increased" },
         title        = "🍀 INCREASED LUCK EVENT!",
-        description  = "Increased Luck sedang aktif!\nChance dapat ikan langka meningkat!",
+        description  = "Increased Luck sedang aktif!",
         color        = 65280,
         emoji        = "🍀",
         imageUrl     = nil,
@@ -569,7 +577,7 @@ end
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
-    if captionType == "secret" or captionType == "forgotten" then return "Ingfokan spot pliss " .. m
+    if captionType == "secret" or captionType == "forgotten" then return "Bersyukur iya " .. m
     elseif captionType == "leave"   then return "ke disconect ya? " .. m
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
