@@ -98,6 +98,8 @@ local MemberList = {
     { username = "xiaosanzhe",       display = "san",                  id = "1407648190580133948" },
     { username = "zielsalvatore",    display = "salva",                id = "1205780304753725492" },
     { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
+    { username = "Moonshyse",        display = "MOON",                 id = "1125668364489080933" },
+    { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
 }
 
 -- ============================================================
