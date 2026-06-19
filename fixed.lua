@@ -25,6 +25,7 @@ local SCRIPT_ACTIVE  = false
 
 local LEADERBOARD_INTERVAL    = 1800
 local EVENT_COOLDOWN_SECONDS  = 120
+local ROLE_NELAYAN_ID         = "1465243405591380023"
 
 -- ============================================================
 --  MEMBER LIST
@@ -77,8 +78,8 @@ local MemberList = {
     { username = "bluesjjong",       display = "raxye",                id = "1205780304753725492" },
     { username = "Rambo_4200",       display = "RTBxRamboMYST",        id = "1472822553830621362" },
     { username = "PumpPump369",      display = "PumpPump",             id = "602890650345537555"  },
-    { username = "Rainoruby",        display = "rain",                 id = "1395401789561507952"  },
-    { username = "Reinoruby",        display = "ujan",                 id = "1395401789561507952"  },
+    { username = "Rainoruby",        display = "rain",                 id = "602890650345537555"  },
+    { username = "Reinoruby",        display = "ujan",                 id = "602890650345537555"  },
     { username = "Binxxx22",         display = "BinxPVNK77",           id = "952992106421579796"  },
     { username = "Lacherve",         display = "RaraPVNK77",           id = "952992106421579796"  },
     { username = "biruneptunus",     display = "BiruKC",               id = "962866204203167774"  },
@@ -98,8 +99,6 @@ local MemberList = {
     { username = "xiaosanzhe",       display = "san",                  id = "1407648190580133948" },
     { username = "zielsalvatore",    display = "salva",                id = "1205780304753725492" },
     { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
-    { username = "Moonshyse",        display = "MOON",                 id = "1125668364489080933" },
-    { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
 }
 
 -- ============================================================
@@ -294,51 +293,39 @@ local EventHuntData = {
         -- FIX: trigger harus cocok dengan teks Label saja ("Treasure Hunt")
         -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
-        title        = "💰 TREASURE HUNT DIMULAI!",
-        description  = "Treasure Hunt sedang berlangsung di server ini",
+        title        = "💰 Treasure Hunt Dimulai!",
+        description  = "Buruan cek peta sebelum kehabisan hadiahnya! 🗺️",
         color        = 16766720,
         emoji        = "💰",
         imageUrl     = nil,
+        thumbUrl     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
     },
     {
         textTriggers = { "megalodon hunt" },
-        title        = "🦈 MEGALODON HUNT DIMULAI!",
-        description  = "Megalodon Hunt sedang berlangsung",
+        title        = "🦈 Megalodon Hunt Dimulai!",
+        description  = "Sang predator laut muncul, siapkan umpan terbaik kalian! 🎣",
         color        = 3447003,
         emoji        = "🦈",
         imageUrl     = FishImageURL["Megalodon"],
+        thumbUrl     = FishImageURL["Megalodon"],
     },
     {
         textTriggers = { "thunderzilla hunt", "thunderzilla" },
-        title        = "⚡ THUNDERZILLA HUNT DIMULAI!",
-        description  = "Thunderzilla Hunt sedang berlangsung!",
+        title        = "⚡ Thunderzilla Hunt Dimulai!",
+        description  = "Monster legendaris ini langka banget, jangan sampai ketinggalan! ⚡",
         color        = 16776960,
         emoji        = "⚡",
         imageUrl     = FishImageURL["Thunderzilla"],
+        thumbUrl     = FishImageURL["Thunderzilla"],
     },
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
-        title        = "💎 CRYSTAL EVENT DIMULAI!",
-        description  = "Crystal sedang muncul",
+        title        = "💎 Crystal Event Dimulai!",
+        description  = "Crystal langka sedang bermunculan di server, gas tangkep! 💎",
         color        = 1146986,
         emoji        = "💎",
         imageUrl     = nil,
-    },
-    {
-        textTriggers = { "increased luck", "luck boost", "luck increased" },
-        title        = "🍀 INCREASED LUCK EVENT!",
-        description  = "Increased Luck sedang aktif!",
-        color        = 65280,
-        emoji        = "🍀",
-        imageUrl     = nil,
-    },
-    {
-        textTriggers = { "mutated" },
-        title        = "🌀 MUTATED EVENT!",
-        description  = "Mutated Event sedang berlangsung!",
-        color        = 11534336,
-        emoji        = "🌀",
-        imageUrl     = nil,
+        thumbUrl     = nil,
     },
 }
 
@@ -539,17 +526,18 @@ end
 --  WEBHOOK SENDERS
 -- ============================================================
 
-local function BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, footerTag)
+local function BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, footerTag, author)
     local embed = {
         title       = title,
         description = description,
         color       = color,
         fields      = fields,
-        footer      = { text = (footerTag or "BLOX Gank Webhook") .. " | " .. os.date("%X") },
+        footer      = { text = (footerTag or "BLOX Gank Webhook") .. " • " .. os.date("%d/%m/%Y %H:%M:%S") },
         timestamp   = os.date("!%Y-%m-%dT%H:%M:%SZ"),
     }
     if imageUrl then embed.image     = { url = imageUrl } end
     if thumbUrl then embed.thumbnail = { url = thumbUrl } end
+    if author   then embed.author    = author end
     return embed
 end
 
@@ -618,18 +606,20 @@ local function SendEventWebhook(eventData, rawText)
     PostWebhook(url, {
         username   = "BLOX Gank Event",
         avatar_url = WEBHOOK_AVATAR,
-        content    = "@everyone",
+        content    = "<@&" .. ROLE_NELAYAN_ID .. ">",
         embeds     = { BuildEmbed(
             eventData.title,
             eventData.description,
             eventData.color,
             {
-                { name = "🎮 Host",   value = Players.LocalPlayer.Name,                       inline = true },
-                { name = "👥 Player", value = tostring(#Players:GetPlayers()) .. " orang",  inline = true },
-                { name = "🕐 Waktu",  value = os.date("%H:%M:%S"),                          inline = true },
+                { name = "🎮 Host Server", value = "**" .. Players.LocalPlayer.Name .. "**",              inline = true },
+                { name = "👥 Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang", inline = true },
+                { name = "🕐 Waktu Mulai",  value = os.date("%H:%M:%S"),                                   inline = true },
             },
-            eventData.imageUrl, nil,
-            "BLOX Gank Event Monitor"
+            eventData.imageUrl,
+            eventData.thumbUrl,
+            "BLOX Gank Event Monitor",
+            { name = "🎯 Event Hunt Alert", icon_url = WEBHOOK_AVATAR ~= "" and WEBHOOK_AVATAR or nil }
         )},
     })
 end
@@ -656,9 +646,9 @@ local function ProcessEventText(text)
     if not text or text == "" then return end
     local lower = text:lower()
 
-    -- FIX: hanya proses kalau ada kata "hunt", "started", "event", "luck", "mutated"
+    -- FIX: hanya proses kalau ada kata "hunt", "started", "crystal", "spawned"
     -- supaya tidak false positive dari UI lain
-    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("luck") or lower:find("mutated") or lower:find("crystal") or lower:find("spawned")
+    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal") or lower:find("spawned")
     if not isRelevant then return end
 
     for _, evData in ipairs(EventHuntData) do
@@ -741,8 +731,8 @@ local function SendLeaderboard()
     end
 
     local uptime = os.time() - ServerStats.startTime
-    SendStatsWebhook("🏆 LEADERBOARD SECRET FISH", table.concat(lines, "\n\n"), 16766720, {
-        { name = "⏱️ Uptime",          value = UptimeString(uptime),                                      inline = true },
+    SendStatsWebhook("🏆 Leaderboard Secret Fish", table.concat(lines, "\n\n"), 16766720, {
+        { name = "⏱️ Uptime Server",   value = UptimeString(uptime),                                      inline = true },
         { name = "🦕 Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
         { name = "⚜️ Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
     })
@@ -799,11 +789,11 @@ local function CheckAndSend(rawMsg)
     local legendaryBase = FindLegendaryCrystal(data.fish)
     if legendaryBase then
         local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
-        SendFishWebhook("☄️ CRYSTALIZED LEGENDARY!", nil, 3407871, {
-            { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = "Mutasi", value = "✨ Crystalized",             inline = true },
-            { name = "Berat",  value = data.weight,                  inline = true },
+        SendFishWebhook("☄️ Crystalized Legendary!", "Pemain berhasil mendapatkan item legendaris berbentuk kristal! ✨", 3407871, {
+            { name = "🎣 Pemain",  value = "**" .. data.player .. "**", inline = true },
+            { name = "🪙 Item",    value = "**" .. data.fish .. "**",   inline = true },
+            { name = "⚖️ Berat",   value = "**" .. data.weight .. "**", inline = true },
+            { name = "✨ Status",  value = "Crystalized",                inline = true },
         }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
@@ -811,10 +801,10 @@ local function CheckAndSend(rawMsg)
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
         local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
-        SendFishWebhook("💎 RUBY GEMSTONE!", nil, 16753920, {
-            { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = "Item",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = "Berat",  value = data.weight,                  inline = true },
+        SendFishWebhook("💎 Ruby Gemstone!", "Pemain menemukan Ruby Gemstone yang langka! 💎", 16753920, {
+            { name = "🎣 Pemain", value = "**" .. data.player .. "**", inline = true },
+            { name = "🪙 Item",   value = "**" .. data.fish .. "**",   inline = true },
+            { name = "⚖️ Berat",  value = "**" .. data.weight .. "**", inline = true },
         }, imageUrl, avatarUrl, GetMention(data.player), "secret")
         return
     end
@@ -830,33 +820,33 @@ local function CheckAndSend(rawMsg)
             PlayerStats[uid].secretList[baseName] = (PlayerStats[uid].secretList[baseName] or 0) + 1
         end
         local chanceInfo  = FishChanceData[baseName] or "Unknown"
-        local mutasiField = mutasi and ("*" .. mutasi .. "*") or "-"
+        local mutasiField = mutasi and ("🌀 *" .. mutasi .. "*") or "—"
         local fields = {
-            { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = "Mutasi", value = mutasiField,                  inline = true },
-            { name = "Berat",  value = data.weight,                  inline = true },
-            { name = "Chance", value = "🎲 " .. chanceInfo,          inline = true },
+            { name = "🎣 Pemain", value = "**" .. data.player .. "**", inline = true },
+            { name = "🐟 Ikan",   value = "**" .. data.fish .. "**",   inline = true },
+            { name = "⚖️ Berat",  value = "**" .. data.weight .. "**", inline = true },
+            { name = "🧬 Mutasi", value = mutasiField,                  inline = true },
+            { name = "🎲 Chance", value = chanceInfo,                   inline = true },
         }
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("⚜️ FORGOTTEN TIER DETECTED!", nil, 16777215, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
+            SendFishWebhook("⚜️ Forgotten Tier Detected!", "Tangkapan langka tier **Forgotten** baru saja terjadi! ⚜️", 16777215, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("🦕 SECRET FISH DETECTED!", nil, 1752220, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
+            SendFishWebhook("🦕 Secret Fish Detected!", "Ada tangkapan **Secret** baru, cuss intip spotnya! 🦕", 1752220, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
         end
         return
     end
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook("✨ MUTASI DETECTED!", nil, 16776960, {
-            { name = "Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = "Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = "Mutasi", value = "🌀 " .. mutasiDetected,     inline = true },
-            { name = "Berat",  value = data.weight,                  inline = true },
+        SendFishWebhook("✨ Mutasi Terdeteksi!", "Pemain mendapat ikan dengan mutasi spesial! ✨", 16776960, {
+            { name = "🎣 Pemain", value = "**" .. data.player .. "**", inline = true },
+            { name = "🐟 Ikan",   value = "**" .. data.fish .. "**",   inline = true },
+            { name = "⚖️ Berat",  value = "**" .. data.weight .. "**", inline = true },
+            { name = "🧬 Mutasi", value = "🌀 " .. mutasiDetected,     inline = true },
         }, nil, avatarUrl, nil, nil)
     end
 end
@@ -922,10 +912,10 @@ local function StartMonitoring()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
 
-    SendWebhook("🎣 WEBHOOK STARTED", nil, 65280, {
-        { name = "Host",          value = "👤 " .. Players.LocalPlayer.Name,            inline = true  },
-        { name = "Total Player",  value = "👥 " .. tostring(#allPlayers),                inline = true  },
-        { name = "Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
+    SendWebhook("🎣 Monitor Started", "Server monitor sudah aktif dan siap mantau aktivitas! 🟢", 65280, {
+        { name = "👤 Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
+        { name = "👥 Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
+        { name = "📋 Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
     })
 
     HookChat()
@@ -956,12 +946,12 @@ local function StartMonitoring()
                 local e = ServerStats.forgottenLog[i]
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
-            SendStatsWebhook("🌐 SERVER STATS", nil, 3447003, {
+            SendStatsWebhook("🌐 Server Stats", "Ringkasan aktivitas server selama monitoring berjalan 📊", 3447003, {
                 { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
                 { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
                 { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
-                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "-",  inline = false },
-                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "-",inline = false },
+                { name = "🕐 Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "—",  inline = false },
+                { name = "👑 Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "—",inline = false },
             })
         end
     end)
@@ -986,9 +976,9 @@ local function StartMonitoring()
         task.spawn(function()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrl(player)
-            SendWebhook("✅ PLAYER JOINED SERVER", nil, 65280, {
-                { name = "Username", value = "**" .. player.Name .. "**",              inline = true },
-                { name = "Total",    value = "👥 " .. tostring(#Players:GetPlayers()), inline = true },
+            SendWebhook("✅ Player Joined Server", "Ada pemain baru gabung ke server! 🎉", 65280, {
+                { name = "👤 Username",     value = "**" .. player.Name .. "**",                inline = true },
+                { name = "👥 Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
         WatchForFish(player)
@@ -1008,9 +998,9 @@ local function StartMonitoring()
         for k, v in pairs(PlayerNameToId) do if v == pId then PlayerNameToId[k] = nil end end
         MentionCache[string.lower(pName)]   = nil
 
-        SendWebhook("👋 PLAYER LEFT SERVER", nil, 16729344, {
-            { name = "Username", value = "**" .. pName .. "**",       inline = true },
-            { name = "Total",    value = "👥 " .. tostring(totalNow), inline = true },
+        SendWebhook("👋 Player Left Server", "Salah satu pemain baru saja keluar server.", 16729344, {
+            { name = "👤 Username",     value = "**" .. pName .. "**",       inline = true },
+            { name = "👥 Total Player", value = "**" .. tostring(totalNow) .. "**", inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
 
         LeaveTimers[pId] = true
@@ -1023,10 +1013,10 @@ local function StartMonitoring()
                     username   = "BLOX Gank",
                     avatar_url = WEBHOOK_AVATAR,
                     content    = notBackContent,
-                    embeds     = { BuildEmbed("⏰ PLAYER TIDAK KEMBALI", nil, 16711680, {
-                        { name = "Username", value = "**" .. pName .. "**",               inline = true },
-                        { name = "Info",     value = "Tidak kembali selama **10 menit**", inline = true },
-                    }, nil, nil) },
+                    embeds     = { BuildEmbed("⏰ Player Tidak Kembali", "Pemain ini belum balik lagi ke server, semoga aman ya~", 16711680, {
+                        { name = "👤 Username", value = "**" .. pName .. "**",               inline = true },
+                        { name = "⏳ Info",     value = "Tidak kembali selama **10 menit**", inline = true },
+                    }, avatarUrl, nil, "BLOX Gank Webhook") },
                 })
             end
         end)
@@ -1160,7 +1150,7 @@ local function CreateUI()
     MakeLabel("📊 Webhook Stats", 158)
     local inputStats = MakeInput("Paste webhook stats...", 172)
 
-    MakeLabel("🎯 Webhook Event Hunt (@everyone)", 208)
+    MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)", 208)
     local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
 
     local saveEnabled = false
