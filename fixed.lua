@@ -78,8 +78,8 @@ local MemberList = {
     { username = "bluesjjong",       display = "raxye",                id = "1205780304753725492" },
     { username = "Rambo_4200",       display = "RTBxRamboMYST",        id = "1472822553830621362" },
     { username = "PumpPump369",      display = "PumpPump",             id = "602890650345537555"  },
-    { username = "Rainoruby",        display = "rain",                 id = "602890650345537555"  },
-    { username = "Reinoruby",        display = "ujan",                 id = "602890650345537555"  },
+    { username = "Rainoruby",        display = "rain",                 id = "1395401789561507952"  },
+    { username = "Reinoruby",        display = "ujan",                 id = "1395401789561507952"  },
     { username = "Binxxx22",         display = "BinxPVNK77",           id = "952992106421579796"  },
     { username = "Lacherve",         display = "RaraPVNK77",           id = "952992106421579796"  },
     { username = "biruneptunus",     display = "BiruKC",               id = "962866204203167774"  },
@@ -101,6 +101,10 @@ local MemberList = {
     { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
     { username = "Moonshyse",        display = "MOON",                 id = "1125668364489080933" },
     { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
+    { username = "akuganteng66611",  display = "akun",                 id = "1398328850793889872" },
+    { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
+    { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
+
 }
 
 -- ============================================================
@@ -125,7 +129,7 @@ local SecretFishList = {
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
-    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone",
+    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Withering Rell",
 }
 
 local ForgottenList = {
@@ -296,16 +300,16 @@ local EventHuntData = {
         -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
         title        = "💰 Treasure Hunt Dimulai!",
-        description  = "Buruan cek peta sebelum kehabisan hadiahnya! 🗺️",
+        description  = "katakan Peta 🗺️",
         color        = 16766720,
         emoji        = "💰",
         imageUrl     = nil,
-        thumbUrl     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
+        thumbUrl     = "",
     },
     {
         textTriggers = { "megalodon hunt" },
         title        = "🦈 Megalodon Hunt Dimulai!",
-        description  = "Sang predator laut muncul, siapkan umpan terbaik kalian! 🎣",
+        description  = "Mega gusy 🎣",
         color        = 3447003,
         emoji        = "🦈",
         imageUrl     = FishImageURL["Megalodon"],
@@ -314,7 +318,7 @@ local EventHuntData = {
     {
         textTriggers = { "thunderzilla hunt", "thunderzilla" },
         title        = "⚡ Thunderzilla Hunt Dimulai!",
-        description  = "Monster legendaris ini langka banget, jangan sampai ketinggalan! ⚡",
+        description  = "zilla oi ⚡",
         color        = 16776960,
         emoji        = "⚡",
         imageUrl     = FishImageURL["Thunderzilla"],
@@ -323,7 +327,7 @@ local EventHuntData = {
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = "💎 Crystal Event Dimulai!",
-        description  = "Crystal langka sedang bermunculan di server, gas tangkep! 💎",
+        description  = "Crystal muncul gsa nambang 💎",
         color        = 1146986,
         emoji        = "💎",
         imageUrl     = nil,
