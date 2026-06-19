@@ -795,7 +795,7 @@ local function CheckAndSend(rawMsg)
     local legendaryBase = FindLegendaryCrystal(data.fish)
     if legendaryBase then
         local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
-        SendFishWebhook("☄️ Crystalized Legendary!", "Pemain berhasil mendapatkan item legendaris berbentuk kristal! ✨", 3407871, {
+        SendFishWebhook("☄️ Crystalized Legendary!", " ✨", 3407871, {
             { name = "🎣 Pemain",  value = "**" .. data.player .. "**", inline = true },
             { name = "🪙 Item",    value = "**" .. data.fish .. "**",   inline = true },
             { name = "⚖️ Berat",   value = "**" .. data.weight .. "**", inline = true },
@@ -837,18 +837,18 @@ local function CheckAndSend(rawMsg)
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("⚜️ Forgotten Tier Detected!", "Tangkapan langka tier **Forgotten** baru saja terjadi! ⚜️", 16777215, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
+            SendFishWebhook("⚜️ Forgotten Tier Detected!", "Tangkapan langka tier **Forgotten** ⚜️", 16777215, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook("🦕 Secret Fish Detected!", "Ada tangkapan **Secret** baru, cuss intip spotnya! 🦕", 1752220, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
+            SendFishWebhook("🦕 Secret Fish Detected!", "Ada tangkapan **Secret** ", 1752220, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
         end
         return
     end
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook("✨ Mutasi Terdeteksi!", "Pemain mendapat ikan dengan mutasi spesial! ✨", 16776960, {
+        SendFishWebhook("✨ Mutasi Terdeteksi!", " ✨", 16776960, {
             { name = "🎣 Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = "🐟 Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = "⚖️ Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -918,7 +918,7 @@ local function StartMonitoring()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
 
-    SendWebhook("🎣 Monitor Started", "Server monitor sudah aktif dan siap mantau aktivitas! 🟢", 65280, {
+    SendWebhook("🎣 Monitor Started", "Server monitor sudah aktif 🟢", 65280, {
         { name = "👤 Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = "👥 Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
         { name = "📋 Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
@@ -952,7 +952,7 @@ local function StartMonitoring()
                 local e = ServerStats.forgottenLog[i]
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
-            SendStatsWebhook("🌐 Server Stats", "Ringkasan aktivitas server selama monitoring berjalan 📊", 3447003, {
+            SendStatsWebhook("🌐 Server Stats", "Ringkasan aktivitas server📊", 3447003, {
                 { name = "⏱️ Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
                 { name = "🦕 Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
                 { name = "⚜️ Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
@@ -982,7 +982,7 @@ local function StartMonitoring()
         task.spawn(function()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrl(player)
-            SendWebhook("✅ Player Joined Server", "Ada pemain baru gabung ke server! 🎉", 65280, {
+            SendWebhook("✅ Player Joined Server", "welcam", 65280, {
                 { name = "👤 Username",     value = "**" .. player.Name .. "**",                inline = true },
                 { name = "👥 Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
@@ -1004,7 +1004,7 @@ local function StartMonitoring()
         for k, v in pairs(PlayerNameToId) do if v == pId then PlayerNameToId[k] = nil end end
         MentionCache[string.lower(pName)]   = nil
 
-        SendWebhook("👋 Player Left Server", "Salah satu pemain baru saja keluar server.", 16729344, {
+        SendWebhook("👋 Player Left Server", "Salah satu pemain keluar server.", 16729344, {
             { name = "👤 Username",     value = "**" .. pName .. "**",       inline = true },
             { name = "👥 Total Player", value = "**" .. tostring(totalNow) .. "**", inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
