@@ -837,7 +837,7 @@ local function CheckAndSend(rawMsg)
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
         -- FIX: Memperbaiki string kosong menggantung yang membuat skrip gagal loading
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", nil, TierColors.Mutasi, {
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", "jual ke alex", TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
