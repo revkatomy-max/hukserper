@@ -958,13 +958,14 @@ SendFishWebhook(
         { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
         { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
         { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-        { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected, inline = true },
+        { name = SEP .. " Mutasi", value = mutasiDetected and (EMOJI_MUTASI .. " " .. mutasiDetected) or "—", inline = true },
     },
     nil,
     avatarUrl,
-    nil,
+    GetMention(data.player),
     nil
 )
+end   -- <<< TAMBAHKAN INI
 
 -- ============================================================
 --  BACKPACK MONITOR
