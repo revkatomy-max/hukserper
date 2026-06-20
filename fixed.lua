@@ -641,7 +641,7 @@ local function BuildEmbed(title, description, color, fields, imageUrl, thumbUrl,
         description = description,
         color       = color,
         fields      = fields,
-        footer      = { text = (footerTag or BRAND_FOOTER_TEXT) .. " " .. SEP .. " " .. os.date("%d/%m/%Y %H:%M:%S") },
+        footer      = { text = (footerTag or BRAND_FOOTER_TEXT) .. " " .. os.date("%d/%m/%Y %H:%M:%S") },
         timestamp   = os.date("!%Y-%m-%dT%H:%M:%SZ"),
     }
     if imageUrl then embed.image     = { url = imageUrl } end
@@ -902,8 +902,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Pemain",  value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",    value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",   value = "**" .. data.weight .. "**", inline = true },
-            { name = SEP .. " Status",  value = "Crystalized",                inline = true },
-        }, imageUrl, avatarUrl, GetMention(data.player), "secret")
+        }, imageUrl, avatarUrl, nil, "secret")
         return
     end
 
@@ -914,7 +913,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-        }, imageUrl, avatarUrl, GetMention(data.player), "secret")
+        }, imageUrl, avatarUrl, nil, "secret")
         return
     end
 
@@ -966,7 +965,7 @@ local function CheckAndSend(rawMsg)
         },
         nil,
         avatarUrl,
-        GetMention(data.player),
+        nil,
         nil
     )
 end  -- FIX: 'end' ini sebelumnya hilang, menyebabkan seluruh sisa file
