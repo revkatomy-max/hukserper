@@ -63,6 +63,7 @@ local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"  -- TODO: ganti -> Server Stats title
+local EMOJI_TROPHY    = "🏆"  -- FIX: dipakai di SendLeaderboard tapi belum pernah didefinisikan
 
 -- Separator unik dipakai di semua field
 local SEP = EMOJI_SEPARATOR
@@ -950,22 +951,27 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-SendFishWebhook(
-    EMOJI_MUTASI .. " Mutasi Terdeteksi!",
-    "",
-    TierColors.Mutasi,
-    {
-        { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
-        { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-        { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-        { name = SEP .. " Mutasi", value = mutasiDetected and (EMOJI_MUTASI .. " " .. mutasiDetected) or "—", inline = true },
-    },
-    nil,
-    avatarUrl,
-    GetMention(data.player),
-    nil
-)
-end   -- <<< TAMBAHKAN INI
+    -- FIX: mutasiDetected sekarang dihitung dari FindMutasi(data.fish) (sebelumnya
+    -- variabel ini dipakai tanpa pernah didefinisikan -> nil global error)
+    local mutasiDetected = FindMutasi(data.fish)
+    SendFishWebhook(
+        EMOJI_MUTASI .. " Mutasi Terdeteksi!",
+        "",
+        TierColors.Mutasi,
+        {
+            { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
+            { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
+            { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
+            { name = SEP .. " Mutasi", value = mutasiDetected and (EMOJI_MUTASI .. " " .. mutasiDetected) or "—", inline = true },
+        },
+        nil,
+        avatarUrl,
+        GetMention(data.player),
+        nil
+    )
+end  -- FIX: 'end' ini sebelumnya hilang, menyebabkan seluruh sisa file
+     -- (WatchBackpack, WatchForFish, HookChat, StartMonitoring, CreateUI, dll)
+     -- ikut ter-nest di dalam CheckAndSend -> parse error 'end' expected di EOF
 
 -- ============================================================
 --  BACKPACK MONITOR
