@@ -32,7 +32,7 @@ local ROLE_NELAYAN_ID         = "1465243405591380023"
 -- ============================================================
 
 local BRAND_NAME        = "BLOX GANK"
-local BRAND_ICON        = "" -- isi link logo kamu kalau sudah ada
+local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png" -- isi link logo kamu kalau sudah ada
 local BRAND_FOOTER_TEXT = "BLOX GANK • Server Monitor"
 
 local TierColors = {
