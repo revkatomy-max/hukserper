@@ -257,10 +257,9 @@ local FishChanceData = {
     ["Machodon"]                  = "1 in 10M",
     ["Crystalline Behemoth"]      = "1 in 20M",
     ["Frostmoon Whale"]           = "1 in 5M",
-    ["Crystal Goliath"]           = "1 in 3M",
+    ["Crystal Goliath"]          = "1 in 3M",
     ["Ketupat Whale"]             = "1 in ??",
     ["Scorching Veinmaw"]         = "1 in 5M",
-    [""]                          = "1 in 3M",
 }
 
 local FishImageURL = {
@@ -325,7 +324,6 @@ local FishImageURL = {
     ["Crystalline Behemoth"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crisstalline%20behemoth.png",
     ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/frostmoon%20whale.png",
     ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crystal%20Goliath.png",
-    [""]                         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
 }
 
 -- ============================================================
@@ -836,8 +834,8 @@ local function CheckAndSend(rawMsg)
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        -- FIX: Memperbaiki string kosong menggantung yang membuat skrip gagal loading
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", "jual ke alex", TierColors.Mutasi, {
+        -- FIX: Menghapus error syntax string menggantung (" " .. ,)
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", "Ada ikan mutasi baru nih!", TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -915,7 +913,6 @@ local function StartMonitoring()
     })
 
     HookChat()
-
     StartEventMonitor()
 
     task.spawn(function()
