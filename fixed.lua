@@ -48,21 +48,21 @@ local TierColors = {
 
 -- Custom server emoji (format Discord: <:nama:id>)
 local EMOJI_NOTIF     = "<:notif:1517730648545034390>"   -- ganti dino di title notif fish
-local EMOJI_SEPARATOR = "<:arrow:1517730055323652106>"     -- separator field
-local EMOJI_STARTER   = "<:mancing:1517730589091041433>" -- ganti 🎣 di Monitor Started
-local EMOJI_FORGOTTEN = "<:wiu:1517740584763265094>" -- ganti ⚜️ di Forgotten Tier
-local EMOJI_MUTASI    = "<:mutasi:1517730565225447616>"   -- TODO: ganti kalau sudah ada ID emoji mutasi
-local EMOJI_RUBY      = "<:ruby:1517740619794092153>"   -- TODO: ganti kalau sudah ada ID emoji ruby
+local EMOJI_SEPARATOR = "<a:arrow:1517730055323652106>"     -- separator field
+local EMOJI_STARTER   = "<a:mancing:1517730589091041433>" -- ganti 🎣 di Monitor Started
+local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>" -- ganti ⚜️ di Forgotten Tier
+local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"   -- TODO: ganti kalau sudah ada ID emoji mutasi
+local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"   -- TODO: ganti kalau sudah ada ID emoji ruby
 local EMOJI_LEGENDARY = "☄️"  -- TODO: ganti -> Crystalized Legendary
-local EMOJI_TREASURE  = "<:treasure:1517740647119847516>"  -- TODO: ganti -> Treasure Hunt event
-local EMOJI_MEGALODON = "<:mega~1:1517740677814030437>"  -- TODO: ganti -> Megalodon Hunt event
-local EMOJI_THUNDER   = "<:thunder:1517730620250390589>"  -- TODO: ganti -> Thunderzilla Hunt event
-local EMOJI_CRYSTAL   = "<:ruby:1517740619794092153>"  -- TODO: ganti -> Crystal Event
+local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"  -- TODO: ganti -> Treasure Hunt event
+local EMOJI_MEGALODON = "🦈"  -- TODO: ganti -> Megalodon Hunt event
+local EMOJI_THUNDER   = "<a:notif:1517730648545034390>"  -- TODO: ganti -> Thunderzilla Hunt event
+local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"  -- TODO: ganti -> Crystal Event
 local EMOJI_EVENTTAG  = "🎯"  -- TODO: ganti -> "Event Hunt Alert" author icon
 local EMOJI_TROPHY    = "🏆"  -- TODO: ganti -> Leaderboard title
-local EMOJI_JOIN      = "<:join:1517738095917924372>"  -- TODO: ganti -> Player Joined Server
-local EMOJI_LEAVE     = "<:leave:1517738147914711190>"  -- TODO: ganti -> Player Left Server
-local EMOJI_NOTBACK   = "<:jam:1517740557445894194>"  -- TODO: ganti -> Player Tidak Kembali
+local EMOJI_JOIN      = "<a:join:1517738095917924372>"  -- TODO: ganti -> Player Joined Server
+local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"  -- TODO: ganti -> Player Left Server
+local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"  -- TODO: ganti -> Player Tidak Kembali
 local EMOJI_SERVER    = "🌐"  -- TODO: ganti -> Server Stats title
 
 -- Separator unik dipakai di semua field
