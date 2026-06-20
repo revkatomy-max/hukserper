@@ -53,16 +53,16 @@ local EMOJI_STARTER   = "<a:mancing:1517730589091041433>"
 local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>"
 local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"
 local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"
-local EMOJI_LEGENDARY = "☄️"  -- TODO: ganti -> Crystalized Legendary
+local EMOJI_LEGENDARY = "<a:apiijo:1517778951223902239>"  -- TODO: ganti -> Crystalized Legendary
 local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
 local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"  -- TODO: ganti -> Megalodon Hunt event
 local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
 local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"
-local EMOJI_EVENTTAG  = "🎯"  -- TODO: ganti -> "Event Hunt Alert" author icon
+local EMOJI_EVENTTAG  = "<a:ikanmuter:1517778187147280434>"  -- TODO: ganti -> "Event Hunt Alert" author icon
 local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
-local EMOJI_SERVER    = "🌐"  -- TODO: ganti -> Server Stats title
+local EMOJI_SERVER    = "<a:muter:1517778915836563596>"  -- TODO: ganti -> Server Stats title
 
 -- Separator unik dipakai di semua field
 local SEP = EMOJI_SEPARATOR
@@ -367,7 +367,7 @@ local EventHuntData = {
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = EMOJI_CRYSTAL .. " Crystal Event Dimulai!",
-        description  = "Crystal muncul gsa nambang " .. EMOJI_CRYSTAL,
+        description  = "Crystal muncul gas nambang " .. EMOJI_CRYSTAL,
         color        = 1146986,
         emoji        = "💎",
         imageUrl     = nil,
@@ -509,11 +509,11 @@ local function BuildRarityBar(chanceStr)
     local bar = string.rep("▓", filled) .. string.rep("░", 10 - filled)
 
     local label
-    if value >= 15000000 then label = "MYTHIC"
-    elseif value >= 5000000 then label = "ULTRA RARE"
-    elseif value >= 1000000 then label = "VERY RARE"
-    elseif value >= 300000 then label = "RARE"
-    else label = "UNCOMMON"
+    if value >= 15000000 then label = "FORGOTEN"
+    elseif value >= 5000000 then label = "SECRET"
+    elseif value >= 1000000 then label = "SIMPEN"
+    elseif value >= 300000 then label = "LUMAYAN"
+    else label = "TUMBAL"
     end
 
     return bar .. " " .. label
@@ -667,7 +667,7 @@ end
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
-    if captionType == "secret" or captionType == "forgotten" then return "Ingfokan spot pliss " .. m
+    if captionType == "secret" or captionType == "forgotten" then return "Hari hari bersyukur " .. m
     elseif captionType == "leave"   then return "ke disconect ya? " .. m
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
@@ -909,7 +909,7 @@ local function CheckAndSend(rawMsg)
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
         local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
-        SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", "Pemain menemukan Ruby Gemstone yang langka! " .. EMOJI_RUBY, TierColors.Ruby, {
+        SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", "Goceng" .. EMOJI_RUBY, TierColors.Ruby, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -941,25 +941,30 @@ local function CheckAndSend(rawMsg)
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", "Tangkapan langka tier **Forgotten** " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
+            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", " " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", "Ada tangkapan **Secret** ", TierColors.Secret, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
+            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", " ", TierColors.Secret, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
         end
         return
     end
 
-    local mutasiDetected = FindMutasi(data.fish)
-    if mutasiDetected then
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .. EMOJI_MUTASI, TierColors.Mutasi, {
-            { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-            { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected,     inline = true },
-        }, nil, avatarUrl, nil, nil)
-    end
-end
+SendFishWebhook(
+    EMOJI_MUTASI .. " Mutasi Terdeteksi!",
+    "",
+    TierColors.Mutasi,
+    {
+        { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
+        { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
+        { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
+        { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected, inline = true },
+    },
+    nil,
+    avatarUrl,
+    nil,
+    nil
+)
 
 -- ============================================================
 --  BACKPACK MONITOR
@@ -1022,7 +1027,7 @@ local function StartMonitoring()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
 
-    SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif 🟢", TierColors.Join, {
+    SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif ", TierColors.Join, {
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
         { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
@@ -1056,7 +1061,7 @@ local function StartMonitoring()
                 local e = ServerStats.forgottenLog[i]
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
-            SendStatsWebhook(EMOJI_SERVER .. " Server Stats", "Ringkasan aktivitas server📊", 3447003, {
+            SendStatsWebhook(EMOJI_SERVER .. " Server Stats", "Ringkasan aktivitas server", 3447003, {
                 { name = SEP .. " Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
                 { name = SEP .. " Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
                 { name = SEP .. " Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
