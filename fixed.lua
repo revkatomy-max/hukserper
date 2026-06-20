@@ -950,9 +950,14 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- FIX: mutasiDetected sekarang dihitung dari FindMutasi(data.fish) (sebelumnya
-    -- variabel ini dipakai tanpa pernah didefinisikan -> nil global error)
+    -- FIX: sebelumnya blok ini jadi fallback TANPA SYARAT untuk semua ikan
+    -- yang bukan secret/ruby/legendary -> ikan biasa (Primal Axolotl, Wild West
+    -- Crab, dll) ikut kekirim sebagai "Mutasi Terdeteksi" padahal field Mutasi-nya
+    -- kosong ("—"), karena FindMutasi(data.fish) memang tidak menemukan apa-apa.
+    -- Sekarang webhook HANYA terkirim kalau mutasi benar-benar terdeteksi di nama ikan.
     local mutasiDetected = FindMutasi(data.fish)
+    if not mutasiDetected then return end
+
     SendFishWebhook(
         EMOJI_MUTASI .. " Mutasi Terdeteksi!",
         "",
@@ -961,7 +966,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-            { name = SEP .. " Mutasi", value = mutasiDetected and (EMOJI_MUTASI .. " " .. mutasiDetected) or "—", inline = true },
+            { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected, inline = true },
         },
         nil,
         avatarUrl,
