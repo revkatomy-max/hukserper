@@ -23,7 +23,6 @@ local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
 
-local LEADERBOARD_INTERVAL    = 1800
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
 
@@ -46,23 +45,22 @@ local TierColors = {
     NotBack   = 16711680,
 }
 
--- Custom server emoji (format Discord: <:nama:id>)
-local EMOJI_NOTIF     = "<:notif:1517730648545034390>"   -- ganti dino di title notif fish
-local EMOJI_SEPARATOR = "<a:arrow:1517730055323652106>"     -- separator field
-local EMOJI_STARTER   = "<a:mancing:1517730589091041433>" -- ganti 🎣 di Monitor Started
-local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>" -- ganti ⚜️ di Forgotten Tier
-local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"   -- TODO: ganti kalau sudah ada ID emoji mutasi
-local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"   -- TODO: ganti kalau sudah ada ID emoji ruby
+-- Custom server emoji (format Discord: <a:nama:id> untuk animated emoji)
+local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
+local EMOJI_SEPARATOR = "<a:arrow:1517730055323652106>"
+local EMOJI_STARTER   = "<a:mancing:1517730589091041433>"
+local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>"
+local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"
+local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"
 local EMOJI_LEGENDARY = "☄️"  -- TODO: ganti -> Crystalized Legendary
-local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"  -- TODO: ganti -> Treasure Hunt event
-local EMOJI_MEGALODON = "🦈"  -- TODO: ganti -> Megalodon Hunt event
-local EMOJI_THUNDER   = "<a:notif:1517730648545034390>"  -- TODO: ganti -> Thunderzilla Hunt event
-local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"  -- TODO: ganti -> Crystal Event
+local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
+local EMOJI_MEGALODON = "<:mega~1:1517740677814030437>"  -- TODO: ganti -> Megalodon Hunt event
+local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
+local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"
 local EMOJI_EVENTTAG  = "🎯"  -- TODO: ganti -> "Event Hunt Alert" author icon
-local EMOJI_TROPHY    = "🏆"  -- TODO: ganti -> Leaderboard title
-local EMOJI_JOIN      = "<a:join:1517738095917924372>"  -- TODO: ganti -> Player Joined Server
-local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"  -- TODO: ganti -> Player Left Server
-local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"  -- TODO: ganti -> Player Tidak Kembali
+local EMOJI_JOIN      = "<a:join:1517738095917924372>"
+local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
+local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "🌐"  -- TODO: ganti -> Server Stats title
 
 -- Separator unik dipakai di semua field
@@ -368,7 +366,7 @@ local EventHuntData = {
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = EMOJI_CRYSTAL .. " Crystal Event Dimulai!",
-        description  = "Crystal muncul gsa nambang " .. EMOJI_CRYSTAL,
+        description  = "Crystal muncul gas nambang " .. EMOJI_CRYSTAL,
         color        = 1146986,
         emoji        = "💎",
         imageUrl     = nil,
@@ -463,61 +461,6 @@ local function FindPlayer(name)
         end
     end
     return nil
-end
-
--- ============================================================
---  RARITY BAR HELPER
--- ============================================================
-
--- Mengubah string chance ("1 in 15M", "1 in 750K", "1 in ??") menjadi
--- representasi bar visual ASCII + label tier kelangkaan.
-local function ChanceToScale(chanceStr)
-    if not chanceStr then return nil end
-    local num, unit = chanceStr:match("1 in ([%d%.]+)([KM]?)")
-    if not num then return nil end
-    local value = tonumber(num)
-    if not value then return nil end
-    if unit == "K" then value = value * 1000
-    elseif unit == "M" then value = value * 1000000
-    end
-    return value
-end
-
-local function BuildRarityBar(chanceStr)
-    if not chanceStr or chanceStr == "Unknown" then
-        return "░░░░░░░░░░ ?"
-    end
-    if chanceStr:find("%?%?") then
-        return "▓▓▓▓▓▓▓▓▓▓ ∞"
-    end
-
-    local value = ChanceToScale(chanceStr)
-    if not value then
-        return "░░░░░░░░░░ ?"
-    end
-
-    -- Skala log supaya rentang 100K - 30M+ tetap proporsional di 10 segmen
-    -- semakin besar angka "1 in X", semakin langka, semakin penuh bar-nya
-    local minLog, maxLog = math.log(50000), math.log(35000000)
-    local valLog = math.log(value)
-    local ratio  = (valLog - minLog) / (maxLog - minLog)
-    ratio = math.clamp(ratio, 0, 1)
-
-    local filled = math.floor(ratio * 10 + 0.5)
-    if filled < 1 then filled = 1 end
-    if filled > 10 then filled = 10 end
-
-    local bar = string.rep("▓", filled) .. string.rep("░", 10 - filled)
-
-    local label
-    if value >= 15000000 then label = ""
-    elseif value >= 5000000 then label = ""
-    elseif value >= 1000000 then label = ""
-    elseif value >= 300000 then label = ""
-    else label = "UNCOMMON"
-    end
-
-    return bar .. " " .. label
 end
 
 -- ============================================================
@@ -812,42 +755,6 @@ local function StartEventMonitor()
 end
 
 -- ============================================================
---  LEADERBOARD
--- ============================================================
-
-local function SendLeaderboard()
-    local leaderData = {}
-    for _, stats in pairs(PlayerStats) do
-        local total, fishList = 0, {}
-        for fishName, count in pairs(stats.secretList) do
-            total = total + count
-            table.insert(fishList, fishName .. " x" .. count)
-        end
-        if total > 0 then
-            table.insert(leaderData, { name = stats.name or "Unknown", total = total,
-                fishStr = #fishList > 0 and table.concat(fishList, ", ") or "-" })
-        end
-    end
-    table.sort(leaderData, function(a, b) return a.total > b.total end)
-    if #leaderData == 0 then return end
-
-    local medals = { "🥇", "🥈", "🥉" }
-    local lines  = {}
-    for i, entry in ipairs(leaderData) do
-        if i > 10 then break end
-        local medal = medals[i] or ("**#" .. i .. "**")
-        table.insert(lines, medal .. " **" .. entry.name .. "** " .. SEP .. " " .. entry.total .. " secret\n↳ " .. entry.fishStr)
-    end
-
-    local uptime = os.time() - ServerStats.startTime
-    SendStatsWebhook(EMOJI_TROPHY .. " Leaderboard Secret Fish", table.concat(lines, "\n\n"), 16766720, {
-        { name = SEP .. " Uptime Server",   value = UptimeString(uptime),                                      inline = true },
-        { name = SEP .. " Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
-        { name = SEP .. " Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
-    })
-end
-
--- ============================================================
 --  CHAT PARSING & DETECTION
 -- ============================================================
 
@@ -929,7 +836,6 @@ local function CheckAndSend(rawMsg)
             PlayerStats[uid].secretList[baseName] = (PlayerStats[uid].secretList[baseName] or 0) + 1
         end
         local chanceInfo  = FishChanceData[baseName] or "Unknown"
-        local rarityBar   = BuildRarityBar(chanceInfo)
         local mutasiField = mutasi and (EMOJI_MUTASI .. " *" .. mutasi .. "*") or "—"
         local fields = {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
@@ -937,7 +843,6 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
             { name = SEP .. " Mutasi", value = mutasiField,                  inline = true },
             { name = SEP .. " Chance", value = chanceInfo,                   inline = true },
-            { name = SEP .. " Rarity", value = rarityBar,                    inline = false },
         }
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
@@ -953,7 +858,7 @@ local function CheckAndSend(rawMsg)
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .. EMOJI_MUTASI, TierColors.Mutasi, {
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .., TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -1033,14 +938,6 @@ local function StartMonitoring()
 
     -- Event Monitor via PlayerGui (FIX)
     StartEventMonitor()
-
-    -- Leaderboard setiap 30 menit
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(LEADERBOARD_INTERVAL)
-            if SCRIPT_ACTIVE then SendLeaderboard() end
-        end
-    end)
 
     -- Server stats setiap 20 menit
     task.spawn(function()
