@@ -23,6 +23,7 @@ local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
 
+local LEADERBOARD_INTERVAL    = 1800
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
 
@@ -31,7 +32,7 @@ local ROLE_NELAYAN_ID         = "1465243405591380023"
 -- ============================================================
 
 local BRAND_NAME        = "BLOX GANK"
-local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png" -- isi link logo kamu kalau sudah ada
+local BRAND_ICON        = "" -- isi link logo kamu kalau sudah ada
 local BRAND_FOOTER_TEXT = "BLOX GANK • Server Monitor"
 
 local TierColors = {
@@ -260,13 +261,13 @@ local FishChanceData = {
     ["Frostmoon Whale"]           = "1 in 5M",
     ["Crystal Goliath"]           = "1 in 3M",
     ["Ketupat Whale"]             = "1 in ??",
-    ["Scorching Veinmaw"]         = "1 in 5M",
+    ["Scorching Veinmaw"]         = "1 in 15M",
     [""]                          = "1 in 3M",
 }
 
 local FishImageURL = {
     ["Monster Shark"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Monster%20Shark.png",
-    ["Megalodon"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Megalodon%20new.png",
+    ["Megalodon"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Megalodon.png",
     ["Ancient Lochness Monster"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Lochness%20Monster.png",
     ["Ancient Magma Whale"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Magma%20Whale.png",
     ["Ancient Whale"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Whale.png",
@@ -314,13 +315,13 @@ local FishImageURL = {
     ["Aurelion"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Aurelion.png",
     ["Frogalloon"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Frogallon.png",
     ["Scare"]                    = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scare.png",
-    ["Viridis Lurker"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Viridis%20Lurker%20New.png",
+    ["Viridis Lurker"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Viridis%20Lurker.jpg",
     ["Fluorivane"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Fluorivane.png",
     ["Coral Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Coral%20Whale.png",
     ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Runic%20Enchant%20Stone.png",
     ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
     ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
-    ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core%20new.png",
+    ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Machodon.png",
     ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scorching%20Veinmaw.png",
     ["Crystalline Behemoth"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crisstalline%20behemoth.png",
@@ -351,7 +352,7 @@ local EventHuntData = {
         description  = "Mega gusy 🎣",
         color        = 3447003,
         emoji        = "🦈",
-        imageUrl     = nil,
+        imageUrl     = FishImageURL["Megalodon"],
         thumbUrl     = FishImageURL["Megalodon"],
     },
     {
@@ -360,7 +361,7 @@ local EventHuntData = {
         description  = "zilla oi " .. EMOJI_THUNDER,
         color        = 16776960,
         emoji        = "⚡",
-        imageUrl     = nil,
+        imageUrl     = FishImageURL["Thunderzilla"],
         thumbUrl     = FishImageURL["Thunderzilla"],
     },
     {
@@ -461,6 +462,61 @@ local function FindPlayer(name)
         end
     end
     return nil
+end
+
+-- ============================================================
+--  RARITY BAR HELPER
+-- ============================================================
+
+-- Mengubah string chance ("1 in 15M", "1 in 750K", "1 in ??") menjadi
+-- representasi bar visual ASCII + label tier kelangkaan.
+local function ChanceToScale(chanceStr)
+    if not chanceStr then return nil end
+    local num, unit = chanceStr:match("1 in ([%d%.]+)([KM]?)")
+    if not num then return nil end
+    local value = tonumber(num)
+    if not value then return nil end
+    if unit == "K" then value = value * 1000
+    elseif unit == "M" then value = value * 1000000
+    end
+    return value
+end
+
+local function BuildRarityBar(chanceStr)
+    if not chanceStr or chanceStr == "Unknown" then
+        return "░░░░░░░░░░ ?"
+    end
+    if chanceStr:find("%?%?") then
+        return "▓▓▓▓▓▓▓▓▓▓ ∞"
+    end
+
+    local value = ChanceToScale(chanceStr)
+    if not value then
+        return "░░░░░░░░░░ ?"
+    end
+
+    -- Skala log supaya rentang 100K - 30M+ tetap proporsional di 10 segmen
+    -- semakin besar angka "1 in X", semakin langka, semakin penuh bar-nya
+    local minLog, maxLog = math.log(50000), math.log(35000000)
+    local valLog = math.log(value)
+    local ratio  = (valLog - minLog) / (maxLog - minLog)
+    ratio = math.clamp(ratio, 0, 1)
+
+    local filled = math.floor(ratio * 10 + 0.5)
+    if filled < 1 then filled = 1 end
+    if filled > 10 then filled = 10 end
+
+    local bar = string.rep("▓", filled) .. string.rep("░", 10 - filled)
+
+    local label
+    if value >= 15000000 then label = "MYTHIC"
+    elseif value >= 5000000 then label = "ULTRA RARE"
+    elseif value >= 1000000 then label = "VERY RARE"
+    elseif value >= 300000 then label = "RARE"
+    else label = "UNCOMMON"
+    end
+
+    return bar .. " " .. label
 end
 
 -- ============================================================
@@ -611,7 +667,7 @@ end
 local function BuildContent(mention, captionType)
     if not mention or mention == "" then return nil end
     local m = Trim(mention)
-    if captionType == "secret" or captionType == "forgotten" then return "Bersyukur kamu " .. m
+    if captionType == "secret" or captionType == "forgotten" then return "Ingfokan spot pliss " .. m
     elseif captionType == "leave"   then return "ke disconect ya? " .. m
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
@@ -755,6 +811,42 @@ local function StartEventMonitor()
 end
 
 -- ============================================================
+--  LEADERBOARD
+-- ============================================================
+
+local function SendLeaderboard()
+    local leaderData = {}
+    for _, stats in pairs(PlayerStats) do
+        local total, fishList = 0, {}
+        for fishName, count in pairs(stats.secretList) do
+            total = total + count
+            table.insert(fishList, fishName .. " x" .. count)
+        end
+        if total > 0 then
+            table.insert(leaderData, { name = stats.name or "Unknown", total = total,
+                fishStr = #fishList > 0 and table.concat(fishList, ", ") or "-" })
+        end
+    end
+    table.sort(leaderData, function(a, b) return a.total > b.total end)
+    if #leaderData == 0 then return end
+
+    local medals = { "🥇", "🥈", "🥉" }
+    local lines  = {}
+    for i, entry in ipairs(leaderData) do
+        if i > 10 then break end
+        local medal = medals[i] or ("**#" .. i .. "**")
+        table.insert(lines, medal .. " **" .. entry.name .. "** " .. SEP .. " " .. entry.total .. " secret\n↳ " .. entry.fishStr)
+    end
+
+    local uptime = os.time() - ServerStats.startTime
+    SendStatsWebhook(EMOJI_TROPHY .. " Leaderboard Secret Fish", table.concat(lines, "\n\n"), 16766720, {
+        { name = SEP .. " Uptime Server",   value = UptimeString(uptime),                                      inline = true },
+        { name = SEP .. " Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
+        { name = SEP .. " Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
+    })
+end
+
+-- ============================================================
 --  CHAT PARSING & DETECTION
 -- ============================================================
 
@@ -817,7 +909,7 @@ local function CheckAndSend(rawMsg)
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
         local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
-        SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", " " .. EMOJI_RUBY, TierColors.Ruby, {
+        SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", "Pemain menemukan Ruby Gemstone yang langka! " .. EMOJI_RUBY, TierColors.Ruby, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -836,6 +928,7 @@ local function CheckAndSend(rawMsg)
             PlayerStats[uid].secretList[baseName] = (PlayerStats[uid].secretList[baseName] or 0) + 1
         end
         local chanceInfo  = FishChanceData[baseName] or "Unknown"
+        local rarityBar   = BuildRarityBar(chanceInfo)
         local mutasiField = mutasi and (EMOJI_MUTASI .. " *" .. mutasi .. "*") or "—"
         local fields = {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
@@ -843,15 +936,16 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
             { name = SEP .. " Mutasi", value = mutasiField,                  inline = true },
             { name = SEP .. " Chance", value = chanceInfo,                   inline = true },
+            { name = SEP .. " Rarity", value = rarityBar,                    inline = false },
         }
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", "" .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
+            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", "Tangkapan langka tier **Forgotten** " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", "", TierColors.Secret, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
+            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", "Ada tangkapan **Secret** ", TierColors.Secret, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
         end
         return
     end
@@ -938,6 +1032,14 @@ local function StartMonitoring()
 
     -- Event Monitor via PlayerGui (FIX)
     StartEventMonitor()
+
+    -- Leaderboard setiap 30 menit
+    task.spawn(function()
+        while SCRIPT_ACTIVE do
+            task.wait(LEADERBOARD_INTERVAL)
+            if SCRIPT_ACTIVE then SendLeaderboard() end
+        end
+    end)
 
     -- Server stats setiap 20 menit
     task.spawn(function()
