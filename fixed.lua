@@ -54,7 +54,7 @@ local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"
 local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"
 local EMOJI_LEGENDARY = "☄️"  -- TODO: ganti -> Crystalized Legendary
 local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
-local EMOJI_MEGALODON = "🦈"  -- TODO: ganti -> Megalodon Hunt event
+local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"  -- TODO: ganti -> Megalodon Hunt event
 local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
 local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"
 local EMOJI_EVENTTAG  = "🎯"  -- TODO: ganti -> "Event Hunt Alert" author icon
@@ -858,7 +858,7 @@ local function CheckAndSend(rawMsg)
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .., TierColors.Mutasi, {
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .. EMOJI_MUTASI, TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
