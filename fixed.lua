@@ -143,7 +143,6 @@ local MemberList = {
     { username = "akuganteng66611",  display = "akun",                 id = "1398328850793889872" },
     { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
     { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
-
 }
 
 -- ============================================================
@@ -335,8 +334,6 @@ local FishImageURL = {
 
 local EventHuntData = {
     {
-        -- FIX: trigger harus cocok dengan teks Label saja ("Treasure Hunt")
-        -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
         title        = EMOJI_TREASURE .. " Treasure Hunt Dimulai!",
         description  = "katakan Peta 🗺️",
@@ -677,18 +674,7 @@ local function SendEventWebhook(eventData, rawText)
 end
 
 -- ============================================================
---  EVENT DETECTION — FIX UTAMA
---
---  Masalah sebelumnya:
---  1. Nama GUI dicari "TextNotifications" padahal aslinya "Texts"
---  2. checkText dipanggil saat hookLabel (saat teks kosong / UI lain)
---  3. task.defer tidak reliable
---
---  Fix:
---  - Hook SEMUA TextLabel di seluruh PlayerGui via DescendantAdded
---  - checkText hanya dipanggil saat teks BERUBAH (GetPropertyChangedSignal)
---  - Tidak cek teks saat hook awal (menghindari false positive UI lain)
---  - Kecuali kalau teks sudah berisi keyword saat script pertama jalan
+--  EVENT DETECTION
 -- ============================================================
 
 local _hookedLabels = {}
@@ -698,8 +684,6 @@ local function ProcessEventText(text)
     if not text or text == "" then return end
     local lower = text:lower()
 
-    -- FIX: hanya proses kalau ada kata "hunt", "started", "crystal", "spawned"
-    -- supaya tidak false positive dari UI lain
     local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal") or lower:find("spawned")
     if not isRelevant then return end
 
@@ -721,10 +705,8 @@ local function HookLabel(label)
     if _hookedLabels[label] then return end
     _hookedLabels[label] = true
 
-    -- Cek teks saat ini dulu (kalau event sudah aktif sebelum script jalan)
     ProcessEventText(label.Text)
 
-    -- Monitor setiap kali teks berubah
     label:GetPropertyChangedSignal("Text"):Connect(function()
         ProcessEventText(label.Text)
     end)
@@ -735,18 +717,14 @@ local function StartEventMonitor()
         local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 30)
         if not pg then return end
 
-        -- Hook semua TextLabel yang sudah ada di PlayerGui
         for _, v in ipairs(pg:GetDescendants()) do
             if v:IsA("TextLabel") or v:IsA("TextButton") then
                 HookLabel(v)
             end
         end
 
-        -- Hook TextLabel baru yang ditambahkan ke PlayerGui
-        -- DescendantAdded jauh lebih reliable daripada ChildAdded + hookAll rekursif
         pg.DescendantAdded:Connect(function(v)
             if v:IsA("TextLabel") or v:IsA("TextButton") then
-                -- task.wait(0) untuk beri waktu game set teks sebelum kita cek
                 task.wait(0)
                 HookLabel(v)
             end
@@ -858,7 +836,8 @@ local function CheckAndSend(rawMsg)
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .., TierColors.Mutasi, {
+        -- FIX: Memperbaiki string kosong menggantung yang membuat skrip gagal loading
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", "Ada ikan mutasi!", TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -931,15 +910,14 @@ local function StartMonitoring()
     SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif 🟢", TierColors.Join, {
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
-        { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
+        { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "
+```", inline = false },
     })
 
     HookChat()
 
-    -- Event Monitor via PlayerGui (FIX)
     StartEventMonitor()
 
-    -- Server stats setiap 20 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(1200)
@@ -964,7 +942,6 @@ local function StartMonitoring()
         end
     end)
 
-    -- Init existing players
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
         AvatarCache[p.UserId]                       = GetAvatarUrl(p)
