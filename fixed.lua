@@ -858,7 +858,7 @@ local function CheckAndSend(rawMsg)
 
     local mutasiDetected = FindMutasi(data.fish)
     if mutasiDetected then
-        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .. EMOJI_MUTASI, TierColors.Mutasi, {
+        SendFishWebhook(EMOJI_MUTASI .. " Mutasi Terdeteksi!", " " .., TierColors.Mutasi, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
