@@ -145,6 +145,8 @@ local MemberList = {
     { username = "akuganteng66611",  display = "akun",                 id = "1398328850793889872" },
     { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
     { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
+    { username = "dipyyy",           display = "karyawandripy",        id = "454238781168418826" },
+
 
 }
 
@@ -170,7 +172,7 @@ local SecretFishList = {
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
-    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Withering Rell",
+    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon", "Elemental Tempestray",
 }
 
 local ForgottenList = {
@@ -264,6 +266,9 @@ local FishChanceData = {
     ["Ketupat Whale"]             = "1 in ??",
     ["Scorching Veinmaw"]         = "1 in 5M",
     [""]                          = "1 in 3M",
+    ["Elemental Tempestray"]      = "1 in 1M",
+    ["Dark Megalodon"]            = "1 in 8M",
+    
 }
 
 local FishImageURL = {
@@ -329,6 +334,8 @@ local FishImageURL = {
     ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/frostmoon%20whale.png",
     ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crystal%20Goliath.png",
     [""]                         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
+    ["Elemental Tempestray"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Elemental%20Tempestray.png",
+    ["Dark Megalodon"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/dark%20megalodon.png",
 }
 
 -- ============================================================
