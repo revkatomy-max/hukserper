@@ -32,7 +32,7 @@ local ROLE_NELAYAN_ID         = "1465243405591380023"
 -- ============================================================
 
 local BRAND_NAME        = "BLOX GANK"
-local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png" -- isi link logo kamu kalau sudah ada
+local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png"
 local BRAND_FOOTER_TEXT = "BLOX GANK • Server Monitor"
 
 local TierColors = {
@@ -46,26 +46,24 @@ local TierColors = {
     NotBack   = 16711680,
 }
 
--- Custom server emoji (format Discord: <a:nama:id> untuk animated emoji)
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
 local EMOJI_SEPARATOR = "<a:arrow:1517730055323652106>"
 local EMOJI_STARTER   = "<a:mancing:1517730589091041433>"
 local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>"
 local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"
 local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"
-local EMOJI_LEGENDARY = "<a:apiijo:1517778951223902239>"  -- TODO: ganti -> Crystalized Legendary
+local EMOJI_LEGENDARY = "<a:apiijo:1517778951223902239>"
 local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
-local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"  -- TODO: ganti -> Megalodon Hunt event
+local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"
 local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
 local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"
-local EMOJI_EVENTTAG  = "📢"  -- TODO: ganti -> "Event Hunt Alert" author icon
+local EMOJI_EVENTTAG  = "📢"
 local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
-local EMOJI_SERVER    = "<a:muter:1517778915836563596>"  -- TODO: ganti -> Server Stats title
-local EMOJI_TROPHY    = "🏆"  -- FIX: dipakai di SendLeaderboard tapi belum pernah didefinisikan
+local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
+local EMOJI_TROPHY    = "🏆"
 
--- Separator unik dipakai di semua field
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -89,7 +87,7 @@ local MemberList = {
     { username = "mnikndy",          display = "prettyv",              id = "1478607686345035880" },
     { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" },
     { username = "flucidious",       display = "fluc",                 id = "279691238494699530" },
-    { username = "nahaaa01",        display = "naffz",               id = "1392909983678595244" },
+    { username = "nahaaa01",         display = "naffz",               id = "1392909983678595244" },
     { username = "AcidReign07",      display = "kiixlau",              id = "1393120438594437161" },
     { username = "minyaktalon9990",  display = "Revv2",                id = "870201488218157107" },
     { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" },
@@ -146,8 +144,6 @@ local MemberList = {
     { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
     { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
     { username = "dipyyy",           display = "karyawandripy",        id = "454238781168418826" },
-
-
 }
 
 -- ============================================================
@@ -268,7 +264,6 @@ local FishChanceData = {
     [""]                          = "1 in 3M",
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
-    
 }
 
 local FishImageURL = {
@@ -344,8 +339,6 @@ local FishImageURL = {
 
 local EventHuntData = {
     {
-        -- FIX: trigger harus cocok dengan teks Label saja ("Treasure Hunt")
-        -- bukan full sentence, karena Label & Header adalah 2 label terpisah
         textTriggers = { "treasure hunt" },
         title        = EMOJI_TREASURE .. " Treasure Hunt Dimulai!",
         description  = "katakan Peta 🗺️",
@@ -383,7 +376,6 @@ local EventHuntData = {
     },
 }
 
--- Cooldown anti-spam per event
 local EventCooldown  = {}
 
 -- ============================================================
@@ -476,8 +468,6 @@ end
 --  RARITY BAR HELPER
 -- ============================================================
 
--- Mengubah string chance ("1 in 15M", "1 in 750K", "1 in ??") menjadi
--- representasi bar visual ASCII + label tier kelangkaan.
 local function ChanceToScale(chanceStr)
     if not chanceStr then return nil end
     local num, unit = chanceStr:match("1 in ([%d%.]+)([KM]?)")
@@ -503,8 +493,6 @@ local function BuildRarityBar(chanceStr)
         return "░░░░░░░░░░ ?"
     end
 
-    -- Skala log supaya rentang 100K - 30M+ tetap proporsional di 10 segmen
-    -- semakin besar angka "1 in X", semakin langka, semakin penuh bar-nya
     local minLog, maxLog = math.log(50000), math.log(35000000)
     local valLog = math.log(value)
     local ratio  = (valLog - minLog) / (maxLog - minLog)
@@ -520,8 +508,8 @@ local function BuildRarityBar(chanceStr)
     if value >= 15000000 then label = "FORGOTEN"
     elseif value >= 5000000 then label = "SECRET"
     elseif value >= 1000000 then label = "SIMPEN"
-    elseif value >= 300000 then label = "LUMAYAN"
-    else label = "TUMBAL"
+    elseif value >= 300000 then label = "TUMBAL"
+    else label = "JUAL KE ALEX"
     end
 
     return bar .. " " .. label
@@ -741,18 +729,7 @@ local function SendEventWebhook(eventData, rawText)
 end
 
 -- ============================================================
---  EVENT DETECTION — FIX UTAMA
---
---  Masalah sebelumnya:
---  1. Nama GUI dicari "TextNotifications" padahal aslinya "Texts"
---  2. checkText dipanggil saat hookLabel (saat teks kosong / UI lain)
---  3. task.defer tidak reliable
---
---  Fix:
---  - Hook SEMUA TextLabel di seluruh PlayerGui via DescendantAdded
---  - checkText hanya dipanggil saat teks BERUBAH (GetPropertyChangedSignal)
---  - Tidak cek teks saat hook awal (menghindari false positive UI lain)
---  - Kecuali kalau teks sudah berisi keyword saat script pertama jalan
+--  EVENT DETECTION
 -- ============================================================
 
 local _hookedLabels = {}
@@ -762,8 +739,6 @@ local function ProcessEventText(text)
     if not text or text == "" then return end
     local lower = text:lower()
 
-    -- FIX: hanya proses kalau ada kata "hunt", "started", "crystal", "spawned"
-    -- supaya tidak false positive dari UI lain
     local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal") or lower:find("spawned")
     if not isRelevant then return end
 
@@ -785,10 +760,8 @@ local function HookLabel(label)
     if _hookedLabels[label] then return end
     _hookedLabels[label] = true
 
-    -- Cek teks saat ini dulu (kalau event sudah aktif sebelum script jalan)
     ProcessEventText(label.Text)
 
-    -- Monitor setiap kali teks berubah
     label:GetPropertyChangedSignal("Text"):Connect(function()
         ProcessEventText(label.Text)
     end)
@@ -799,18 +772,14 @@ local function StartEventMonitor()
         local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 30)
         if not pg then return end
 
-        -- Hook semua TextLabel yang sudah ada di PlayerGui
         for _, v in ipairs(pg:GetDescendants()) do
             if v:IsA("TextLabel") or v:IsA("TextButton") then
                 HookLabel(v)
             end
         end
 
-        -- Hook TextLabel baru yang ditambahkan ke PlayerGui
-        -- DescendantAdded jauh lebih reliable daripada ChildAdded + hookAll rekursif
         pg.DescendantAdded:Connect(function(v)
             if v:IsA("TextLabel") or v:IsA("TextButton") then
-                -- task.wait(0) untuk beri waktu game set teks sebelum kita cek
                 task.wait(0)
                 HookLabel(v)
             end
@@ -879,9 +848,22 @@ local function ParseChat(rawMsg)
     return { player = playerName, fish = fishFull, weight = weight }
 end
 
-local function GetAvatarUrl(player)
-    return player and (PROXY .. "/avatar/" .. tostring(player.UserId) .. "?t=" .. tostring(os.time())) or nil
+-- ============================================================
+--  AVATAR URL HELPER
+--  FIX: sekarang terima uid langsung supaya bisa fallback
+--  tanpa perlu player object
+-- ============================================================
+
+local function GetAvatarUrlById(userId)
+    if not userId then return nil end
+    return PROXY .. "/avatar/" .. tostring(userId) .. "?t=" .. tostring(os.time())
 end
+
+-- ============================================================
+--  CHECK AND SEND
+--  FIX: avatarUrl sekarang pakai uid fallback dari PlayerNameToId
+--  supaya thumbnail tetap muncul meski FindPlayer() return nil
+-- ============================================================
 
 local function CheckAndSend(rawMsg)
     if not SCRIPT_ACTIVE then return end
@@ -891,8 +873,14 @@ local function CheckAndSend(rawMsg)
     if not data then return end
 
     local targetPlayer = FindPlayer(data.player)
-    local avatarUrl    = GetAvatarUrl(targetPlayer)
-    local uid          = targetPlayer and targetPlayer.UserId or PlayerNameToId[string.lower(data.player)]
+
+    -- FIX: resolve uid dari player object ATAU dari cache PlayerNameToId
+    local uid = (targetPlayer and targetPlayer.UserId)
+             or PlayerNameToId[string.lower(data.player)]
+
+    -- FIX: avatar diambil dari uid, bukan dari player object
+    -- kalau FindPlayer() gagal tapi uid ada di cache, thumbnail tetap muncul
+    local avatarUrl = GetAvatarUrlById(uid)
 
     if uid then
         if not PlayerStats[uid] then
@@ -957,11 +945,6 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- FIX: sebelumnya blok ini jadi fallback TANPA SYARAT untuk semua ikan
-    -- yang bukan secret/ruby/legendary -> ikan biasa (Primal Axolotl, Wild West
-    -- Crab, dll) ikut kekirim sebagai "Mutasi Terdeteksi" padahal field Mutasi-nya
-    -- kosong ("—"), karena FindMutasi(data.fish) memang tidak menemukan apa-apa.
-    -- Sekarang webhook HANYA terkirim kalau mutasi benar-benar terdeteksi di nama ikan.
     local mutasiDetected = FindMutasi(data.fish)
     if not mutasiDetected then return end
 
@@ -980,9 +963,7 @@ local function CheckAndSend(rawMsg)
         nil,
         nil
     )
-end  -- FIX: 'end' ini sebelumnya hilang, menyebabkan seluruh sisa file
-     -- (WatchBackpack, WatchForFish, HookChat, StartMonitoring, CreateUI, dll)
-     -- ikut ter-nest di dalam CheckAndSend -> parse error 'end' expected di EOF
+end
 
 -- ============================================================
 --  BACKPACK MONITOR
@@ -1052,11 +1033,8 @@ local function StartMonitoring()
     })
 
     HookChat()
-
-    -- Event Monitor via PlayerGui (FIX)
     StartEventMonitor()
 
-    -- Leaderboard setiap 30 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(LEADERBOARD_INTERVAL)
@@ -1064,7 +1042,6 @@ local function StartMonitoring()
         end
     end)
 
-    -- Server stats setiap 20 menit
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(1200)
@@ -1089,10 +1066,9 @@ local function StartMonitoring()
         end
     end)
 
-    -- Init existing players
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
-        AvatarCache[p.UserId]                       = GetAvatarUrl(p)
+        AvatarCache[p.UserId]                       = GetAvatarUrlById(p.UserId)
         PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name }
         PlayerNameToId[string.lower(p.Name)]        = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
@@ -1108,7 +1084,7 @@ local function StartMonitoring()
         BuildMentionCache(player.Name, player.DisplayName)
         task.spawn(function()
             task.wait(1)
-            AvatarCache[player.UserId] = GetAvatarUrl(player)
+            AvatarCache[player.UserId] = GetAvatarUrlById(player.UserId)
             SendWebhook(EMOJI_JOIN .. " Player Joined Server", "welcam", TierColors.Join, {
                 { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                inline = true },
                 { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
@@ -1121,7 +1097,7 @@ local function StartMonitoring()
         if not SCRIPT_ACTIVE then return end
         local pName      = player.Name
         local pId        = player.UserId
-        local avatarUrl  = AvatarCache[pId] or GetAvatarUrl(player)
+        local avatarUrl  = AvatarCache[pId] or GetAvatarUrlById(pId)
         local totalNow   = #Players:GetPlayers() - 1
         local mentionStr = GetMention(pName)
 
