@@ -64,8 +64,7 @@ local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
 local EMOJI_TROPHY    = "🏆"
 
-local SEP  = EMOJI_SEPARATOR
-local LINE = { name = "\u{200b}", value = "─────────────────────────────", inline = false }
+local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
 --  MEMBER LIST
@@ -333,7 +332,6 @@ local FishImageURL = {
     ["Elemental Tempestray"]     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/16.png",
     ["Dark Megalodon"]           = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/41.png",
 }
-
 -- ============================================================
 --  EVENT HUNT DATABASE
 -- ============================================================
@@ -675,7 +673,6 @@ end
 local function SendWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    table.insert(f, LINE)
     PostWebhook(WEBHOOK_URL, {
         username   = "BLOX Gank",
         avatar_url = WEBHOOK_AVATAR,
@@ -689,7 +686,6 @@ local function SendFishWebhook(title, description, color, fields, imageUrl, thum
     if url == "" then return end
     local f = {}
     for _, v in ipairs(fields) do table.insert(f, v) end
-    table.insert(f, LINE)
     PostWebhook(url, {
         content = BuildContent(mention, captionType),
         embeds  = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl) },
@@ -697,11 +693,8 @@ local function SendFishWebhook(title, description, color, fields, imageUrl, thum
 end
 
 local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
-    local f = {}
-    for _, v in ipairs(fields) do table.insert(f, v) end
-    table.insert(f, LINE)
     PostWebhook(WEBHOOK_STATS, {
-        embeds = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Stats") }
+        embeds = { BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, "BLOX Gank Stats") }
     })
 end
 
@@ -722,10 +715,9 @@ local function SendEventWebhook(eventData, rawText)
             eventData.description,
             eventData.color,
             {
-                { name = SEP .. " Host Server",  value = "**" .. Players.LocalPlayer.Name .. "**",               inline = true },
-                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang",  inline = true },
-                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                    inline = true },
-                LINE,
+                { name = SEP .. " Host Server", value = "**" .. Players.LocalPlayer.Name .. "**",              inline = true },
+                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang", inline = true },
+                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                   inline = true },
             },
             eventData.imageUrl,
             eventData.thumbUrl,
@@ -824,7 +816,6 @@ local function SendLeaderboard()
 
     local uptime = os.time() - ServerStats.startTime
     SendStatsWebhook(EMOJI_TROPHY .. " Leaderboard Secret Fish", table.concat(lines, "\n\n"), 16766720, {
-        LINE,
         { name = SEP .. " Uptime Server",   value = UptimeString(uptime),                                      inline = true },
         { name = SEP .. " Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
         { name = SEP .. " Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
@@ -858,6 +849,8 @@ end
 
 -- ============================================================
 --  AVATAR URL HELPER
+--  FIX: sekarang terima uid langsung supaya bisa fallback
+--  tanpa perlu player object
 -- ============================================================
 
 local function GetAvatarUrlById(userId)
@@ -867,6 +860,8 @@ end
 
 -- ============================================================
 --  CHECK AND SEND
+--  FIX: avatarUrl sekarang pakai uid fallback dari PlayerNameToId
+--  supaya thumbnail tetap muncul meski FindPlayer() return nil
 -- ============================================================
 
 local function CheckAndSend(rawMsg)
@@ -877,8 +872,13 @@ local function CheckAndSend(rawMsg)
     if not data then return end
 
     local targetPlayer = FindPlayer(data.player)
+
+    -- FIX: resolve uid dari player object ATAU dari cache PlayerNameToId
     local uid = (targetPlayer and targetPlayer.UserId)
              or PlayerNameToId[string.lower(data.player)]
+
+    -- FIX: avatar diambil dari uid, bukan dari player object
+    -- kalau FindPlayer() gagal tapi uid ada di cache, thumbnail tetap muncul
     local avatarUrl = GetAvatarUrlById(uid)
 
     if uid then
@@ -893,7 +893,6 @@ local function CheckAndSend(rawMsg)
     if legendaryBase then
         local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
         SendFishWebhook(EMOJI_LEGENDARY .. " Crystalized Legendary!", " " .. EMOJI_MUTASI, TierColors.Legendary, {
-            LINE,
             { name = SEP .. " Pemain",  value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",    value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",   value = "**" .. data.weight .. "**", inline = true },
@@ -905,7 +904,6 @@ local function CheckAndSend(rawMsg)
     if rubyBase then
         local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
         SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", "Goceng" .. EMOJI_RUBY, TierColors.Ruby, {
-            LINE,
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -927,7 +925,6 @@ local function CheckAndSend(rawMsg)
         local rarityBar   = BuildRarityBar(chanceInfo)
         local mutasiField = mutasi and (EMOJI_MUTASI .. " *" .. mutasi .. "*") or "—"
         local fields = {
-            LINE,
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -955,7 +952,6 @@ local function CheckAndSend(rawMsg)
         "",
         TierColors.Mutasi,
         {
-            LINE,
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
@@ -1030,7 +1026,6 @@ local function StartMonitoring()
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
 
     SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif ", TierColors.Join, {
-        LINE,
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
         { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
@@ -1061,7 +1056,6 @@ local function StartMonitoring()
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
             SendStatsWebhook(EMOJI_SERVER .. " Server Stats", "Ringkasan aktivitas server", 3447003, {
-                LINE,
                 { name = SEP .. " Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
                 { name = SEP .. " Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
                 { name = SEP .. " Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
@@ -1091,8 +1085,7 @@ local function StartMonitoring()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrlById(player.UserId)
             SendWebhook(EMOJI_JOIN .. " Player Joined Server", "welcam", TierColors.Join, {
-                LINE,
-                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                    inline = true },
+                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                inline = true },
                 { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
@@ -1114,8 +1107,7 @@ local function StartMonitoring()
         MentionCache[string.lower(pName)]   = nil
 
         SendWebhook(EMOJI_LEAVE .. " Player Left Server", "Salah satu pemain keluar server.", TierColors.Leave, {
-            LINE,
-            { name = SEP .. " Username",     value = "**" .. pName .. "**",             inline = true },
+            { name = SEP .. " Username",     value = "**" .. pName .. "**",       inline = true },
             { name = SEP .. " Total Player", value = "**" .. tostring(totalNow) .. "**", inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
 
@@ -1130,7 +1122,6 @@ local function StartMonitoring()
                     avatar_url = WEBHOOK_AVATAR,
                     content    = notBackContent,
                     embeds     = { BuildEmbed(EMOJI_NOTBACK .. " Player Tidak Kembali", "Pemain ini belum balik lagi ke server, semoga aman ya~", TierColors.NotBack, {
-                        LINE,
                         { name = SEP .. " Username", value = "**" .. pName .. "**",               inline = true },
                         { name = SEP .. " Info",     value = "Tidak kembali selama **10 menit**", inline = true },
                     }, avatarUrl, nil, "BLOX Gank Webhook") },
