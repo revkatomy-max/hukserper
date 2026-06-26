@@ -331,11 +331,13 @@ local FishImageURL = {
     ["Love Nessie"]              = NP .. "85.png",
     ["Broken Heart Nessie"]      = NP .. "86.png",
     ["Ketupat Whale"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ketupat%20Whale.png",
-    ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/99.png",
+    ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Leviathan.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
-    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/2.png",
+    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
     ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
+    ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/77.png",
+    ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/76.png",
 }
 
 -- ============================================================
@@ -349,8 +351,7 @@ local EventHuntData = {
         description  = "katakan Peta 🗺️",
         color        = 16766720,
         emoji        = "💰",
-        imageUrl     = nil,
-        thumbUrl     = "",
+        thumbUrl     = FishImageURL["treasure hunt"],
     },
     {
         textTriggers = { "megalodon hunt" },
@@ -358,7 +359,6 @@ local EventHuntData = {
         description  = "Mega gusy 🎣",
         color        = 3447003,
         emoji        = "🦈",
-        imageUrl     = FishImageURL["Megalodon"],
         thumbUrl     = FishImageURL["Megalodon"],
     },
     {
@@ -367,7 +367,6 @@ local EventHuntData = {
         description  = "zilla oi " .. EMOJI_THUNDER,
         color        = 16776960,
         emoji        = "⚡",
-        imageUrl     = FishImageURL["Thunderzilla"],
         thumbUrl     = FishImageURL["Thunderzilla"],
     },
     {
@@ -376,8 +375,15 @@ local EventHuntData = {
         description  = "Crystal muncul gas nambang " .. EMOJI_CRYSTAL,
         color        = 1146986,
         emoji        = "💎",
-        imageUrl     = nil,
-        thumbUrl     = nil,
+        thumbUrl     = FishImageURL["Crystal"],
+    },
+    {
+        textTriggers = { "dark megalodon hunt", "dark megalodon" },
+        title        = "🌑 Dark Megalodon Hunt Dimulai!",
+        description  = "Dark Mega guys " .. EMOJI_MEGALODON,
+        color        = 2303786,
+        emoji        = "🌑",
+        thumbUrl     = FishImageURL["Dark Megalodon"],
     },
 }
 
@@ -727,7 +733,7 @@ local function SendEventWebhook(eventData, rawText)
                 { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang",  inline = true },
                 { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                    inline = true },
             },
-            eventData.imageUrl,
+            nil,
             eventData.thumbUrl,
             "BLOX Gank Event Monitor",
             { name = EMOJI_EVENTTAG .. " Event Hunt Alert", icon_url = WEBHOOK_AVATAR ~= "" and WEBHOOK_AVATAR or nil }
