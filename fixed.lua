@@ -64,7 +64,7 @@ local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
 local EMOJI_TROPHY    = "🏆"
 
-local SEP = EMOJI_SEPARATOR
+local SEP  = EMOJI_SEPARATOR
 
 -- ============================================================
 --  MEMBER LIST
@@ -168,7 +168,7 @@ local SecretFishList = {
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
-    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon", "Elemental Tempestray",
+    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon", "Elemental Tempestray", "Glacial Serpent",
 }
 
 local ForgottenList = {
@@ -261,76 +261,76 @@ local FishChanceData = {
     ["Crystal Goliath"]           = "1 in 3M",
     ["Ketupat Whale"]             = "1 in ??",
     ["Scorching Veinmaw"]         = "1 in 5M",
-    [""]                          = "1 in 3M",
+    ["Glacial Serpent"]           = "1 in 3M",
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
 }
 
 local FishImageURL = {
     ["Monster Shark"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Monster%20Shark.png",
-    ["Megalodon"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Megalodon.png",
+    ["Megalodon"]                = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/36.png",
     ["Ancient Lochness Monster"] = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Lochness%20Monster.png",
     ["Ancient Magma Whale"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Magma%20Whale.png",
     ["Ancient Whale"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ancient%20Whale.png",
-    ["Bloodmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Bloodmoon%20Whale.png",
-    ["Blob Shark"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Blob%20Shark.png",
-    ["Bonemaw Tyrant"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Bonemaw%20Tyrant.png",
+    ["Bloodmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/37.png",
+    ["Blob Shark"]               = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/2.png",
+    ["Bonemaw Tyrant"]           = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/24.png",
     ["Bone Whale"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Bone%20Whale.png",
     ["Cosmic Mutant Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cosmic%20Mutant%20Shark.png",
-    ["Cryoshade Glider"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cryoshade%20Glider.png",
-    ["Crystal Crab"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Crystal%20Crab.png",
-    ["Cursed Kraken"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cursed%20Kraken.png",
-    ["Depthseeker Ray"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Depthseeker%20Ray.png",
-    ["Eerie Shark"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Eerie%20Shark.png",
-    ["Elpirate Gran Maja"]       = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Elpirate%20Gran%20Maja.png",
-    ["Elshark Gran Maja"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Elshark%20Gran%20Maja.png",
-    ["Frostborn Shark"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Frostborn%20Shark.png",
-    ["Ghost Shark"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ghost%20Shark.png",
-    ["Giant Squid"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Giant%20Squid.png",
-    ["Gladiator Shark"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Gladiator%20Shark.png",
-    ["Great Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Great%20Whale.png",
+    ["Cryoshade Glider"]         = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/5.png",
+    ["Crystal Crab"]             = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/9.png",
+    ["Cursed Kraken"]            = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/32.png",
+    ["Depthseeker Ray"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/18.png",
+    ["Eerie Shark"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/3.png",
+    ["Elpirate Gran Maja"]       = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/34.png",
+    ["Elshark Gran Maja"]        = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/33.png",
+    ["Frostborn Shark"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/7.png",
+    ["Ghost Shark"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/6.png",
+    ["Giant Squid"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/13.png",
+    ["Gladiator Shark"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/15.png",
+    ["Great Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/14.png",
     ["Ketupat Whale"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ketupat%20Whale.png",
-    ["King Crab"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/King%20Crab.png",
-    ["King Jelly"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/King%20Jelly.png",
+    ["King Crab"]                = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/19.png",
+    ["King Jelly"]               = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/20.png",
     ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Leviathan.png",
     ["Lochness Monster"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Lochness%20Monster.png",
-    ["Mosasaur Shark"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Mosasaur%20Shark.png",
-    ["Orca"]                     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Orca.png",
-    ["Panther Eel"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Panther%20Eel.png",
-    ["Pirate Megalodon"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Pirate%20Megalodon.png",
-    ["Queen Crab"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Queen%20Crab.png",
+    ["Mosasaur Shark"]           = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/12.png",
+    ["Orca"]                     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/22.png",
+    ["Panther Eel"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/10.png",
+    ["Pirate Megalodon"]         = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/35.png",
+    ["Queen Crab"]               = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/11.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
-    ["Robot Kraken"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Robot%20Kraken.png",
-    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ruby%20Gemstone.png",
-    ["Sea Eater"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Sea%20Eater.png",
-    ["Skeleton Narwhal"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Skeleton%20Narwhal.png",
-    ["Thin Armor Shark"]         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Thin%20Armor%20Shark.png",
-    ["Thunderzilla"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Thunderzilla.png",
+    ["Robot Kraken"]             = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/31.png",
+    ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
+    ["Sea Eater"]                = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/47.png",
+    ["Skeleton Narwhal"]         = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/8.png",
+    ["Thin Armor Shark"]         = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/4.png",
+    ["Thunderzilla"]             = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/48.png",
     ["Strawberry Orca"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Strawberry%20Orca.png",
     ["Eggy Enchant Stone"]       = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Eggy%20Enchant%20Stone.png",
-    ["Worm Fish"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Worm%20Fish.png",
+    ["Worm Fish"]                = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/25.png",
     ["Iridesca"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Iridesca.png",
     ["Deepsea Monster Axolotl"]  = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Deepsea%20Monster%20Axolotl.jpeg",
-    ["Blocky Lochness Monster"]  = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Blocky%20Lochness%20Monster.jpeg",
-    ["Frostbite Leviathan"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Frostbite%20Leviathan.jpeg",
-    ["Aurelion"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Aurelion.png",
-    ["Frogalloon"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Frogallon.png",
-    ["Scare"]                    = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scare.png",
+    ["Blocky Lochness Monster"]  = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/29.png",
+    ["Frostbite Leviathan"]      = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/43.png",
+    ["Aurelion"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/30.png",
+    ["Frogalloon"]               = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/21.png",
+    ["Scare"]                    = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/28.png",
     ["Viridis Lurker"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Viridis%20Lurker.jpg",
-    ["Fluorivane"]               = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Fluorivane.png",
-    ["Coral Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Coral%20Whale.png",
-    ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Runic%20Enchant%20Stone.png",
-    ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Flame%20Tyrant.png",
-    ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Cerulean%20Dragon.png",
-    ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Withering%20Core.png",
-    ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Machodon.png",
-    ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Scorching%20Veinmaw.png",
-    ["Crystalline Behemoth"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crisstalline%20behemoth.png",
-    ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/frostmoon%20whale.png",
-    ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/crystal%20Goliath.png",
-    [""]                         = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
-    ["Elemental Tempestray"]     = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Elemental%20Tempestray.png",
-    ["Dark Megalodon"]           = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/dark%20megalodon.png",
+    ["Fluorivane"]               = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/44.png",
+    ["Coral Whale"]              = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/23.png",
+    ["Runic Enchant Stone"]      = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/17.png",
+    ["Flame Tyrant"]             = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/40.png",
+    ["Cerulean Dragon"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/46.png",
+    ["Withering Core"]           = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/26.png",
+    ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
+    ["Scorching Veinmaw"]        = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/38.png",
+    ["Crystalline Behemoth"]     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/45.png",
+    ["Frostmoon Whale"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/39.png",
+    ["Crystal Goliath"]          = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/27.png",
+    ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
+    ["Elemental Tempestray"]     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/16.png",
+    ["Dark Megalodon"]           = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/41.png",
 }
 
 -- ============================================================
@@ -694,8 +694,10 @@ local function SendFishWebhook(title, description, color, fields, imageUrl, thum
 end
 
 local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
+    local f = {}
+    for _, v in ipairs(fields) do table.insert(f, v) end
     PostWebhook(WEBHOOK_STATS, {
-        embeds = { BuildEmbed(title, description, color, fields, imageUrl, thumbUrl, "BLOX Gank Stats") }
+        embeds = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Stats") }
     })
 end
 
@@ -716,9 +718,9 @@ local function SendEventWebhook(eventData, rawText)
             eventData.description,
             eventData.color,
             {
-                { name = SEP .. " Host Server", value = "**" .. Players.LocalPlayer.Name .. "**",              inline = true },
-                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang", inline = true },
-                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                   inline = true },
+                { name = SEP .. " Host Server",  value = "**" .. Players.LocalPlayer.Name .. "**",               inline = true },
+                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang",  inline = true },
+                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                    inline = true },
             },
             eventData.imageUrl,
             eventData.thumbUrl,
@@ -850,8 +852,6 @@ end
 
 -- ============================================================
 --  AVATAR URL HELPER
---  FIX: sekarang terima uid langsung supaya bisa fallback
---  tanpa perlu player object
 -- ============================================================
 
 local function GetAvatarUrlById(userId)
@@ -861,8 +861,6 @@ end
 
 -- ============================================================
 --  CHECK AND SEND
---  FIX: avatarUrl sekarang pakai uid fallback dari PlayerNameToId
---  supaya thumbnail tetap muncul meski FindPlayer() return nil
 -- ============================================================
 
 local function CheckAndSend(rawMsg)
@@ -873,13 +871,8 @@ local function CheckAndSend(rawMsg)
     if not data then return end
 
     local targetPlayer = FindPlayer(data.player)
-
-    -- FIX: resolve uid dari player object ATAU dari cache PlayerNameToId
     local uid = (targetPlayer and targetPlayer.UserId)
              or PlayerNameToId[string.lower(data.player)]
-
-    -- FIX: avatar diambil dari uid, bukan dari player object
-    -- kalau FindPlayer() gagal tapi uid ada di cache, thumbnail tetap muncul
     local avatarUrl = GetAvatarUrlById(uid)
 
     if uid then
@@ -897,7 +890,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Pemain",  value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",    value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",   value = "**" .. data.weight .. "**", inline = true },
-        }, imageUrl, avatarUrl, nil, "secret")
+        }, nil, imageUrl, nil, "secret")
         return
     end
 
@@ -908,7 +901,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-        }, imageUrl, avatarUrl, nil, "secret")
+        }, nil, imageUrl, nil, "secret")
         return
     end
 
@@ -936,11 +929,11 @@ local function CheckAndSend(rawMsg)
         if isForgotten then
             ServerStats.totalForgotten = ServerStats.totalForgotten + 1
             table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", " " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, imageUrl, avatarUrl, GetMention(data.player), "forgotten")
+            SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", " " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, nil, imageUrl, GetMention(data.player), "forgotten")
         else
             ServerStats.totalSecret = ServerStats.totalSecret + 1
             table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
-            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", " ", TierColors.Secret, fields, imageUrl, avatarUrl, GetMention(data.player), "secret")
+            SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", " ", TierColors.Secret, fields, nil, imageUrl, GetMention(data.player), "secret")
         end
         return
     end
@@ -1086,7 +1079,7 @@ local function StartMonitoring()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrlById(player.UserId)
             SendWebhook(EMOJI_JOIN .. " Player Joined Server", "welcam", TierColors.Join, {
-                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                inline = true },
+                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                    inline = true },
                 { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
@@ -1108,7 +1101,7 @@ local function StartMonitoring()
         MentionCache[string.lower(pName)]   = nil
 
         SendWebhook(EMOJI_LEAVE .. " Player Left Server", "Salah satu pemain keluar server.", TierColors.Leave, {
-            { name = SEP .. " Username",     value = "**" .. pName .. "**",       inline = true },
+            { name = SEP .. " Username",     value = "**" .. pName .. "**",             inline = true },
             { name = SEP .. " Total Player", value = "**" .. tostring(totalNow) .. "**", inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
 
