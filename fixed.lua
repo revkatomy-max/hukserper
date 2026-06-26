@@ -336,7 +336,7 @@ local FishImageURL = {
     ["Ruby"]                     = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
     ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
-    ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/77.png",
+    ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/76.png",
 }
 
