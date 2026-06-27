@@ -1,7 +1,5 @@
 -- ============================================================
 --  BLOX Gank Server Monitor  |  Discord: @bloxgank
---  Event Monitor: Megalodon / Thunderzilla / Treasure / Shark Hunt dll
---  Deteksi via PlayerGui (hook semua TextLabel perubahan teks)
 -- ============================================================
 
 local HttpService        = game:GetService("HttpService")
@@ -11,10 +9,6 @@ local ReplicatedStorage  = game:GetService("ReplicatedStorage")
 local CoreGui            = game:GetService("CoreGui")
 local TweenService       = game:GetService("TweenService")
 
--- ============================================================
---  CONFIGURATION
--- ============================================================
-
 local WEBHOOK_URL    = ""
 local WEBHOOK_STATS  = ""
 local WEBHOOK_FISH   = ""
@@ -23,13 +17,8 @@ local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
 
-local LEADERBOARD_INTERVAL    = 1800
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
-
--- ============================================================
---  BRANDING
--- ============================================================
 
 local BRAND_NAME        = "BLOX GANK"
 local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png"
@@ -62,9 +51,7 @@ local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
-local EMOJI_TROPHY    = "🏆"
-
-local SEP  = EMOJI_SEPARATOR
+local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
 --  MEMBER LIST
@@ -73,9 +60,7 @@ local SEP  = EMOJI_SEPARATOR
 local MemberList = {
     { username = "zupzupzuppasup",   display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" },
     { username = "natadecxco",       display = "natarebus",            id = "638355599574171668" },
-    { username = "pyciieegirls",     display = "pyciiiii",             id = "1182254978904109138" },
     { username = "kdryvka",          display = "YIYA",                 id = "1312729486067761162" },
-    { username = "1nhanss",          display = "han",                  id = "1438046472179548190" },
     { username = "cjmin131",         display = "Karaadino",            id = "1506715872612585606" },
     { username = "x_ibo21",          display = "wowo",                 id = "954296542406246400" },
     { username = "evosudin",         display = "Bluuism",              id = "875656564931956766" },
@@ -87,7 +72,7 @@ local MemberList = {
     { username = "mnikndy",          display = "prettyv",              id = "1478607686345035880" },
     { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" },
     { username = "flucidious",       display = "fluc",                 id = "279691238494699530" },
-    { username = "nahaaa01",         display = "naffz",               id = "1392909983678595244" },
+    { username = "nahaaa01",         display = "naffz",                id = "1392909983678595244" },
     { username = "AcidReign07",      display = "kiixlau",              id = "1393120438594437161" },
     { username = "minyaktalon9990",  display = "Revv2",                id = "870201488218157107" },
     { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" },
@@ -96,7 +81,6 @@ local MemberList = {
     { username = "Klerra_Asu",       display = "MomKlerra",            id = "1171410071092215888" },
     { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
     { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
-    { username = "zyr_xi",           display = "fii",                  id = "1181609363236999289" },
     { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
     { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
     { username = "cobadulumogaseru", display = "lah",                  id = "1451975194397638676" },
@@ -138,12 +122,18 @@ local MemberList = {
     { username = "xiaosanzhe",       display = "san",                  id = "1407648190580133948" },
     { username = "zielsalvatore",    display = "salva",                id = "1205780304753725492" },
     { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
-    { username = "Moonshyse",        display = "MOON",                 id = "1125668364489080933" },
+    { username = "Mhrshina",         display = "shina",                id = "1125668364489080933" },
     { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
     { username = "akuganteng66611",  display = "akun",                 id = "1398328850793889872" },
     { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
     { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
     { username = "dipyyy",           display = "karyawandripy",        id = "454238781168418826" },
+    { username = "caribbeanight",    display = "holly",                id = "869841474332811274" },
+    { username = "luwepol",          display = "pakmala",              id = "757111417919766648" },
+    { username = "rykalys06",        display = "bebew06",              id = "1488495609961906247" },
+    { username = "thewtrmlnz",       display = "karinateary",          id = "1450346429867622480" },
+    { username = "MrZealouz",        display = "MrZealouz",            id = "1450346429867622480" },
+    { username = "Uwellll2",         display = "narumi",               id = "1395401789561507952" }, -- FIX: hapus trailing space
 }
 
 -- ============================================================
@@ -168,16 +158,17 @@ local SecretFishList = {
     "Runic Enchant Stone", "Frogalloon", "Coral Whale", "Flame Tyrant", "Withering Core",
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
-    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon", "Elemental Tempestray", "Glacial Serpent",
+    "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
+    "Elemental Tempestray", "Glacial Serpent",
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon","Crystalline Behemoth",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Crystalline Behemoth",
 }
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
+    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Aurora",
 }
 
 local LegendaryCrystalList = {
@@ -342,6 +333,7 @@ local FishImageURL = {
 
 -- ============================================================
 --  EVENT HUNT DATABASE
+--  FIX 1: Dark Megalodon dipindah ke ATAS Megalodon Hunt
 -- ============================================================
 
 local EventHuntData = {
@@ -352,6 +344,15 @@ local EventHuntData = {
         color        = 16766720,
         emoji        = "💰",
         thumbUrl     = FishImageURL["treasure hunt"],
+    },
+    -- FIX 1: dark megalodon HARUS di atas megalodon hunt
+    {
+        textTriggers = { "dark megalodon hunt", "dark megalodon" },
+        title        = "🌑 Dark Megalodon Hunt Dimulai!",
+        description  = "Dark Mega guys " .. EMOJI_MEGALODON,
+        color        = 2303786,
+        emoji        = "🌑",
+        thumbUrl     = FishImageURL["Dark Megalodon"],
     },
     {
         textTriggers = { "megalodon hunt" },
@@ -378,16 +379,17 @@ local EventHuntData = {
         thumbUrl     = FishImageURL["Crystal"],
     },
     {
-        textTriggers = { "dark megalodon hunt", "dark megalodon" },
-        title        = "🌑 Dark Megalodon Hunt Dimulai!",
-        description  = "Dark Mega guys " .. EMOJI_MEGALODON,
-        color        = 2303786,
-        emoji        = "🌑",
-        thumbUrl     = FishImageURL["Dark Megalodon"],
+        -- FIX 2: trigger lowercase supaya match konsisten
+        textTriggers = { "aurora borealis", "aurora event" },
+        title        = "💫 Aurora Borealis!",
+        description  = "cantiknyooo",
+        color        = 9055202,
+        emoji        = "💫",
+        thumbUrl     = nil,
     },
 }
 
-local EventCooldown  = {}
+local EventCooldown = {}
 
 -- ============================================================
 --  STATE / CACHE
@@ -473,57 +475,6 @@ local function FindPlayer(name)
         end
     end
     return nil
-end
-
--- ============================================================
---  RARITY BAR HELPER
--- ============================================================
-
-local function ChanceToScale(chanceStr)
-    if not chanceStr then return nil end
-    local num, unit = chanceStr:match("1 in ([%d%.]+)([KM]?)")
-    if not num then return nil end
-    local value = tonumber(num)
-    if not value then return nil end
-    if unit == "K" then value = value * 1000
-    elseif unit == "M" then value = value * 1000000
-    end
-    return value
-end
-
-local function BuildRarityBar(chanceStr)
-    if not chanceStr or chanceStr == "Unknown" then
-        return "░░░░░░░░░░ ?"
-    end
-    if chanceStr:find("%?%?") then
-        return "▓▓▓▓▓▓▓▓▓▓ ∞"
-    end
-
-    local value = ChanceToScale(chanceStr)
-    if not value then
-        return "░░░░░░░░░░ ?"
-    end
-
-    local minLog, maxLog = math.log(50000), math.log(35000000)
-    local valLog = math.log(value)
-    local ratio  = (valLog - minLog) / (maxLog - minLog)
-    ratio = math.clamp(ratio, 0, 1)
-
-    local filled = math.floor(ratio * 10 + 0.5)
-    if filled < 1 then filled = 1 end
-    if filled > 10 then filled = 10 end
-
-    local bar = string.rep("▓", filled) .. string.rep("░", 10 - filled)
-
-    local label
-    if value >= 15000000 then label = "FORGOTEN"
-    elseif value >= 5000000 then label = "SECRET"
-    elseif value >= 1000000 then label = "SIMPEN"
-    elseif value >= 300000 then label = "TUMBAL"
-    else label = "JUAL KE ALEX"
-    end
-
-    return bar .. " " .. label
 end
 
 -- ============================================================
@@ -719,7 +670,6 @@ end
 local function SendEventWebhook(eventData, rawText)
     local url = (WEBHOOK_EVENT ~= "") and WEBHOOK_EVENT or WEBHOOK_URL
     if url == "" then return end
-
     PostWebhook(url, {
         username   = "BLOX Gank Event",
         avatar_url = WEBHOOK_AVATAR,
@@ -729,9 +679,9 @@ local function SendEventWebhook(eventData, rawText)
             eventData.description,
             eventData.color,
             {
-                { name = SEP .. " Host Server",  value = "**" .. Players.LocalPlayer.Name .. "**",               inline = true },
-                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang",  inline = true },
-                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                    inline = true },
+                { name = SEP .. " Host Server",  value = "**" .. Players.LocalPlayer.Name .. "**",              inline = true },
+                { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "** orang", inline = true },
+                { name = SEP .. " Waktu Mulai",  value = os.date("%H:%M:%S"),                                   inline = true },
             },
             nil,
             eventData.thumbUrl,
@@ -743,6 +693,7 @@ end
 
 -- ============================================================
 --  EVENT DETECTION
+--  FIX 2: tambah "aurora" ke isRelevant filter
 -- ============================================================
 
 local _hookedLabels = {}
@@ -752,7 +703,9 @@ local function ProcessEventText(text)
     if not text or text == "" then return end
     local lower = text:lower()
 
-    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal") or lower:find("spawned")
+    -- FIX 2: tambah "aurora" supaya Aurora event terdeteksi
+    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal")
+        or lower:find("spawned") or lower:find("aurora")
     if not isRelevant then return end
 
     for _, evData in ipairs(EventHuntData) do
@@ -772,9 +725,7 @@ end
 local function HookLabel(label)
     if _hookedLabels[label] then return end
     _hookedLabels[label] = true
-
     ProcessEventText(label.Text)
-
     label:GetPropertyChangedSignal("Text"):Connect(function()
         ProcessEventText(label.Text)
     end)
@@ -784,13 +735,9 @@ local function StartEventMonitor()
     task.spawn(function()
         local pg = Players.LocalPlayer:WaitForChild("PlayerGui", 30)
         if not pg then return end
-
         for _, v in ipairs(pg:GetDescendants()) do
-            if v:IsA("TextLabel") or v:IsA("TextButton") then
-                HookLabel(v)
-            end
+            if v:IsA("TextLabel") or v:IsA("TextButton") then HookLabel(v) end
         end
-
         pg.DescendantAdded:Connect(function(v)
             if v:IsA("TextLabel") or v:IsA("TextButton") then
                 task.wait(0)
@@ -801,78 +748,31 @@ local function StartEventMonitor()
 end
 
 -- ============================================================
---  LEADERBOARD
--- ============================================================
-
-local function SendLeaderboard()
-    local leaderData = {}
-    for _, stats in pairs(PlayerStats) do
-        local total, fishList = 0, {}
-        for fishName, count in pairs(stats.secretList) do
-            total = total + count
-            table.insert(fishList, fishName .. " x" .. count)
-        end
-        if total > 0 then
-            table.insert(leaderData, { name = stats.name or "Unknown", total = total,
-                fishStr = #fishList > 0 and table.concat(fishList, ", ") or "-" })
-        end
-    end
-    table.sort(leaderData, function(a, b) return a.total > b.total end)
-    if #leaderData == 0 then return end
-
-    local medals = { "🥇", "🥈", "🥉" }
-    local lines  = {}
-    for i, entry in ipairs(leaderData) do
-        if i > 10 then break end
-        local medal = medals[i] or ("**#" .. i .. "**")
-        table.insert(lines, medal .. " **" .. entry.name .. "** " .. SEP .. " " .. entry.total .. " secret\n↳ " .. entry.fishStr)
-    end
-
-    local uptime = os.time() - ServerStats.startTime
-    SendStatsWebhook(EMOJI_TROPHY .. " Leaderboard Secret Fish", table.concat(lines, "\n\n"), 16766720, {
-        { name = SEP .. " Uptime Server",   value = UptimeString(uptime),                                      inline = true },
-        { name = SEP .. " Total Secret",    value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",    inline = true },
-        { name = SEP .. " Total Forgotten", value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor", inline = true },
-    })
-end
-
--- ============================================================
 --  CHAT PARSING & DETECTION
 -- ============================================================
 
 local function ParseChat(rawMsg)
     local msg = StripTags(rawMsg)
     msg = string.gsub(msg, "^%[Server%]:%s*", "")
-
     local playerName, fishFull, weight = string.match(msg, "^(.-) obtained an? (.-) %(([%d%.%a]+ ?kg)%)")
     if not playerName then
         playerName, fishFull = string.match(msg, "^(.-) obtained an? (.+)")
         weight = "N/A"
     end
     if not playerName or not fishFull then return nil end
-
     playerName = playerName:match("%[%a+%]:%s*(.+)") or playerName
     playerName = Trim(playerName)
     weight     = weight and Trim(weight) or "N/A"
     fishFull   = fishFull:match("^(.-)%s+with a 1 in") or fishFull
     fishFull   = fishFull:match("^(.-)%s*[!%.]?$")     or fishFull
     fishFull   = Trim(fishFull)
-
     return { player = playerName, fish = fishFull, weight = weight }
 end
-
--- ============================================================
---  AVATAR URL HELPER
--- ============================================================
 
 local function GetAvatarUrlById(userId)
     if not userId then return nil end
     return PROXY .. "/avatar/" .. tostring(userId) .. "?t=" .. tostring(os.time())
 end
-
--- ============================================================
---  CHECK AND SEND
--- ============================================================
 
 local function CheckAndSend(rawMsg)
     if not SCRIPT_ACTIVE then return end
@@ -898,9 +798,9 @@ local function CheckAndSend(rawMsg)
     if legendaryBase then
         local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
         SendFishWebhook(EMOJI_LEGENDARY .. " Crystalized Legendary!", " " .. EMOJI_MUTASI, TierColors.Legendary, {
-            { name = SEP .. " Pemain",  value = "**" .. data.player .. "**", inline = true },
-            { name = SEP .. " Item",    value = "**" .. data.fish .. "**",   inline = true },
-            { name = SEP .. " Berat",   value = "**" .. data.weight .. "**", inline = true },
+            { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
+            { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
+            { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
         }, nil, imageUrl, nil, "secret")
         return
     end
@@ -951,19 +851,14 @@ local function CheckAndSend(rawMsg)
     if not mutasiDetected then return end
 
     SendFishWebhook(
-        EMOJI_MUTASI .. " Mutasi Terdeteksi!",
-        "",
-        TierColors.Mutasi,
+        EMOJI_MUTASI .. " Mutasi Terdeteksi!", "", TierColors.Mutasi,
         {
-            { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
-            { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",   inline = true },
-            { name = SEP .. " Berat",  value = "**" .. data.weight .. "**", inline = true },
-            { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected, inline = true },
+            { name = SEP .. " Pemain", value = "**" .. data.player .. "**",            inline = true },
+            { name = SEP .. " Ikan",   value = "**" .. data.fish .. "**",              inline = true },
+            { name = SEP .. " Berat",  value = "**" .. data.weight .. "**",            inline = true },
+            { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected,  inline = true },
         },
-        nil,
-        avatarUrl,
-        nil,
-        nil
+        nil, avatarUrl, nil, nil
     )
 end
 
@@ -1028,7 +923,7 @@ local function StartMonitoring()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
 
-    SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif ", TierColors.Join, {
+    SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif", TierColors.Join, {
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
         { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
@@ -1036,13 +931,6 @@ local function StartMonitoring()
 
     HookChat()
     StartEventMonitor()
-
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(LEADERBOARD_INTERVAL)
-            if SCRIPT_ACTIVE then SendLeaderboard() end
-        end
-    end)
 
     task.spawn(function()
         while SCRIPT_ACTIVE do
@@ -1059,11 +947,11 @@ local function StartMonitoring()
                 table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
             end
             SendStatsWebhook(EMOJI_SERVER .. " Server Stats", "Ringkasan aktivitas server", 3447003, {
-                { name = SEP .. " Uptime Monitor",    value = UptimeString(uptime),                                                 inline = true  },
-                { name = SEP .. " Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",              inline = true  },
-                { name = SEP .. " Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",           inline = true  },
-                { name = SEP .. " Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "—",  inline = false },
-                { name = SEP .. " Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "—",inline = false },
+                { name = SEP .. " Uptime Monitor",     value = UptimeString(uptime),                                                  inline = true  },
+                { name = SEP .. " Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",               inline = true  },
+                { name = SEP .. " Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",            inline = true  },
+                { name = SEP .. " Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "—",   inline = false },
+                { name = SEP .. " Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "—", inline = false },
             })
         end
     end)
@@ -1088,7 +976,7 @@ local function StartMonitoring()
             task.wait(1)
             AvatarCache[player.UserId] = GetAvatarUrlById(player.UserId)
             SendWebhook(EMOJI_JOIN .. " Player Joined Server", "welcam", TierColors.Join, {
-                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                    inline = true },
+                { name = SEP .. " Username",     value = "**" .. player.Name .. "**",                     inline = true },
                 { name = SEP .. " Total Player", value = "**" .. tostring(#Players:GetPlayers()) .. "**", inline = true },
             }, nil, AvatarCache[player.UserId], GetMention(player.Name), "join")
         end)
@@ -1110,7 +998,7 @@ local function StartMonitoring()
         MentionCache[string.lower(pName)]   = nil
 
         SendWebhook(EMOJI_LEAVE .. " Player Left Server", "Salah satu pemain keluar server.", TierColors.Leave, {
-            { name = SEP .. " Username",     value = "**" .. pName .. "**",             inline = true },
+            { name = SEP .. " Username",     value = "**" .. pName .. "**",              inline = true },
             { name = SEP .. " Total Player", value = "**" .. tostring(totalNow) .. "**", inline = true },
         }, nil, avatarUrl, mentionStr, "leave")
 
@@ -1148,12 +1036,12 @@ local function CreateUI()
 
     local FRAME_H = 355
     local frame = Instance.new("Frame")
-    frame.Name              = "Main"
-    frame.Size              = UDim2.new(0, 300, 0, FRAME_H)
-    frame.Position          = UDim2.new(0.5, -150, 0.5, -120)
-    frame.BackgroundColor3  = Color3.fromRGB(20, 20, 20)
-    frame.BorderSizePixel   = 0
-    frame.Parent            = gui
+    frame.Name             = "Main"
+    frame.Size             = UDim2.new(0, 300, 0, FRAME_H)
+    frame.Position         = UDim2.new(0.5, -150, 0.5, -120)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    frame.BorderSizePixel  = 0
+    frame.Parent           = gui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
     local stroke = Instance.new("UIStroke")
@@ -1202,8 +1090,8 @@ local function CreateUI()
         btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = hoverColor }):Play() end)
         btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.1), { BackgroundColor3 = baseColor  }):Play() end)
     end
-    HoverTween(minBtn,   Color3.fromRGB(80,80,80),   Color3.fromRGB(60,60,60))
-    HoverTween(closeBtn, Color3.fromRGB(230,70,70),  Color3.fromRGB(200,50,50))
+    HoverTween(minBtn,   Color3.fromRGB(80,80,80),  Color3.fromRGB(60,60,60))
+    HoverTween(closeBtn, Color3.fromRGB(230,70,70), Color3.fromRGB(200,50,50))
 
     local dragging, dragStart, startPos
     topBar.InputBegan:Connect(function(input)
@@ -1254,13 +1142,10 @@ local function CreateUI()
 
     MakeLabel("👋 Webhook Join / Leave", 58)
     local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
-
     MakeLabel("🐋 Webhook Secret Fish", 108)
     local inputFish  = MakeInput("Paste webhook secret fish...", 122)
-
     MakeLabel("📊 Webhook Stats", 158)
     local inputStats = MakeInput("Paste webhook stats...", 172)
-
     MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)", 208)
     local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
 
