@@ -124,7 +124,7 @@ local MemberList = {
     { username = "thispalls",        display = "thispalls",            id = "1311353388314923019" },
     { username = "Mhrshina",         display = "shina",                id = "1125668364489080933" },
     { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
-    { username = "akuganteng66611",  display = "akun",                 id = "1398328850793889872" },
+    { username = "andokecheh",       display = "AS×ABMystique_1",      id = "1395401789561507952" },
     { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
     { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
     { username = "dipyyy",           display = "karyawandripy",        id = "454238781168418826" },
@@ -133,7 +133,9 @@ local MemberList = {
     { username = "rykalys06",        display = "bebew06",              id = "1488495609961906247" },
     { username = "thewtrmlnz",       display = "karinateary",          id = "1450346429867622480" },
     { username = "MrZealouz",        display = "MrZealouz",            id = "1450346429867622480" },
-    { username = "Uwellll2",         display = "narumi",               id = "1395401789561507952" }, -- FIX: hapus trailing space
+    { username = "Uwellll2",         display = "narumi",               id = "1395401789561507952" }, 
+    { username = "Flyerclone",       display = "Budum",                id = "703536872911011890" }, 
+    { username = "Adfansyah1",       display = "Adfansyah1",           id = "537197144075927552" },
 }
 
 -- ============================================================
