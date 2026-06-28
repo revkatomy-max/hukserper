@@ -170,7 +170,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Aurora",
+    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment",
 }
 
 local LegendaryCrystalList = {
@@ -332,6 +332,8 @@ local FishImageURL = {
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
     ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
+    ["Caustic Maw"]              = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Caustic%20Maw.png",
+    ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Aurora.png",
 }
 
 -- ============================================================
@@ -388,7 +390,7 @@ local EventHuntData = {
         description  = "cantiknyooo",
         color        = 9055202,
         emoji        = "💫",
-        thumbUrl     = nil,
+        thumbUrl     = FishImageURL["Aurora"],
     },
 }
 
