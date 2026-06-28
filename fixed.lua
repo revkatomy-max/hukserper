@@ -161,7 +161,7 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Segredo",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw",
 }
 
 local ForgottenList = {
@@ -257,7 +257,7 @@ local FishChanceData = {
     ["Glacial Serpent"]           = "1 in 3M",
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
-    ["Segredo"]                   = "1 in 4M",
+    ["Caustic Maw"]               = "1 in 4M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
