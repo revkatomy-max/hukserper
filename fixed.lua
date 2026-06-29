@@ -94,7 +94,7 @@ local MemberList = {
     { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
     { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
     { username = "Baeforlife",       display = "Jaemin_choa",          id = "1467390946357416060" },
-    { username = "OomKlerra2",       display = "OomKlerra2",           id = "1171410071092215888" },
+    { username = "hawaish01",        display = "ilywaa",               id = "1392909983678595244" },
     { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
     { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
     { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
@@ -111,7 +111,7 @@ local MemberList = {
     { username = "ZatzaMMay",        display = "TuyulGomenarai",       id = "892353508160970773"  },
     { username = "WaifunyaGomenarai",display = "aci",                  id = "892353508160970773"  },
     { username = "furinyawn",        display = "cipii",                id = "1312729486067761162" },
-    { username = "Blckwv3",          display = "Blackwave",            id = "494856245023604736" },
+    { username = "bbackburney",      display = "neyyina",              id = "1443066200945852477" },
     { username = "Leale716",         display = "Leaa",                 id = "1408658812424028182" },
     { username = "aca_ri17",         display = "ricarica",             id = "1471486371377053768" },
     { username = "keyrannn1",        display = "key",                  id = "1458430632370769972" },
@@ -332,8 +332,8 @@ local FishImageURL = {
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
     ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
-    ["Caustic Maw"]              = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Caustic%20Maw.png",
-    ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Aurora.png",
+    ["Caustic Maw"]              = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/97.png",
+    ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/99.png",
 }
 
 -- ============================================================
