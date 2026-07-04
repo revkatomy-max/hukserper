@@ -137,6 +137,9 @@ local MemberList = {
     { username = "callmeflaviaa",    display = "Piaa",                 id = "757111417919766648" }, 
     { username = "valalily",         display = "valalily",             id = "706512230627278908" },
 {username = "princekudoo", display = "shinichi",id = "757609752149754027"},
+{username = "pettrichoor", display = "sugengspakbor",id = "977807235906404422"},
+{username = "nicika204", display = "ikaa",id = "1414865637829906544"},
+{username = "velorisee", display = "velorisee",id = "692735562817470494"},
 
 }
 
