@@ -161,7 +161,7 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper",
 }
 
 local ForgottenList = {
@@ -258,6 +258,7 @@ local FishChanceData = {
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
     ["Caustic Maw"]               = "1 in 4M",
+    ["Coral Reaper"]              = "1 in ??",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -334,7 +335,10 @@ local FishImageURL = {
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
     ["Caustic Maw"]              = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/97.png",
     ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/99.png",
+    ["Coral Reaper"]             = "",
+    
 }
+
 
 -- ============================================================
 --  EVENT HUNT DATABASE
