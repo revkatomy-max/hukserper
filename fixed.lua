@@ -171,7 +171,7 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden",
 }
 
 local ForgottenList = {
