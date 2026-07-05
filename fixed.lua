@@ -140,6 +140,11 @@ local MemberList = {
 {username = "pettrichoor", display = "sugengspakbor",id = "977807235906404422"},
 {username = "nicika204", display = "ikaa",id = "1414865637829906544"},
 {username = "velorisee", display = "velorisee",id = "692735562817470494"},
+{username = "userrxyz2", display = "alaydf",id = "1425223281686085713"},
+{username = "worldofwis", display = "FUNxWis",id = "1185617757446873199"},
+{username = "djars15", display = "djars15",id = "1447227099206385745"},
+{username = "Hyrooboy99", display = "481HyrooSalvatore",id = "1309945598409048076"},
+{username = "ch0colveuuu", display = "chocoo",id = "1410918804036390995"},
 
 }
 
