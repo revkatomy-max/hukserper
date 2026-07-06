@@ -1253,6 +1253,16 @@ local function CreateUI()
     startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,348)
     startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100); startBtn.TextColor3 = Color3.fromRGB(255,255,255)
     startBtn.Font = Enum.Font.GothamBold; startBtn.TextSize = 12; startBtn.BorderSizePixel = 0; startBtn.Parent = frame
+    -- FIX: teks kepotong kalau kepanjangan (mis. "❌ WEBHOOK JOIN INVALID!") karena dulu gak TextScaled.
+    -- Sekarang teks otomatis ngecil biar muat, tapi dibatasi max 12px biar teks pendek gak jadi kegedean.
+    startBtn.TextScaled  = true
+    startBtn.TextWrapped = false
+    local startBtnSizeConstraint = Instance.new("UITextSizeConstraint")
+    startBtnSizeConstraint.MaxTextSize = 12
+    startBtnSizeConstraint.Parent      = startBtn
+    local startBtnPad = Instance.new("UIPadding", startBtn)
+    startBtnPad.PaddingLeft  = UDim.new(0,6)
+    startBtnPad.PaddingRight = UDim.new(0,6)
     Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0,6)
     HoverTween(startBtn, Color3.fromRGB(0,210,120), Color3.fromRGB(0,180,100))
 
