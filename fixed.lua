@@ -180,8 +180,8 @@ local ForgottenList = {
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
-    "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn",
+     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
     -- TODO: kalo mau nambahin "Albino" tinggal masukin string-nya di sini, contoh: "Albino",
 }
 
@@ -1090,7 +1090,12 @@ local function CreateUI()
     local frame = Instance.new("Frame")
     frame.Name             = "Main"
     frame.Size             = UDim2.new(0, 300, 0, FRAME_H)
-    frame.Position         = UDim2.new(0.5, -150, 0.5, -120)
+    -- FIX: dulu posisi pakai offset tetap (-150, -120) yang gak nyesuain tinggi frame,
+    -- jadi kalau FRAME_H makin tinggi (kayak sekarang, abis nambah field mutasi),
+    -- bagian bawah panel (tombol START MONITORING) ke-dorong keluar layar di HP.
+    -- Sekarang pakai AnchorPoint biar SELALU center di tengah layar berapa pun tinggi framenya.
+    frame.AnchorPoint       = Vector2.new(0.5, 0.5)
+    frame.Position          = UDim2.new(0.5, 0, 0.5, 0)
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     frame.BorderSizePixel  = 0
     frame.Parent           = gui
