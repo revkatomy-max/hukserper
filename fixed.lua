@@ -13,6 +13,7 @@ local WEBHOOK_URL    = ""
 local WEBHOOK_STATS  = ""
 local WEBHOOK_FISH   = ""
 local WEBHOOK_EVENT  = ""
+local WEBHOOK_MUTASI = ""
 local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
@@ -45,7 +46,7 @@ local EMOJI_LEGENDARY = "<a:apiijo:1517778951223902239>"
 local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
 local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"
 local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
-local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>"
+local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>" -- NOTE: sama persis dgn EMOJI_RUBY, cek lagi apakah emoji crystal-nya beneran ini
 local EMOJI_EVENTTAG  = "📢"
 local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
@@ -181,6 +182,7 @@ local ForgottenList = {
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", "Frozen",
     "Galaxy", "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
+    -- TODO: kalo mau nambahin "Albino" tinggal masukin string-nya di sini, contoh: "Albino",
 }
 
 local LegendaryCrystalList = {
@@ -438,14 +440,15 @@ local ServerStats = {
 
 local CONFIG_FILE = "bloxgank_config.json"
 
-local function SaveConfig(joinUrl, fishUrl, statsUrl, eventUrl)
+local function SaveConfig(joinUrl, fishUrl, statsUrl, eventUrl, mutasiUrl)
     if not writefile then return end
     pcall(function()
         writefile(CONFIG_FILE, HttpService:JSONEncode({
-            webhook_join  = joinUrl  or "",
-            webhook_fish  = fishUrl  or "",
-            webhook_stats = statsUrl or "",
-            webhook_event = eventUrl or "",
+            webhook_join   = joinUrl   or "",
+            webhook_fish   = fishUrl   or "",
+            webhook_stats  = statsUrl  or "",
+            webhook_event  = eventUrl  or "",
+            webhook_mutasi = mutasiUrl or "",
         }))
     end)
 end
@@ -555,15 +558,19 @@ local function FindSecretFish(fishName)
     return bestBase, bestMutasi
 end
 
+-- FIX 3: FindMutasi sebelumnya gagal detect kalau nama mutasi ada di UJUNG string
+-- (contoh fish name "Dead Zombie Shark Frozen" -> "Frozen" di ujung, afterPos jadi
+-- string kosong sehingga "afterOk" dulu selalu false). Sekarang end-of-string dihitung valid juga.
 local function FindMutasi(fishName)
     local lower = string.lower(fishName)
     for _, mutasiName in ipairs(MutasiList) do
         local mutasiLower = string.lower(mutasiName)
         local s = string.find(lower, mutasiLower, 1, true)
         if s then
-            local before = s == 1 and " " or lower:sub(s - 1, s - 1)
-            local after  = lower:sub(s + #mutasiLower, s + #mutasiLower)
-            if (before == " " and after == " ") or (s == 1 and after == " ") then
+            local beforeOk = (s == 1) or (lower:sub(s - 1, s - 1) == " ")
+            local afterPos = s + #mutasiLower
+            local afterOk  = (afterPos > #lower) or (lower:sub(afterPos, afterPos) == " ")
+            if beforeOk and afterOk then
                 return mutasiName
             end
         end
@@ -651,6 +658,7 @@ local function BuildContent(mention, captionType)
     elseif captionType == "leave"   then return "ke disconect ya? " .. m
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
+    elseif captionType == "mutasi"  then return "cek mutasinya " .. m
     end
     return m
 end
@@ -682,6 +690,22 @@ local function SendStatsWebhook(title, description, color, fields, imageUrl, thu
     for _, v in ipairs(fields) do table.insert(f, v) end
     PostWebhook(WEBHOOK_STATS, {
         embeds = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Stats") }
+    })
+end
+
+-- NEW: webhook khusus mutasi list, terpisah dari webhook secret fish.
+-- Fallback: kalau WEBHOOK_MUTASI kosong -> pakai WEBHOOK_FISH -> kalau itu juga kosong pakai WEBHOOK_URL.
+local function SendMutasiWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
+    local url = (WEBHOOK_MUTASI ~= "") and WEBHOOK_MUTASI
+        or ((WEBHOOK_FISH ~= "") and WEBHOOK_FISH or WEBHOOK_URL)
+    if url == "" then return end
+    local f = {}
+    for _, v in ipairs(fields) do table.insert(f, v) end
+    PostWebhook(url, {
+        username   = "BLOX Gank Mutasi",
+        avatar_url = WEBHOOK_AVATAR,
+        content    = BuildContent(mention, captionType),
+        embeds     = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Mutasi List") },
     })
 end
 
@@ -869,10 +893,16 @@ local function CheckAndSend(rawMsg)
         return
     end
 
+    -- NEW: mutasi (di luar secret fish) sekarang dikirim ke webhook mutasi sendiri,
+    -- pakai mention & fields yg konsisten dengan embed lain.
     local mutasiDetected = FindMutasi(data.fish)
     if not mutasiDetected then return end
 
-    SendFishWebhook(
+    if uid and PlayerStats[uid] then
+        PlayerStats[uid].mutasiCount = (PlayerStats[uid].mutasiCount or 0) + 1
+    end
+
+    SendMutasiWebhook(
         EMOJI_MUTASI .. " Mutasi Terdeteksi!", "", TierColors.Mutasi,
         {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**",            inline = true },
@@ -880,7 +910,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**",            inline = true },
             { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected,  inline = true },
         },
-        nil, avatarUrl, nil, nil
+        nil, avatarUrl, GetMention(data.player), "mutasi"
     )
 end
 
@@ -1056,7 +1086,7 @@ local function CreateUI()
 
     local savedConfig = LoadConfig()
 
-    local FRAME_H = 355
+    local FRAME_H = 405
     local frame = Instance.new("Frame")
     frame.Name             = "Main"
     frame.Size             = UDim2.new(0, 300, 0, FRAME_H)
@@ -1170,11 +1200,14 @@ local function CreateUI()
     local inputStats = MakeInput("Paste webhook stats...", 172)
     MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)", 208)
     local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
+    -- NEW: input webhook khusus mutasi list
+    MakeLabel("🧬 Webhook Mutasi List", 258)
+    local inputMutasi = MakeInput("Kosong = pakai webhook secret fish...", 272)
 
     local saveEnabled = false
 
     local toggleBg = Instance.new("Frame")
-    toggleBg.Size = UDim2.new(0,36,0,18); toggleBg.Position = UDim2.new(1,-48,0,264)
+    toggleBg.Size = UDim2.new(0,36,0,18); toggleBg.Position = UDim2.new(1,-48,0,314)
     toggleBg.BackgroundColor3 = Color3.fromRGB(60,60,60); toggleBg.BorderSizePixel = 0; toggleBg.Parent = frame
     Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1,0)
 
@@ -1184,13 +1217,13 @@ local function CreateUI()
     Instance.new("UICorner", toggleKnob).CornerRadius = UDim.new(1,0)
 
     local toggleLabel = Instance.new("TextLabel")
-    toggleLabel.Text = "💾 Simpan Config"; toggleLabel.Size = UDim2.new(1,-60,0,18); toggleLabel.Position = UDim2.new(0,12,0,262)
+    toggleLabel.Text = "💾 Simpan Config"; toggleLabel.Size = UDim2.new(1,-60,0,18); toggleLabel.Position = UDim2.new(0,12,0,312)
     toggleLabel.BackgroundTransparency = 1; toggleLabel.TextColor3 = Color3.fromRGB(130,130,130)
     toggleLabel.Font = Enum.Font.Gotham; toggleLabel.TextSize = 10
     toggleLabel.TextXAlignment = Enum.TextXAlignment.Left; toggleLabel.Parent = frame
 
     local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size = UDim2.new(0,36,0,18); toggleBtn.Position = UDim2.new(1,-48,0,264)
+    toggleBtn.Size = UDim2.new(0,36,0,18); toggleBtn.Position = UDim2.new(1,-48,0,314)
     toggleBtn.BackgroundTransparency = 1; toggleBtn.Text = ""; toggleBtn.BorderSizePixel = 0; toggleBtn.Parent = frame
 
     local function SetToggle(enabled)
@@ -1208,15 +1241,16 @@ local function CreateUI()
     toggleBtn.MouseButton1Click:Connect(function() SetToggle(not saveEnabled) end)
 
     if savedConfig then
-        if savedConfig.webhook_join  and savedConfig.webhook_join  ~= "" then inputJoin.Text  = savedConfig.webhook_join  end
-        if savedConfig.webhook_fish  and savedConfig.webhook_fish  ~= "" then inputFish.Text  = savedConfig.webhook_fish  end
-        if savedConfig.webhook_stats and savedConfig.webhook_stats ~= "" then inputStats.Text = savedConfig.webhook_stats end
-        if savedConfig.webhook_event and savedConfig.webhook_event ~= "" then inputEvent.Text = savedConfig.webhook_event end
+        if savedConfig.webhook_join   and savedConfig.webhook_join   ~= "" then inputJoin.Text   = savedConfig.webhook_join   end
+        if savedConfig.webhook_fish   and savedConfig.webhook_fish   ~= "" then inputFish.Text   = savedConfig.webhook_fish   end
+        if savedConfig.webhook_stats  and savedConfig.webhook_stats  ~= "" then inputStats.Text  = savedConfig.webhook_stats  end
+        if savedConfig.webhook_event  and savedConfig.webhook_event  ~= "" then inputEvent.Text  = savedConfig.webhook_event  end
+        if savedConfig.webhook_mutasi and savedConfig.webhook_mutasi ~= "" then inputMutasi.Text = savedConfig.webhook_mutasi end
         SetToggle(true)
     end
 
     local startBtn = Instance.new("TextButton")
-    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,298)
+    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,348)
     startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100); startBtn.TextColor3 = Color3.fromRGB(255,255,255)
     startBtn.Font = Enum.Font.GothamBold; startBtn.TextSize = 12; startBtn.BorderSizePixel = 0; startBtn.Parent = frame
     Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0,6)
@@ -1232,11 +1266,12 @@ local function CreateUI()
         end
 
         WEBHOOK_URL = inputJoin.Text
-        if inputFish.Text:find("discord.com/api/webhooks")  then WEBHOOK_FISH  = inputFish.Text  end
-        if inputStats.Text:find("discord.com/api/webhooks") then WEBHOOK_STATS = inputStats.Text end
-        if inputEvent.Text:find("discord.com/api/webhooks") then WEBHOOK_EVENT = inputEvent.Text end
+        if inputFish.Text:find("discord.com/api/webhooks")   then WEBHOOK_FISH   = inputFish.Text   end
+        if inputStats.Text:find("discord.com/api/webhooks")  then WEBHOOK_STATS  = inputStats.Text  end
+        if inputEvent.Text:find("discord.com/api/webhooks")  then WEBHOOK_EVENT  = inputEvent.Text  end
+        if inputMutasi.Text:find("discord.com/api/webhooks") then WEBHOOK_MUTASI = inputMutasi.Text end
 
-        if saveEnabled then SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS, WEBHOOK_EVENT) end
+        if saveEnabled then SaveConfig(WEBHOOK_URL, WEBHOOK_FISH, WEBHOOK_STATS, WEBHOOK_EVENT, WEBHOOK_MUTASI) end
 
         SCRIPT_ACTIVE = true
         statusDot.BackgroundColor3 = Color3.fromRGB(0,220,100)
@@ -1245,7 +1280,7 @@ local function CreateUI()
         startBtn.Text              = "✅ MONITORING AKTIF"
         startBtn.BackgroundColor3  = Color3.fromRGB(30,30,30)
 
-        for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent }) do
+        for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent, inputMutasi }) do
             box.TextEditable = false
         end
         toggleBtn.Active = false
