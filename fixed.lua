@@ -136,11 +136,11 @@ local MemberList = {
     { username = "Uwellll2",         display = "narumi",               id = "1395401789561507952" }, 
     { username = "callmeflaviaa",    display = "Piaa",                 id = "757111417919766648" }, 
     { username = "valalily",         display = "valalily",             id = "706512230627278908" },
-{username = "princekudoo", display = "shinichi",id = "757609752149754027"},
-{username = "pettrichoor", display = "sugengspakbor",id = "977807235906404422"},
-{username = "nicika204", display = "ikaa",id = "1414865637829906544"},
-{username = "velorisee", display = "velorisee",id = "692735562817470494"},
-{username = "userrxyz2", display = "alaydf",id = "1425223281686085713"},
+    {username = "princekudoo", display = "shinichi",id = "757609752149754027"},
+    {username = "pettrichoor", display = "sugengspakbor",id = "977807235906404422"},
+    {username = "nicika204", display = "ikaa",id = "1414865637829906544"},
+    {username = "velorisee", display = "velorisee",id = "692735562817470494"},
+    {username = "userrxyz2", display = "alaydf",id = "1425223281686085713"},
 {username = "worldofwis", display = "FUNxWis",id = "1185617757446873199"},
 {username = "djars15", display = "djars15",id = "1447227099206385745"},
 {username = "Hyrooboy99", display = "481HyrooSalvatore",id = "1309945598409048076"},
@@ -268,7 +268,7 @@ local FishChanceData = {
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
     ["Caustic Maw"]               = "1 in 4M",
-    ["Coral Reaper"]              = "1 in 5M",
+    ["Coral Reaper"]              = "1 in 6M",
     ["Sunken Hadalith"]           = "1 in ??",
     ["Trench Warden"]             = "1 in 15M",
 }
@@ -347,7 +347,8 @@ local FishImageURL = {
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
     ["Caustic Maw"]              = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/97.png",
     ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/99.png",
-    ["Coral Reaper"]             = "",
+    ["Coral Reaper"]             = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Coral%20Reaper.png",
+    ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     
 }
 
