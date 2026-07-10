@@ -186,16 +186,22 @@ local ForgottenList = {
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn",
-     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal", "Aurora", "Midnight", "Galaxsy",
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", 
+     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
+    -- FIX 6: Aurora & Midnight itu mutasi beneran (sama kayak Abyssal), makanya harus tetap ada di sini.
+    -- Masalahnya BUKAN di list ini, tapi di cara deteksi prefix-nya -- lihat MutasiFalsePositiveSpecies di bawah.
+    "Aurora", "Midnight",
     -- TODO: kalo mau nambahin "Albino" tinggal masukin string-nya di sini, contoh: "Albino",
 }
 
--- FIX 4: nama ikan yang KEBETULAN diawali kata yang sama kayak nama mutasi
--- (Abyssal, Aurora, Midnight), padahal itu emang bagian nama ikannya sendiri.
--- Exact-match check ini jalan SEBELUM FindMutasi coba strip prefix,
--- jadi ikan-ikan ini gak bakal ke-flag salah jadi "Mutasi Terdeteksi".
-local MutasiFalsePositiveWhitelist = {
+-- FIX 6: nama SPESIES ikan yang kebetulan diawali kata yang sama kayak nama mutasi beneran
+-- (Abyssal Maw Angler, Aurora Grouper, dst). Bedanya sama FIX 4 lama: dulu whitelist ini
+-- dicek pakai EXACT match ke seluruh nama ikan, jadi gagal kalau ada kata tambahan di depan
+-- (contoh "STONE Aurora Manatee", "Big Aurora Narwhal" -- ada prefix mutasi/qualifier beneran
+-- di depan nama spesiesnya). Sekarang FindMutasi akan MEMBUANG dulu substring nama spesies ini
+-- dari teks sebelum nyari kata mutasi, jadi sisa "STONE"/"Big" itu yang dicek ke MutasiList,
+-- bukan kata "Aurora"/"Abyssal"/"Midnight" yang nempel di nama spesiesnya sendiri.
+local MutasiFalsePositiveSpecies = {
     "abyssal maw angler",
     "aurora grouper",
     "aurora starfish",
@@ -584,10 +590,23 @@ end
 local function FindMutasi(fishName)
     local lower = string.lower(fishName)
 
-    -- FIX 4: exact match ke whitelist -> ini nama ikan asli, bukan mutasi, skip.
-    for _, whitelisted in ipairs(MutasiFalsePositiveWhitelist) do
-        if lower == whitelisted then return nil end
+    -- FIX 6: buang dulu substring nama SPESIES (bukan exact match seluruh nama ikan lagi),
+    -- supaya kata mutasi asli (Abyssal/Aurora/Midnight) yang nempel di nama spesies gak
+    -- ketauan sebagai mutasi, TAPI kata di depan/belakangnya (mutasi beneran, mis. "Stone",
+    -- "Fire", dst -- kalau ada) tetap bisa kedetect karena sisa teksnya tetap dicek di bawah.
+    for _, species in ipairs(MutasiFalsePositiveSpecies) do
+        local s = string.find(lower, species, 1, true)
+        if s then
+            local beforeOk = (s == 1) or (lower:sub(s - 1, s - 1) == " ")
+            local afterPos = s + #species
+            local afterOk  = (afterPos > #lower) or (lower:sub(afterPos, afterPos) == " ")
+            if beforeOk and afterOk then
+                lower = Trim((lower:sub(1, s - 1) .. " " .. lower:sub(afterPos + 1)):gsub("%s+", " "))
+                break
+            end
+        end
     end
+    if lower == "" then return nil end
 
     for _, mutasiName in ipairs(MutasiList) do
         local mutasiLower = string.lower(mutasiName)
