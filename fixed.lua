@@ -21,6 +21,10 @@ local SCRIPT_ACTIVE  = false
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
 
+-- FIX 5: konstanta buat idle detector (player gak catch ikan sama sekali selama sekian lama)
+local IDLE_THRESHOLD_SECONDS = 7200 -- 2 jam
+local IDLE_CHECK_INTERVAL    = 300  -- cek tiap 5 menit
+
 local BRAND_NAME        = "BLOX GANK"
 local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png"
 local BRAND_FOOTER_TEXT = "BLOX GANK • Server Monitor"
@@ -34,6 +38,7 @@ local TierColors = {
     Join      = 65280,
     Leave     = 16729344,
     NotBack   = 16711680,
+    Idle      = 16750848,
 }
 
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
@@ -52,6 +57,7 @@ local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
+local EMOJI_IDLE      = "⏳"
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -181,8 +187,22 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn",
-     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
+     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal", "Aurora", "Midnight", "Galaxsy",
     -- TODO: kalo mau nambahin "Albino" tinggal masukin string-nya di sini, contoh: "Albino",
+}
+
+-- FIX 4: nama ikan yang KEBETULAN diawali kata yang sama kayak nama mutasi
+-- (Abyssal, Aurora, Midnight), padahal itu emang bagian nama ikannya sendiri.
+-- Exact-match check ini jalan SEBELUM FindMutasi coba strip prefix,
+-- jadi ikan-ikan ini gak bakal ke-flag salah jadi "Mutasi Terdeteksi".
+local MutasiFalsePositiveWhitelist = {
+    "abyssal maw angler",
+    "aurora grouper",
+    "aurora starfish",
+    "aurora narwhal",
+    "aurora manatee",
+    "aurora buterfly fish",
+    "midnight star squid",
 }
 
 local LegendaryCrystalList = {
@@ -563,6 +583,12 @@ end
 -- string kosong sehingga "afterOk" dulu selalu false). Sekarang end-of-string dihitung valid juga.
 local function FindMutasi(fishName)
     local lower = string.lower(fishName)
+
+    -- FIX 4: exact match ke whitelist -> ini nama ikan asli, bukan mutasi, skip.
+    for _, whitelisted in ipairs(MutasiFalsePositiveWhitelist) do
+        if lower == whitelisted then return nil end
+    end
+
     for _, mutasiName in ipairs(MutasiList) do
         local mutasiLower = string.lower(mutasiName)
         local s = string.find(lower, mutasiLower, 1, true)
@@ -659,6 +685,7 @@ local function BuildContent(mention, captionType)
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
     elseif captionType == "mutasi"  then return "cek mutasinya " .. m
+    elseif captionType == "idle"    then return "woy masih mancing gak " .. m
     end
     return m
 end
@@ -706,6 +733,22 @@ local function SendMutasiWebhook(title, description, color, fields, imageUrl, th
         avatar_url = WEBHOOK_AVATAR,
         content    = BuildContent(mention, captionType),
         embeds     = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Mutasi List") },
+    })
+end
+
+-- FIX 5: webhook idle detector, numpang di WEBHOOK_URL (webhook join/leave) sesuai request.
+local function SendIdleWebhook(playerName, avatarUrl, mention, idleMinutes)
+    PostWebhook(WEBHOOK_URL, {
+        username   = "BLOX Gank",
+        avatar_url = WEBHOOK_AVATAR,
+        content    = BuildContent(mention, "idle"),
+        embeds     = { BuildEmbed(EMOJI_IDLE .. " Player Idle Terdeteksi",
+            "Pemain ini gak ada catch sama sekali selama 2 jam, tolong dicek apakah masih aktif mancing.",
+            TierColors.Idle,
+            {
+                { name = SEP .. " Username",   value = "**" .. playerName .. "**",            inline = true },
+                { name = SEP .. " Idle Sejak", value = tostring(idleMinutes) .. " menit lalu", inline = true },
+            }, nil, avatarUrl, "BLOX Gank Idle Monitor") },
     })
 end
 
@@ -834,10 +877,11 @@ local function CheckAndSend(rawMsg)
 
     if uid then
         if not PlayerStats[uid] then
-            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = data.player }
+            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = data.player, idleNotified = false }
         end
         PlayerStats[uid].catchCount   = PlayerStats[uid].catchCount + 1
         PlayerStats[uid].lastFishTime = os.time()
+        PlayerStats[uid].idleNotified = false -- FIX 5: reset biar bisa ke-detect idle lagi abis ini
     end
 
     local legendaryBase = FindLegendaryCrystal(data.fish)
@@ -894,7 +938,7 @@ local function CheckAndSend(rawMsg)
     end
 
     -- NEW: mutasi (di luar secret fish) sekarang dikirim ke webhook mutasi sendiri,
-    -- pakai mention & fields yg konsisten dengan embed lain.
+    -- pakai fields yg konsisten dengan embed lain. Tanpa mention (FIX: mention dihapus).
     local mutasiDetected = FindMutasi(data.fish)
     if not mutasiDetected then return end
 
@@ -910,7 +954,7 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Berat",  value = "**" .. data.weight .. "**",            inline = true },
             { name = SEP .. " Mutasi", value = EMOJI_MUTASI .. " " .. mutasiDetected,  inline = true },
         },
-        nil, avatarUrl, GetMention(data.player), "mutasi"
+        nil, avatarUrl, nil, "mutasi"
     )
 end
 
@@ -1008,10 +1052,32 @@ local function StartMonitoring()
         end
     end)
 
+    -- FIX 5: loop idle detector — cek berkala apakah ada player yang gak catch
+    -- sama sekali selama IDLE_THRESHOLD_SECONDS, kirim ke WEBHOOK_URL (join/leave).
+    task.spawn(function()
+        while SCRIPT_ACTIVE do
+            task.wait(IDLE_CHECK_INTERVAL)
+            if not SCRIPT_ACTIVE then break end
+            local now = os.time()
+            for _, p in ipairs(Players:GetPlayers()) do
+                local stat = PlayerStats[p.UserId]
+                if stat then
+                    local lastActivity = stat.lastFishTime or stat.joinTime
+                    local idleFor = now - lastActivity
+                    if idleFor >= IDLE_THRESHOLD_SECONDS and not stat.idleNotified then
+                        stat.idleNotified = true
+                        local avatarUrl = AvatarCache[p.UserId] or GetAvatarUrlById(p.UserId)
+                        SendIdleWebhook(p.Name, avatarUrl, GetMention(p.Name), math.floor(idleFor / 60))
+                    end
+                end
+            end
+        end
+    end)
+
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
         AvatarCache[p.UserId]                       = GetAvatarUrlById(p.UserId)
-        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name }
+        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name, idleNotified = false }
         PlayerNameToId[string.lower(p.Name)]        = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
         BuildMentionCache(p.Name, p.DisplayName)
@@ -1020,7 +1086,7 @@ local function StartMonitoring()
     Players.PlayerAdded:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
         LeaveTimers[player.UserId] = nil
-        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = player.Name }
+        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = player.Name, idleNotified = false }
         PlayerNameToId[string.lower(player.Name)]        = player.UserId
         PlayerNameToId[string.lower(player.DisplayName)] = player.UserId
         BuildMentionCache(player.Name, player.DisplayName)
