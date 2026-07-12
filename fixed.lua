@@ -22,7 +22,8 @@ local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
 
 -- FIX 5: konstanta buat idle detector (player gak catch ikan sama sekali selama sekian lama)
-local IDLE_THRESHOLD_SECONDS = 7200 -- 2 jam
+-- FIX 7: idle threshold diturunin dari 2 jam ke 1 jam sesuai request.
+local IDLE_THRESHOLD_SECONDS = 3600 -- 1 jam
 local IDLE_CHECK_INTERVAL    = 300  -- cek tiap 5 menit
 
 local BRAND_NAME        = "BLOX GANK"
@@ -390,7 +391,10 @@ local FishImageURL = {
 
 -- ============================================================
 --  EVENT HUNT DATABASE
---  FIX 1: Dark Megalodon dipindah ke ATAS Megalodon Hunt
+--  FIX 7: Megalodon Hunt, Dark Megalodon Hunt, dan Aurora Borealis
+--  DINONAKTIFKAN sesuai request. Sekarang tinggal Treasure Hunt
+--  dan Thunderzilla Hunt aja yang bakal kirim notif event.
+--  Entry lama dibiarin ke-comment biar gampang diaktifin lagi kalau perlu.
 -- ============================================================
 
 local EventHuntData = {
@@ -402,7 +406,7 @@ local EventHuntData = {
         emoji        = "💰",
         thumbUrl     = FishImageURL["treasure hunt"],
     },
-    -- FIX 1: dark megalodon HARUS di atas megalodon hunt
+    --[[ FIX 7: dinonaktifkan -- Dark Megalodon Hunt
     {
         textTriggers = { "dark megalodon hunt", "dark megalodon" },
         title        = "🌑 Dark Megalodon Hunt Dimulai!",
@@ -411,6 +415,8 @@ local EventHuntData = {
         emoji        = "🌑",
         thumbUrl     = FishImageURL["Dark Megalodon"],
     },
+    ]]
+    --[[ FIX 7: dinonaktifkan -- Megalodon Hunt
     {
         textTriggers = { "megalodon hunt" },
         title        = EMOJI_MEGALODON .. " Megalodon Hunt Dimulai!",
@@ -419,6 +425,7 @@ local EventHuntData = {
         emoji        = "🦈",
         thumbUrl     = FishImageURL["Megalodon"],
     },
+    ]]
     {
         textTriggers = { "thunderzilla hunt", "thunderzilla" },
         title        = EMOJI_THUNDER .. " Thunderzilla Hunt Dimulai!",
@@ -427,6 +434,8 @@ local EventHuntData = {
         emoji        = "⚡",
         thumbUrl     = FishImageURL["Thunderzilla"],
     },
+    --[[ FIX 7: dinonaktifkan -- Crystal Event (gak diminta tapi tetep dimatiin krn
+    -- request-nya "cuma ada treasure hunt dan thunderzilla hunt")
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = EMOJI_CRYSTAL .. " Crystal Event Dimulai!",
@@ -435,8 +444,9 @@ local EventHuntData = {
         emoji        = "💎",
         thumbUrl     = FishImageURL["Crystal"],
     },
+    ]]
+    --[[ FIX 7: dinonaktifkan -- Aurora Borealis
     {
-        -- FIX 2: trigger lowercase supaya match konsisten
         textTriggers = { "aurora borealis", "aurora event" },
         title        = "💫 Aurora Borealis!",
         description  = "cantiknyooo",
@@ -444,6 +454,7 @@ local EventHuntData = {
         emoji        = "💫",
         thumbUrl     = FishImageURL["Aurora"],
     },
+    ]]
 }
 
 local EventCooldown = {}
@@ -769,7 +780,7 @@ local function SendIdleWebhook(playerName, avatarUrl, mention, idleMinutes)
         avatar_url = WEBHOOK_AVATAR,
         content    = BuildContent(mention, "idle"),
         embeds     = { BuildEmbed(EMOJI_IDLE .. " Player Idle Terdeteksi",
-            "Pemain ini gak ada catch sama sekali selama 2 jam, tolong dicek apakah masih aktif mancing.",
+            "Pemain ini gak ada catch sama sekali selama 1 jam, tolong dicek apakah masih aktif mancing.",
             TierColors.Idle,
             {
                 { name = SEP .. " Username",   value = "**" .. playerName .. "**",            inline = true },
@@ -808,7 +819,9 @@ end
 
 -- ============================================================
 --  EVENT DETECTION
---  FIX 2: tambah "aurora" ke isRelevant filter
+--  FIX 7: filter relevansi disederhanain -- sekarang cuma tinggal 2 event aktif
+--  (treasure hunt & thunderzilla hunt), keduanya selalu mengandung kata "hunt",
+--  jadi keyword "crystal"/"spawned"/"aurora" udah gak perlu dicek lagi.
 -- ============================================================
 
 local _hookedLabels = {}
@@ -818,9 +831,7 @@ local function ProcessEventText(text)
     if not text or text == "" then return end
     local lower = text:lower()
 
-    -- FIX 2: tambah "aurora" supaya Aurora event terdeteksi
-    local isRelevant = lower:find("hunt") or lower:find("started") or lower:find("crystal")
-        or lower:find("spawned") or lower:find("aurora")
+    local isRelevant = lower:find("hunt")
     if not isRelevant then return end
 
     for _, evData in ipairs(EventHuntData) do
@@ -1078,8 +1089,8 @@ local function StartMonitoring()
         end
     end)
 
-    -- FIX 5: loop idle detector — cek berkala apakah ada player yang gak catch
-    -- sama sekali selama IDLE_THRESHOLD_SECONDS, kirim ke WEBHOOK_URL (join/leave).
+    -- FIX 5/7: loop idle detector — cek berkala apakah ada player yang gak catch
+    -- sama sekali selama IDLE_THRESHOLD_SECONDS (sekarang 1 jam), kirim ke WEBHOOK_URL (join/leave).
     task.spawn(function()
         while SCRIPT_ACTIVE do
             task.wait(IDLE_CHECK_INTERVAL)
@@ -1230,6 +1241,96 @@ local function CreateUI()
         TweenService:Create(frame, TweenInfo.new(0.2), { Size = isMinimized and miniSize or fullSize }):Play()
         minBtn.Text = isMinimized and "□" or "—"
     end)
+
+    -- ============================================================
+    --  NEW: FLOATING LOGO INDICATOR
+    --  Logo bulat mengambang yang nunjukkin status aktif/nggaknya
+    --  monitor (dot merah = nonaktif, dot hijau + glow pulsing = aktif).
+    --  Bisa di-drag ke mana aja, dan di-tap buat show/hide panel utama
+    --  (berguna terutama pas panel lagi di-close/minimize).
+    -- ============================================================
+    local floatLogo = Instance.new("ImageButton")
+    floatLogo.Name             = "BloxGankFloatLogo"
+    floatLogo.Size             = UDim2.new(0, 46, 0, 46)
+    floatLogo.Position         = UDim2.new(0, 20, 0, 90)
+    floatLogo.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    floatLogo.Image            = BRAND_ICON
+    floatLogo.ScaleType        = Enum.ScaleType.Crop
+    floatLogo.BorderSizePixel  = 0
+    floatLogo.ZIndex           = 5
+    floatLogo.Parent           = gui
+    Instance.new("UICorner", floatLogo).CornerRadius = UDim.new(1, 0)
+
+    local floatStroke = Instance.new("UIStroke")
+    floatStroke.Color     = Color3.fromRGB(50, 50, 50)
+    floatStroke.Thickness = 2
+    floatStroke.Parent    = floatLogo
+
+    local floatStatusDot = Instance.new("Frame")
+    floatStatusDot.Size             = UDim2.new(0, 14, 0, 14)
+    floatStatusDot.Position         = UDim2.new(1, -14, 1, -14)
+    floatStatusDot.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    floatStatusDot.BorderSizePixel  = 0
+    floatStatusDot.ZIndex           = 6
+    floatStatusDot.Parent           = floatLogo
+    Instance.new("UICorner", floatStatusDot).CornerRadius = UDim.new(1, 0)
+
+    local floatStatusDotStroke = Instance.new("UIStroke")
+    floatStatusDotStroke.Color     = Color3.fromRGB(20, 20, 20)
+    floatStatusDotStroke.Thickness = 2
+    floatStatusDotStroke.Parent    = floatStatusDot
+
+    local floatPulseTween = nil
+    local function SetFloatStatus(active)
+        floatStatusDot.BackgroundColor3 = active and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(255, 60, 60)
+        floatStroke.Color               = active and Color3.fromRGB(0, 220, 100) or Color3.fromRGB(50, 50, 50)
+        if floatPulseTween then floatPulseTween:Cancel(); floatPulseTween = nil end
+        floatStroke.Transparency = 0
+        if active then
+            floatPulseTween = TweenService:Create(
+                floatStroke,
+                TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+                { Transparency = 0.55, Thickness = 3 }
+            )
+            floatPulseTween:Play()
+        else
+            floatStroke.Thickness = 2
+        end
+    end
+    SetFloatStatus(false) -- state awal: belum aktif
+
+    -- drag + tap-to-toggle (dibedain pake threshold jarak drag)
+    local floatDragging, floatDragStart, floatStartPos, floatMoved = false, nil, nil, false
+
+    floatLogo.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            floatDragging  = true
+            floatMoved     = false
+            floatDragStart = input.Position
+            floatStartPos  = floatLogo.Position
+        end
+    end)
+
+    floatLogo.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            floatDragging = false
+            if not floatMoved then
+                frame.Visible = not frame.Visible
+            end
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if floatDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - floatDragStart
+            if math.abs(delta.X) > 3 or math.abs(delta.Y) > 3 then floatMoved = true end
+            floatLogo.Position = UDim2.new(
+                floatStartPos.X.Scale, floatStartPos.X.Offset + delta.X,
+                floatStartPos.Y.Scale, floatStartPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
     closeBtn.MouseButton1Click:Connect(function()
         TweenService:Create(frame, TweenInfo.new(0.15), { Size = UDim2.new(0,300,0,0), BackgroundTransparency=1 }):Play()
         task.wait(0.2); gui:Destroy()
@@ -1386,6 +1487,9 @@ local function CreateUI()
         statusLabel.TextColor3     = Color3.fromRGB(0,220,100)
         startBtn.Text              = "✅ MONITORING AKTIF"
         startBtn.BackgroundColor3  = Color3.fromRGB(30,30,30)
+
+        -- NEW: update logo mengambang jadi status aktif (dot hijau + glow pulsing)
+        SetFloatStatus(true)
 
         for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent, inputMutasi }) do
             box.TextEditable = false
