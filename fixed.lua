@@ -183,7 +183,7 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback",
 }
 
 local ForgottenList = {
@@ -304,6 +304,7 @@ local FishChanceData = {
     ["Coral Reaper"]              = "1 in 6M",
     ["Sunken Hadalith"]           = "1 in ??",
     ["Trench Warden"]             = "1 in 15M",
+    ["Caeruleum Razerback"]       = "1 in 3M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -382,6 +383,7 @@ local FishImageURL = {
     ["Aurora"]                   = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/99.png",
     ["Coral Reaper"]             = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Coral%20Reaper.png",
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
+    ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
     
 }
 
