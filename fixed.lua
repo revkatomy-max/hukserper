@@ -150,15 +150,15 @@ local MemberList = {
     {username = "velorisee",         display = "velorisee",            id = "692735562817470494"},
     {username = "userrxyz2",         display = "alaydf",               id = "1425223281686085713"},
     {username = "worldofwis",        display = "FUNxWis",              id = "1185617757446873199"},
-    {username = "djars15",           display = "djars15",              id = "1447227099206385745"},
+    {username = "Ipungkerta7",           display = "Faruq83NXS",       id = "719154955943936090"},
     {username = "Hyrooboy99",        display = "481HyrooSalvatore",    id = "1309945598409048076"},
     {username = "ch0colveuuu",       display = "chocoo",               id = "1410918804036390995"},
-{username = "Th3SwordIsReal",      display = "Yor",                   id = "370151022628175872"},
-{username = "Blckwv3",             display = "Blackwave",             id = "494856245023604736"},
-{username = "sheenaraa13",         display = "shennn",                id = "1427694245455859715"},
-{username = "TalonGiveMeSecret86", display = "Ajudanipung01",         id = "719154955943936090"},
-{username = "frozenchaos07",           display = "froz",               id = "499967094067298314"},
-
+    {username = "Th3SwordIsReal",      display = "Yor",                id = "370151022628175872"},
+    {username = "Blckwv3",             display = "Blackwave",          id = "494856245023604736"},
+    {username = "sheenaraa13",         display = "shennn",             id = "1427694245455859715"},
+    {username = "TalonGiveMeSecret86", display = "Ajudanipung01",      id = "719154955943936090"},
+    {username = "Gomenarai",           display = "Gomenarai",          id = "892353508160970773"},
+    {username = "ninindiy",             display= "cookiedy",           id = "1414865637829906544"},
 }
 
 -- ============================================================
