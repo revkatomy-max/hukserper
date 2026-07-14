@@ -25,7 +25,7 @@ local ROLE_NELAYAN_ID         = "1465243405591380023"
 
 -- FIX 5: konstanta buat idle detector (player gak catch ikan sama sekali selama sekian lama)
 -- FIX 7: idle threshold diturunin dari 2 jam ke 1 jam sesuai request.
-local IDLE_THRESHOLD_SECONDS = 7200 -- 1 jam
+local IDLE_THRESHOLD_SECONDS = 7000 -- 1 jam
 local IDLE_CHECK_INTERVAL    = 300  -- cek tiap 5 menit
 
 -- NEW: interval buat auto-send Check Player On Server (nebeng loop stats, tiap 20 menit)
@@ -1548,15 +1548,11 @@ local function StartMonitoring()
         end
     end)
 
-    -- NEW: loop auto-send Check Player On Server, nebeng interval yang sama
-    -- kayak stats (default 20 menit, atur di CHECKPLAYER_AUTO_INTERVAL).
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(CHECKPLAYER_AUTO_INTERVAL)
-            if not SCRIPT_ACTIVE then break end
-            SendPlayerCheckWebhook()
-        end
-    end)
+    -- DIMATIKAN sesuai request: dulu ada loop auto-send Check Player On Server tiap
+    -- CHECKPLAYER_AUTO_INTERVAL detik. Sekarang webhook Check Player CUMA kekirim
+    -- kalau di-trigger manual (klik tombol CHECK PLAYER di panel, atau ketik
+    -- "!checkplayer" di chat game). CHECKPLAYER_AUTO_INTERVAL dibiarin di atas
+    -- (gak dipake lagi) biar gampang diaktifin ulang kalau nanti berubah pikiran.
 
     -- FIX 5/7: loop idle detector — cek berkala apakah ada player yang gak catch
     -- sama sekali selama IDLE_THRESHOLD_SECONDS (sekarang 1 jam), kirim ke WEBHOOK_URL (join/leave).
