@@ -1693,7 +1693,6 @@ local function CreateUI()
     content.ScrollBarThickness     = 3
     content.ScrollBarImageColor3   = Color3.fromRGB(80, 80, 80)
     content.CanvasSize             = UDim2.new(0, 0, 0, 0)
-    content.AutomaticCanvasSize    = Enum.AutomaticCanvasSize.Y
     content.Parent                 = frame
 
     local listLayout = Instance.new("UIListLayout")
@@ -1701,6 +1700,16 @@ local function CreateUI()
     listLayout.SortOrder     = Enum.SortOrder.LayoutOrder
     listLayout.Padding       = UDim.new(0, 4)
     listLayout.Parent        = content
+
+    -- FIX: "AutomaticCanvasSize" itu properti yang relatif baru di Roblox dan gak semua
+    -- executor/game client mendukungnya -- kalau di-set dan gak dikenali, ini nge-error
+    -- dan bikin SISA CreateUI() gak sempat jalan (makanya panel jadi blank abis topbar).
+    -- Sekarang canvas size dihitung MANUAL tiap kali AbsoluteContentSize berubah,
+    -- jadi kompatibel di executor manapun.
+    local function UpdateCanvasSize()
+        content.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 10)
+    end
+    listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvasSize)
 
     local listPad = Instance.new("UIPadding")
     listPad.PaddingLeft   = UDim.new(0, 12)
@@ -1894,4 +1903,7 @@ end
 --  INIT
 -- ============================================================
 
-CreateUI()
+local uiOk, uiErr = pcall(CreateUI)
+if not uiOk then
+    warn("[BLOX Gank] Gagal bikin UI: " .. tostring(uiErr))
+end
