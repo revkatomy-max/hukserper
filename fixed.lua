@@ -19,11 +19,7 @@ local WEBHOOK_CHECKPLAYER = ""
 local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
-
--- NEW: toggle ON/OFF buat notif Event Hunt & buat fitur kirim Check Player On Server,
--- dikontrol lewat switch di panel UI. Default keduanya ON (nyala) biar perilaku sama kayak sebelumnya.
-local EVENT_ENABLED       = true
-local CHECKPLAYER_ENABLED = true
+local EVENT_NOTIF_ENABLED = true -- NEW: toggle ON/OFF khusus notifikasi Event Hunt
 
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
@@ -50,7 +46,6 @@ local TierColors = {
     Leave     = 16729344,
     NotBack   = 16711680,
     Idle      = 16750848,
-    Hop       = 10181046,
 }
 
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
@@ -70,12 +65,9 @@ local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
 local EMOJI_IDLE      = "⏳"
-local EMOJI_HOP       = "🔀"
 local EMOJI_CHECK     = "🔍"
 local EMOJI_COIN      = "🪙"
 local EMOJI_LOCATION  = "📍"
-local EMOJI_PING        = "📶"
-local EMOJI_FISHCAUGHT  = "🐟"
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -525,46 +517,6 @@ local function LoadConfig()
 end
 
 -- ============================================================
---  NEW: SERVER HOP DETECTOR
---  game.JobId itu ID unik per-INSTANCE server (ini juga yang muncul
---  di HUD game, tulisan "Your Server - xxxxxxxx-...."). Script gak
---  bisa "melihat" hop kejadian sambil dia jalan (begitu pindah server,
---  executor re-inject dari awal), jadi cara paling akurat: simpen
---  JobId terakhir ke file, terus tiap kali script start, bandingin
---  sama JobId sekarang. Beda = baru aja hop. Sama = cuma re-execute
---  di server yang sama (misal abis reset auto-execute).
--- ============================================================
-
-local LAST_SERVER_FILE = "bloxgank_lastserver.json"
-
--- Baca JobId run sebelumnya, simpen JobId sekarang, balikin (prevId, currentId).
--- prevId == nil kalau ini pertama kali script pernah jalan (belum ada history).
-local function CheckServerHop()
-    local currentId = tostring(game.JobId)
-    if not (writefile and readfile and isfile) then
-        -- executor gak support file I/O -> gak bisa cross-session, cuma balikin current
-        return nil, currentId
-    end
-
-    local prevId = nil
-    local ok, raw = pcall(function()
-        return isfile(LAST_SERVER_FILE) and readfile(LAST_SERVER_FILE) or nil
-    end)
-    if ok and raw and raw ~= "" then
-        local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
-        if ok2 and type(data) == "table" and data.jobId and data.jobId ~= "" then
-            prevId = data.jobId
-        end
-    end
-
-    pcall(function()
-        writefile(LAST_SERVER_FILE, HttpService:JSONEncode({ jobId = currentId, time = os.time() }))
-    end)
-
-    return prevId, currentId
-end
-
--- ============================================================
 --  UTILITY
 -- ============================================================
 
@@ -916,153 +868,10 @@ local function GetPlayerStatsAndLocation(player)
     return caught, location
 end
 
--- DEBUG HELPER: print semua child leaderstats + valuenya buat tiap player,
--- berguna buat nemuin nama stat COIN & LOCATION yang beneran dipakai Fish It
--- (kemungkinan besar bukan "Coins"/"Location" persis, makanya semua ke-N/A).
--- Cara pake: ketik "!debugstats" di chat game.
-local function DebugPrintLeaderstats()
-    for _, p in ipairs(Players:GetPlayers()) do
-        local ls = p:FindFirstChild("leaderstats")
-        if not ls then
-            print("[BLOX Gank DEBUG] " .. p.Name .. " -> TIDAK PUNYA folder 'leaderstats'")
-        else
-            print("[BLOX Gank DEBUG] " .. p.Name .. " -> leaderstats children:")
-            for _, child in ipairs(ls:GetChildren()) do
-                local ok, val = pcall(function() return child.Value end)
-                print("    - " .. child.Name .. " (" .. child.ClassName .. ") = " .. tostring(ok and val or "?"))
-            end
-        end
-    end
-
-    -- NEW: scan SEMUA descendant local player buat cari apapun yang namanya
-    -- mengandung "map" atau "location" (case-insensitive), biar ketauan
-    -- persis di path mana stat lokasi itu disimpan kalau bukan di leaderstats.
-    local lp = Players.LocalPlayer
-    print("[BLOX Gank DEBUG] Scan descendant '" .. lp.Name .. "' buat cari 'map'/'location'...")
-    local found = 0
-    for _, desc in ipairs(lp:GetDescendants()) do
-        local lname = string.lower(desc.Name)
-        if lname:find("map") or lname:find("location") then
-            found = found + 1
-            local ok, val = pcall(function() return desc.Value end)
-            print("    [MAP CANDIDATE] " .. desc:GetFullName() .. " (" .. desc.ClassName .. ") = " .. tostring(ok and val or "(gak punya .Value)"))
-        end
-    end
-    if found == 0 then
-        print("    Gak ketemu apapun yang namanya mengandung 'map'/'location' di descendant player.")
-    end
-
-    -- NEW: scan WORKSPACE juga, siapa tau data Map/Location disimpen di sana
-    -- (folder terpisah per player), bukan di dalam Player instance-nya.
-    print("[BLOX Gank DEBUG] Scan WORKSPACE buat cari 'map'/'location'... (mungkin agak lama, sabar ya)")
-    local wsFound = 0
-    for _, desc in ipairs(Workspace:GetDescendants()) do
-        local lname = string.lower(desc.Name)
-        if lname:find("map") or lname:find("location") then
-            wsFound = wsFound + 1
-            if wsFound <= 50 then
-                local ok, val = pcall(function() return desc.Value end)
-                print("    [WORKSPACE CANDIDATE] " .. desc:GetFullName() .. " (" .. desc.ClassName .. ") = " .. tostring(ok and val or "(gak punya .Value)"))
-            end
-        end
-    end
-    if wsFound == 0 then
-        print("    Gak ketemu apapun yang namanya mengandung 'map'/'location' di workspace juga.")
-    elseif wsFound > 50 then
-        print("    ... total ketemu " .. wsFound .. " kandidat, cuma nampilin 50 pertama biar console gak flood.")
-    end
-
-    -- NEW: scan ATTRIBUTE (bukan child Instance .Value) di Player, Character,
-    -- dan folder leaderstats -- banyak game modern nyimpen data zona/map
-    -- sebagai attribute (SetAttribute/GetAttribute), bukan sebagai Value object.
-    local lp2 = Players.LocalPlayer
-    print("[BLOX Gank DEBUG] Scan ATTRIBUTES milik '" .. lp2.Name .. "'...")
-    local attrs = lp2:GetAttributes()
-    local attrCount = 0
-    for attrName, attrVal in pairs(attrs) do
-        attrCount = attrCount + 1
-        print("    [PLAYER ATTR] " .. attrName .. " = " .. tostring(attrVal))
-    end
-    if attrCount == 0 then print("    Player gak punya attribute apapun.") end
-
-    local char = lp2.Character
-    if char then
-        print("[BLOX Gank DEBUG] Scan ATTRIBUTES milik Character '" .. char.Name .. "'...")
-        local charAttrs = char:GetAttributes()
-        local charAttrCount = 0
-        for attrName, attrVal in pairs(charAttrs) do
-            charAttrCount = charAttrCount + 1
-            print("    [CHARACTER ATTR] " .. attrName .. " = " .. tostring(attrVal))
-        end
-        if charAttrCount == 0 then print("    Character gak punya attribute apapun.") end
-    end
-
-    local ls2 = lp2:FindFirstChild("leaderstats")
-    if ls2 then
-        print("[BLOX Gank DEBUG] Scan ATTRIBUTES milik folder 'leaderstats'...")
-        local lsAttrs = ls2:GetAttributes()
-        local lsAttrCount = 0
-        for attrName, attrVal in pairs(lsAttrs) do
-            lsAttrCount = lsAttrCount + 1
-            print("    [LEADERSTATS ATTR] " .. attrName .. " = " .. tostring(attrVal))
-        end
-        if lsAttrCount == 0 then print("    Folder leaderstats gak punya attribute apapun.") end
-    end
-
-    -- NEW: scan WORKSPACE buat cari Part/Model yang namanya PERSIS sama kayak
-    -- nama lokasi yang udah pernah keliatan di embed (Copper Canyon Mines, dst).
-    -- Kalau ketemu, itu kemungkinan besar "zone trigger" -- lokasi player bisa
-    -- ditentukan dari posisi dia relatif ke part-part ini.
-    local knownLocationNames = {
-        "Copper Canyon Mines", "Copper Canyon", "Mariana Trench", "Underwater City",
-        "Crater Island", "Ancient Jungle", "Dark Megalodon Hunt",
-    }
-    local wantedZones = {}
-    for _, n in ipairs(knownLocationNames) do wantedZones[n] = true end
-    print("[BLOX Gank DEBUG] Scan WORKSPACE buat cari Part/Model bernama lokasi yang udah dikenal...")
-    local zoneFound = 0
-    for _, inst in ipairs(Workspace:GetDescendants()) do
-        if wantedZones[inst.Name] then
-            zoneFound = zoneFound + 1
-            print("    [ZONE PART] " .. inst:GetFullName() .. " (" .. inst.ClassName .. ")")
-        end
-    end
-    if zoneFound == 0 then
-        print("    Gak ketemu Part/Model dengan nama lokasi yang persis kayak di embed.")
-    end
-end
--- DEBUG HELPER: print teks TextLabel/TextButton yang ada di PlayerGui, TAPI
--- di-filter cuma yang mengandung kata "luck", "map", atau "location" biar gak
--- flood console (dulu ke-dump semua teks GUI, kebanyakan gak relevan).
--- Cara pake: klik tombol "🐛 DEBUG STATS + GUI" di panel, atau ketik "!debuggui" di chat.
-local function DebugPrintGuiTexts()
-    local pg = Players.LocalPlayer:FindFirstChild("PlayerGui")
-    if not pg then return end
-    local found = 0
-    for _, v in ipairs(pg:GetDescendants()) do
-        if (v:IsA("TextLabel") or v:IsA("TextButton")) and v.Text and v.Text ~= "" then
-            local lower = v.Text:lower()
-            if lower:find("luck") or lower:find("map") or lower:find("location")
-            or lower:find("ping") or lower:find("fish caught") then
-                found = found + 1
-                local tag = "[GUI TEXT] [OTHER] "
-                if lower:find("luck") then tag = "[GUI TEXT] [LUCK!] "
-                elseif lower:find("ping") then tag = "[GUI TEXT] [PING!] "
-                elseif lower:find("fish caught") then tag = "[GUI TEXT] [FISHCAUGHT!] "
-                elseif lower:find("map") or lower:find("location") then tag = "[GUI TEXT] [MAP/LOC] " end
-                print(tag .. v:GetFullName() .. " => " .. v.Text)
-            end
-        end
-    end
-    if found == 0 then
-        print("[BLOX Gank DEBUG] Gak ketemu teks GUI yang mengandung 'luck'/'map'/'location' sama sekali.")
-    end
-end
 
 -- NOTE: ini scanner HEURISTIK (nebak dari pola teks), karena Server Luck &
 -- End Server Luck cuma ada di GUI game (bukan value/stat). Kalau hasilnya
--- kosong/salah, panggil DebugPrintGuiTexts() dulu buat liat teks GUI asli,
--- terus sesuaikan pattern di bawah ini.
+-- kosong/salah, cek langsung teks GUI game-nya dan sesuaikan pattern di bawah ini.
 local function ScanServerLuckInfo()
     local luckValue, luckEnds = nil, nil
     local pg = Players.LocalPlayer:FindFirstChild("PlayerGui")
@@ -1088,35 +897,6 @@ local function ScanServerLuckInfo()
     return luckValue, luckEnds
 end
 
--- NEW: scan HUD panel game ("Performance" -> Avg Ping, "Fish Caught: 127,811") sama
--- persis cara ScanServerLuckInfo di atas -- heuristik dari teks GUI, karena ini juga
--- gak ada sebagai stat/value, cuma teks di TextLabel. Kalau pattern-nya meleset,
--- panggil DebugPrintGuiTexts() buat liat teks asli & sesuaikan pattern di bawah.
-local function ScanServerHudInfo()
-    local pingValue, fishCaughtValue = nil, nil
-    local pg = Players.LocalPlayer:FindFirstChild("PlayerGui")
-    if not pg then return pingValue, fishCaughtValue end
-
-    for _, v in ipairs(pg:GetDescendants()) do
-        if v:IsA("TextLabel") or v:IsA("TextButton") then
-            local t = v.Text or ""
-            if t ~= "" then
-                if not pingValue then
-                    local p = t:match("[Aa]vg%s*[Pp]ing%s*:?%s*(%d+)%s*ms") or t:match("[Pp]ing%s*:?%s*(%d+)%s*ms")
-                    if p then pingValue = p end
-                end
-                if not fishCaughtValue then
-                    local f = t:match("[Ff]ish%s*[Cc]aught%s*:?%s*([%d,]+)")
-                    if f then fishCaughtValue = f end
-                end
-            end
-        end
-        if pingValue and fishCaughtValue then break end
-    end
-
-    return pingValue, fishCaughtValue
-end
-
 -- Susun deskripsi embed persis format "Check Player On Server"
 local function BuildPlayerCheckDescription()
     local players = Players:GetPlayers()
@@ -1137,9 +917,6 @@ local function BuildPlayerCheckDescription()
     local luckVal, luckEnds = ScanServerLuckInfo()
     table.insert(lines, "• **Server Luck** : x" .. (luckVal or "?"))
     table.insert(lines, "• **End Server Luck** : Ends: " .. (luckEnds or "?"))
-    local pingVal, fishCaughtVal = ScanServerHudInfo()
-    table.insert(lines, "• **" .. EMOJI_PING .. " Avg Ping** : " .. (pingVal and (pingVal .. "ms") or "?"))
-    table.insert(lines, "• **" .. EMOJI_FISHCAUGHT .. " Fish Caught (Server)** : " .. (fishCaughtVal or "?"))
     table.insert(lines, "")
     table.insert(lines, "Updated: " .. os.date("%d/%m/%Y %H:%M:%S"))
 
@@ -1279,11 +1056,6 @@ end
 -- NEW: webhook "Check Player On Server" -- kirim daftar semua player + coin + lokasi + server luck.
 -- Fallback: kalau WEBHOOK_CHECKPLAYER kosong -> pakai WEBHOOK_STATS -> kalau itu juga kosong pakai WEBHOOK_URL.
 local function SendPlayerCheckWebhook()
-    if not CHECKPLAYER_ENABLED then
-        print("[BLOX Gank DEBUG] SendPlayerCheckWebhook batal: fitur Check Player lagi DIMATIKAN dari toggle panel.")
-        return
-    end
-
     local url = (WEBHOOK_CHECKPLAYER ~= "") and WEBHOOK_CHECKPLAYER
         or ((WEBHOOK_STATS ~= "") and WEBHOOK_STATS or WEBHOOK_URL)
 
@@ -1317,11 +1089,6 @@ end
 -- ============================================================
 
 local function SendEventWebhook(eventData, rawText)
-    if not EVENT_ENABLED then
-        print("[BLOX Gank DEBUG] SendEventWebhook batal: notif Event Hunt lagi DIMATIKAN dari toggle panel.")
-        return
-    end
-
     local url = (WEBHOOK_EVENT ~= "") and WEBHOOK_EVENT or WEBHOOK_URL
     if url == "" then return end
     PostWebhook(url, {
@@ -1347,19 +1114,20 @@ end
 
 -- ============================================================
 --  EVENT DETECTION
---  FIX 7: filter relevansi disederhanain -- sekarang cuma tinggal 2 event aktif
---  (treasure hunt & thunderzilla hunt), keduanya selalu mengandung kata "hunt",
---  jadi keyword "crystal"/"spawned"/"aurora" udah gak perlu dicek lagi.
+--  Event aktif sekarang: Treasure Hunt, Thunderzilla Hunt, & Crystal Event.
+--  Filter relevansi cek keyword "hunt" ATAU "crystal" sebelum masuk ke
+--  pengecekan trigger detail per-event di bawah.
 -- ============================================================
 
 local _hookedLabels = {}
 
 local function ProcessEventText(text)
     if not SCRIPT_ACTIVE then return end
+    if not EVENT_NOTIF_ENABLED then return end -- NEW: toggle ON/OFF khusus notif Event Hunt
     if not text or text == "" then return end
     local lower = text:lower()
 
-    local isRelevant = lower:find("hunt")
+    local isRelevant = lower:find("hunt") or lower:find("crystal")
     if not isRelevant then return end
 
     for _, evData in ipairs(EventHuntData) do
@@ -1557,18 +1325,11 @@ local function HookChat()
             local text = msg.Text or ""
             if msg.TextSource == nil then CheckAndSend(text) end
 
-            -- NEW: command manual buat trigger "Check Player On Server" kapan aja.
+            -- Command manual buat trigger "Check Player On Server" kapan aja.
             -- Ketik !checkplayer di chat game buat langsung kirim ke webhook.
             local lowerText = Trim(string.lower(text))
-            if lowerText:sub(1,1) == "!" then
-                print("[BLOX Gank DEBUG] (TextChatService) Command chat terdeteksi: '" .. lowerText .. "'")
-            end
             if lowerText == "!checkplayer" then
                 SendPlayerCheckWebhook()
-            elseif lowerText == "!debugstats" then
-                DebugPrintLeaderstats()
-            elseif lowerText == "!debuggui" then
-                DebugPrintGuiTexts()
             end
         end)
     end
@@ -1583,15 +1344,8 @@ local function HookChat()
                     CheckAndSend(d.Message)
                 end
                 local trimmedMsg = Trim(lowerMsg)
-                if trimmedMsg:sub(1,1) == "!" then
-                    print("[BLOX Gank DEBUG] (DefaultChatSystem) Command chat terdeteksi: '" .. trimmedMsg .. "'")
-                end
                 if trimmedMsg == "!checkplayer" then
                     SendPlayerCheckWebhook()
-                elseif trimmedMsg == "!debugstats" then
-                    DebugPrintLeaderstats()
-                elseif trimmedMsg == "!debuggui" then
-                    DebugPrintGuiTexts()
                 end
             end)
         end
@@ -1605,17 +1359,6 @@ end
 local function StartMonitoring()
     ServerStats.startTime = os.time()
     CacheSpawnLocations() -- NEW: scan folder "!!! SPAWN LOCATIONS" sekali di awal monitoring
-
-    -- NEW: cek apakah server sekarang beda dari server terakhir kali monitoring di-start
-    -- (dibaca dari file, jadi tetap kedetect walau script sempat mati/di-reinject).
-    local prevServerId, currentServerId = CheckServerHop()
-    if prevServerId and prevServerId ~= currentServerId then
-        SendWebhook(EMOJI_HOP .. " Server Hop Terdeteksi", "Host baru aja pindah ke server lain.", TierColors.Hop, {
-            { name = SEP .. " Host",           value = "**" .. Players.LocalPlayer.Name .. "**", inline = true },
-            { name = SEP .. " Server Lama",    value = "```" .. prevServerId    .. "```",         inline = false },
-            { name = SEP .. " Server Baru",    value = "```" .. currentServerId .. "```",         inline = false },
-        })
-    end
 
     local allPlayers = Players:GetPlayers()
     local names      = {}
@@ -1760,18 +1503,22 @@ local function CreateUI()
 
     local savedConfig = LoadConfig()
 
-    local FRAME_H = 566
+    -- FIX (optimasi layout): dulu semua elemen (6 input webhook + 2 toggle + 3 tombol)
+    -- diposisikan manual pakai koordinat Y tetap satu-satu. Ini gampang banget numpuk/overlap
+    -- tiap kali nambah field baru (udah kejadian berkali-kali). Sekarang bagian tengah
+    -- (webhook inputs + toggle) dipindah ke ScrollingFrame + UIListLayout yang otomatis
+    -- nyusun elemen berurutan tanpa nabrak, dan bisa di-scroll kalau kepanjangan.
+    -- Tombol aksi (CHECK PLAYER / DEBUG / START) tetap fixed di bawah, di luar scroll,
+    -- biar selalu keliatan & gampang dijangkau.
+    local FRAME_H = 430
     local frame = Instance.new("Frame")
     frame.Name             = "Main"
     frame.Size             = UDim2.new(0, 300, 0, FRAME_H)
-    -- FIX: dulu posisi pakai offset tetap (-150, -120) yang gak nyesuain tinggi frame,
-    -- jadi kalau FRAME_H makin tinggi (kayak sekarang, abis nambah field mutasi),
-    -- bagian bawah panel (tombol START MONITORING) ke-dorong keluar layar di HP.
-    -- Sekarang pakai AnchorPoint biar SELALU center di tengah layar berapa pun tinggi framenya.
     frame.AnchorPoint       = Vector2.new(0.5, 0.5)
     frame.Position          = UDim2.new(0.5, 0, 0.5, 0)
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     frame.BorderSizePixel  = 0
+    frame.ClipsDescendants = true
     frame.Parent           = gui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
 
@@ -1804,21 +1551,12 @@ local function CreateUI()
     local minBtn   = MakeWinBtn("—", -58, Color3.fromRGB(60, 60, 60))
     local closeBtn = MakeWinBtn("✕", -28, Color3.fromRGB(200, 50, 50))
 
-    -- FIX: dulu minimize cuma nge-shrink tinggi frame ke 36px, TAPI posisinya tetap
-    -- ke-anchor di TENGAH layar, jadi strip tipisnya tetap nutupin pandangan gameplay.
-    -- Sekarang minimize langsung nyembunyiin panel SEPENUHNYA (frame.Visible = false).
-    -- Logo bulat mengambang (floatLogo) tetap ada di layar sebagai indikator status,
-    -- dan tap logo itu (bukan drag) bakal munculin lagi panelnya -- lihat floatLogo.InputEnded di bawah.
     minBtn.MouseButton1Click:Connect(function()
         frame.Visible = false
     end)
 
     -- ============================================================
-    --  NEW: FLOATING LOGO INDICATOR
-    --  Logo bulat mengambang yang nunjukkin status aktif/nggaknya
-    --  monitor (dot merah = nonaktif, dot hijau + glow pulsing = aktif).
-    --  Bisa di-drag ke mana aja, dan di-tap buat show/hide panel utama
-    --  (berguna terutama pas panel lagi di-close/minimize).
+    --  FLOATING LOGO INDICATOR
     -- ============================================================
     local floatLogo = Instance.new("ImageButton")
     floatLogo.Name             = "BloxGankFloatLogo"
@@ -1868,9 +1606,8 @@ local function CreateUI()
             floatStroke.Thickness = 2
         end
     end
-    SetFloatStatus(false) -- state awal: belum aktif
+    SetFloatStatus(false)
 
-    -- drag + tap-to-toggle (dibedain pake threshold jarak drag)
     local floatDragging, floatDragStart, floatStartPos, floatMoved = false, nil, nil, false
 
     floatLogo.InputBegan:Connect(function(input)
@@ -1941,93 +1678,74 @@ local function CreateUI()
     statusLabel.Font = Enum.Font.Gotham; statusLabel.TextSize = 11
     statusLabel.TextXAlignment = Enum.TextXAlignment.Left; statusLabel.Parent = frame
 
-    local function MakeLabel(text, yPos)
+    -- ============================================================
+    --  SCROLLABLE CONTENT AREA (webhook inputs + toggle)
+    -- ============================================================
+    local BOTTOM_BLOCK_H = 74 -- tinggi area tombol aksi di bawah (fixed, di luar scroll)
+    local SCROLL_Y        = 64
+
+    local content = Instance.new("ScrollingFrame")
+    content.Name                   = "Content"
+    content.Position               = UDim2.new(0, 0, 0, SCROLL_Y)
+    content.Size                   = UDim2.new(1, 0, 0, FRAME_H - SCROLL_Y - BOTTOM_BLOCK_H)
+    content.BackgroundTransparency = 1
+    content.BorderSizePixel        = 0
+    content.ScrollBarThickness     = 3
+    content.ScrollBarImageColor3   = Color3.fromRGB(80, 80, 80)
+    content.CanvasSize             = UDim2.new(0, 0, 0, 0)
+    content.AutomaticCanvasSize    = Enum.AutomaticCanvasSize.Y
+    content.Parent                 = frame
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.FillDirection = Enum.FillDirection.Vertical
+    listLayout.SortOrder     = Enum.SortOrder.LayoutOrder
+    listLayout.Padding       = UDim.new(0, 4)
+    listLayout.Parent        = content
+
+    local listPad = Instance.new("UIPadding")
+    listPad.PaddingLeft   = UDim.new(0, 12)
+    listPad.PaddingRight  = UDim.new(0, 12)
+    listPad.PaddingTop    = UDim.new(0, 4)
+    listPad.PaddingBottom = UDim.new(0, 6)
+    listPad.Parent        = content
+
+    local function MakeLabel(text)
         local lbl = Instance.new("TextLabel")
-        lbl.Text = text; lbl.Size = UDim2.new(1,-24,0,14); lbl.Position = UDim2.new(0,12,0,yPos)
+        lbl.Text = text; lbl.Size = UDim2.new(1, 0, 0, 14)
         lbl.BackgroundTransparency = 1; lbl.TextColor3 = Color3.fromRGB(130,130,130)
-        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10; lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.Parent = frame
+        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10; lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = content
         return lbl
     end
 
-    local function MakeInput(placeholder, yPos)
+    local function MakeInput(placeholder)
         local box = Instance.new("TextBox")
-        box.PlaceholderText = placeholder; box.Size = UDim2.new(1,-24,0,28); box.Position = UDim2.new(0,12,0,yPos)
+        box.PlaceholderText = placeholder; box.Size = UDim2.new(1, 0, 0, 28)
         box.BackgroundColor3 = Color3.fromRGB(35,35,35); box.TextColor3 = Color3.fromRGB(220,220,220)
         box.PlaceholderColor3 = Color3.fromRGB(100,100,100); box.Font = Enum.Font.Gotham; box.TextSize = 10
         box.ClearTextOnFocus = false; box.BorderSizePixel = 0; box.Text = ""
-        box.TextXAlignment = Enum.TextXAlignment.Left; box.ClipsDescendants = true; box.Parent = frame
+        box.TextXAlignment = Enum.TextXAlignment.Left; box.ClipsDescendants = true; box.Parent = content
         Instance.new("UICorner", box).CornerRadius = UDim.new(0,6)
         local pad = Instance.new("UIPadding", box); pad.PaddingLeft = UDim.new(0,8); pad.PaddingRight = UDim.new(0,8)
         return box
     end
 
-    MakeLabel("👋 Webhook Join / Leave", 58)
-    local inputJoin  = MakeInput("Paste webhook join/leave...", 72)
-    MakeLabel("🐋 Webhook Secret Fish", 108)
-    local inputFish  = MakeInput("Paste webhook secret fish...", 122)
-    MakeLabel("📊 Webhook Stats", 158)
-    local inputStats = MakeInput("Paste webhook stats...", 172)
-    MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)", 208)
-    local inputEvent = MakeInput("Kosong = pakai webhook join/leave...", 222)
-    -- NEW: input webhook khusus mutasi list
-    MakeLabel("🧬 Webhook Mutasi List", 258)
-    local inputMutasi = MakeInput("Kosong = pakai webhook secret fish...", 272)
-    -- NEW: input webhook khusus Check Player On Server
-    MakeLabel(EMOJI_CHECK .. " Webhook Check Player", 308)
-    local inputCheckplayer = MakeInput("Kosong = pakai webhook stats...", 322)
+    -- Toggle row: label kiri + switch kanan dalam satu baris ringkas.
+    local function MakeToggleRow(labelText, defaultOn, onChange)
+        local row = Instance.new("Frame")
+        row.Size = UDim2.new(1, 0, 0, 22)
+        row.BackgroundTransparency = 1
+        row.Parent = content
 
-    local saveEnabled = false
-
-    local toggleBg = Instance.new("Frame")
-    toggleBg.Size = UDim2.new(0,36,0,18); toggleBg.Position = UDim2.new(1,-48,0,364)
-    toggleBg.BackgroundColor3 = Color3.fromRGB(60,60,60); toggleBg.BorderSizePixel = 0; toggleBg.Parent = frame
-    Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1,0)
-
-    local toggleKnob = Instance.new("Frame")
-    toggleKnob.Size = UDim2.new(0,14,0,14); toggleKnob.Position = UDim2.new(0,2,0.5,-7)
-    toggleKnob.BackgroundColor3 = Color3.fromRGB(200,200,200); toggleKnob.BorderSizePixel = 0; toggleKnob.Parent = toggleBg
-    Instance.new("UICorner", toggleKnob).CornerRadius = UDim.new(1,0)
-
-    local toggleLabel = Instance.new("TextLabel")
-    toggleLabel.Text = "💾 Simpan Config"; toggleLabel.Size = UDim2.new(1,-60,0,18); toggleLabel.Position = UDim2.new(0,12,0,362)
-    toggleLabel.BackgroundTransparency = 1; toggleLabel.TextColor3 = Color3.fromRGB(130,130,130)
-    toggleLabel.Font = Enum.Font.Gotham; toggleLabel.TextSize = 10
-    toggleLabel.TextXAlignment = Enum.TextXAlignment.Left; toggleLabel.Parent = frame
-
-    local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size = UDim2.new(0,36,0,18); toggleBtn.Position = UDim2.new(1,-48,0,364)
-    toggleBtn.BackgroundTransparency = 1; toggleBtn.Text = ""; toggleBtn.BorderSizePixel = 0; toggleBtn.Parent = frame
-
-    local function SetToggle(enabled)
-        saveEnabled = enabled
-        TweenService:Create(toggleKnob, TweenInfo.new(0.15), {
-            Position         = enabled and UDim2.new(0,20,0.5,-7) or UDim2.new(0,2,0.5,-7),
-            BackgroundColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(200,200,200),
-        }):Play()
-        TweenService:Create(toggleBg, TweenInfo.new(0.15), {
-            BackgroundColor3 = enabled and Color3.fromRGB(0,100,50) or Color3.fromRGB(60,60,60),
-        }):Play()
-        toggleLabel.TextColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(130,130,130)
-    end
-
-    toggleBtn.MouseButton1Click:Connect(function() SetToggle(not saveEnabled) end)
-
-    -- ============================================================
-    --  NEW: reusable toggle-switch builder, dipakai buat toggle
-    --  "Notif Event Hunt" & "Kirim Check Player" di bawah.
-    --  Beda dari SetToggle di atas (itu spesifik utk saveEnabled),
-    --  ini generic: kasih label + callback, balikin fungsi setter.
-    -- ============================================================
-    local function MakeToggleSwitch(labelText, yPos, initialState, onChanged)
         local lbl = Instance.new("TextLabel")
-        lbl.Text = labelText; lbl.Size = UDim2.new(1,-60,0,18); lbl.Position = UDim2.new(0,12,0,yPos)
+        lbl.Text = labelText; lbl.Size = UDim2.new(1, -44, 1, 0)
         lbl.BackgroundTransparency = 1; lbl.TextColor3 = Color3.fromRGB(130,130,130)
-        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10
-        lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.Parent = frame
+        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10; lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = row
 
         local bg = Instance.new("Frame")
-        bg.Size = UDim2.new(0,36,0,18); bg.Position = UDim2.new(1,-48,0,yPos)
-        bg.BackgroundColor3 = Color3.fromRGB(60,60,60); bg.BorderSizePixel = 0; bg.Parent = frame
+        bg.Size = UDim2.new(0,36,0,18); bg.Position = UDim2.new(1,-36,0.5,-9)
+        bg.BackgroundColor3 = Color3.fromRGB(60,60,60); bg.BorderSizePixel = 0; bg.Parent = row
         Instance.new("UICorner", bg).CornerRadius = UDim.new(1,0)
 
         local knob = Instance.new("Frame")
@@ -2035,13 +1753,12 @@ local function CreateUI()
         knob.BackgroundColor3 = Color3.fromRGB(200,200,200); knob.BorderSizePixel = 0; knob.Parent = bg
         Instance.new("UICorner", knob).CornerRadius = UDim.new(1,0)
 
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0,36,0,18); btn.Position = UDim2.new(1,-48,0,yPos)
-        btn.BackgroundTransparency = 1; btn.Text = ""; btn.BorderSizePixel = 0; btn.Parent = frame
+        local hitbox = Instance.new("TextButton")
+        hitbox.Size = UDim2.new(0,36,0,18); hitbox.Position = UDim2.new(1,-36,0.5,-9)
+        hitbox.BackgroundTransparency = 1; hitbox.Text = ""; hitbox.BorderSizePixel = 0; hitbox.Parent = row
 
-        local state = initialState
-
-        local function Apply(enabled, skipCallback)
+        local state = false
+        local function setState(enabled)
             state = enabled
             TweenService:Create(knob, TweenInfo.new(0.15), {
                 Position         = enabled and UDim2.new(0,20,0.5,-7) or UDim2.new(0,2,0.5,-7),
@@ -2051,23 +1768,37 @@ local function CreateUI()
                 BackgroundColor3 = enabled and Color3.fromRGB(0,100,50) or Color3.fromRGB(60,60,60),
             }):Play()
             lbl.TextColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(130,130,130)
-            if not skipCallback and onChanged then onChanged(enabled) end
+            if onChange then onChange(enabled) end
         end
 
-        btn.MouseButton1Click:Connect(function() Apply(not state) end)
-        Apply(initialState, true) -- set tampilan awal tanpa mancing callback
+        hitbox.MouseButton1Click:Connect(function() setState(not state) end)
+        setState(defaultOn)
 
-        return Apply
+        return { setState = setState, getState = function() return state end, hitbox = hitbox }
     end
 
-    -- Toggle ON/OFF notif Event Hunt (treasure hunt / thunderzilla hunt / crystal event, dst)
-    local SetEventToggle = MakeToggleSwitch(EMOJI_EVENTTAG .. " Notif Event Hunt", 392, EVENT_ENABLED, function(enabled)
-        EVENT_ENABLED = enabled
+    MakeLabel("👋 Webhook Join / Leave")
+    local inputJoin  = MakeInput("Paste webhook join/leave...")
+    MakeLabel("🐋 Webhook Secret Fish")
+    local inputFish  = MakeInput("Paste webhook secret fish...")
+    MakeLabel("📊 Webhook Stats")
+    local inputStats = MakeInput("Paste webhook stats...")
+    MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)")
+    local inputEvent = MakeInput("Kosong = pakai webhook join/leave...")
+    MakeLabel("🧬 Webhook Mutasi List")
+    local inputMutasi = MakeInput("Kosong = pakai webhook secret fish...")
+    MakeLabel(EMOJI_CHECK .. " Webhook Check Player")
+    local inputCheckplayer = MakeInput("Kosong = pakai webhook stats...")
+
+    local saveEnabled = false
+    local saveToggle = MakeToggleRow("💾 Simpan Config", false, function(enabled)
+        saveEnabled = enabled
     end)
 
-    -- Toggle ON/OFF fitur Check Player On Server (tombol manual & command !checkplayer)
-    local SetCheckplayerToggle = MakeToggleSwitch(EMOJI_CHECK .. " Kirim Check Player", 422, CHECKPLAYER_ENABLED, function(enabled)
-        CHECKPLAYER_ENABLED = enabled
+    -- NEW: toggle ON/OFF khusus buat notifikasi Event Hunt (treasure/thunderzilla/crystal).
+    -- Gak ngaruh ke fitur lain, bisa diubah kapan aja termasuk pas monitoring udah aktif.
+    local eventToggle = MakeToggleRow("🔔 Notif Event Hunt", true, function(enabled)
+        EVENT_NOTIF_ENABLED = enabled
     end)
 
     if savedConfig then
@@ -2077,27 +1808,25 @@ local function CreateUI()
         if savedConfig.webhook_event       and savedConfig.webhook_event       ~= "" then inputEvent.Text       = savedConfig.webhook_event       end
         if savedConfig.webhook_mutasi      and savedConfig.webhook_mutasi      ~= "" then inputMutasi.Text      = savedConfig.webhook_mutasi      end
         if savedConfig.webhook_checkplayer and savedConfig.webhook_checkplayer ~= "" then inputCheckplayer.Text = savedConfig.webhook_checkplayer end
-        SetToggle(true)
+        saveToggle.setState(true)
     end
 
-    -- NEW: tombol manual "CHECK PLAYER" -- kirim embed on-demand tanpa nunggu interval/command chat.
+    -- ============================================================
+    --  TOMBOL AKSI (fixed di bawah, di luar scroll area)
+    -- ============================================================
+    local BTN_Y1 = FRAME_H - BOTTOM_BLOCK_H          -- CHECK PLAYER
+    local BTN_Y3 = BTN_Y1 + 26 + 6                    -- START MONITORING
+
     local checkBtn = Instance.new("TextButton")
-    checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"; checkBtn.Size = UDim2.new(1,-24,0,26); checkBtn.Position = UDim2.new(0,12,0,452)
+    checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"; checkBtn.Size = UDim2.new(1,-24,0,26); checkBtn.Position = UDim2.new(0,12,0,BTN_Y1)
     checkBtn.BackgroundColor3 = Color3.fromRGB(45,45,45); checkBtn.TextColor3 = Color3.fromRGB(220,220,220)
     checkBtn.Font = Enum.Font.GothamBold; checkBtn.TextSize = 11; checkBtn.BorderSizePixel = 0; checkBtn.Parent = frame
     Instance.new("UICorner", checkBtn).CornerRadius = UDim.new(0,6)
     HoverTween(checkBtn, Color3.fromRGB(65,65,65), Color3.fromRGB(45,45,45))
 
     checkBtn.MouseButton1Click:Connect(function()
-        print("[BLOX Gank DEBUG] Tombol CHECK PLAYER diklik. SCRIPT_ACTIVE=" .. tostring(SCRIPT_ACTIVE) .. " CHECKPLAYER_ENABLED=" .. tostring(CHECKPLAYER_ENABLED))
         if not SCRIPT_ACTIVE then
             checkBtn.Text = "⚠️ Start monitoring dulu"
-            task.wait(1.5)
-            checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"
-            return
-        end
-        if not CHECKPLAYER_ENABLED then
-            checkBtn.Text = "⚠️ Toggle Check Player OFF"
             task.wait(1.5)
             checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"
             return
@@ -2108,32 +1837,10 @@ local function CreateUI()
         checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"
     end)
 
-    -- NEW: tombol "DEBUG STATS + GUI" -- langsung panggil DebugPrintLeaderstats() dan
-    -- DebugPrintGuiTexts() dari UI, gak lewat chat sama sekali (jaga-jaga kalau command
-    -- chat "!" diintersep/di-block duluan sama sistem chat custom game-nya).
-    local debugBtn = Instance.new("TextButton")
-    debugBtn.Text = "🐛 DEBUG STATS + GUI (cek console)"; debugBtn.Size = UDim2.new(1,-24,0,26); debugBtn.Position = UDim2.new(0,12,0,482)
-    debugBtn.BackgroundColor3 = Color3.fromRGB(45,45,45); debugBtn.TextColor3 = Color3.fromRGB(220,220,220)
-    debugBtn.Font = Enum.Font.GothamBold; debugBtn.TextSize = 10; debugBtn.BorderSizePixel = 0; debugBtn.Parent = frame
-    Instance.new("UICorner", debugBtn).CornerRadius = UDim.new(0,6)
-    HoverTween(debugBtn, Color3.fromRGB(65,65,65), Color3.fromRGB(45,45,45))
-
-    debugBtn.MouseButton1Click:Connect(function()
-        print("[BLOX Gank DEBUG] ============ START DEBUG SCAN ============")
-        DebugPrintLeaderstats()
-        DebugPrintGuiTexts()
-        print("[BLOX Gank DEBUG] ============ END DEBUG SCAN ============")
-        debugBtn.Text = "✅ Cek console sekarang!"
-        task.wait(1.5)
-        debugBtn.Text = "🐛 DEBUG STATS + GUI (cek console)"
-    end)
-
     local startBtn = Instance.new("TextButton")
-    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,514)
+    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,BTN_Y3)
     startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100); startBtn.TextColor3 = Color3.fromRGB(255,255,255)
     startBtn.Font = Enum.Font.GothamBold; startBtn.TextSize = 12; startBtn.BorderSizePixel = 0; startBtn.Parent = frame
-    -- FIX: teks kepotong kalau kepanjangan (mis. "❌ WEBHOOK JOIN INVALID!") karena dulu gak TextScaled.
-    -- Sekarang teks otomatis ngecil biar muat, tapi dibatasi max 12px biar teks pendek gak jadi kegedean.
     startBtn.TextScaled  = true
     startBtn.TextWrapped = false
     local startBtnSizeConstraint = Instance.new("UITextSizeConstraint")
@@ -2170,13 +1877,14 @@ local function CreateUI()
         startBtn.Text              = "✅ MONITORING AKTIF"
         startBtn.BackgroundColor3  = Color3.fromRGB(30,30,30)
 
-        -- NEW: update logo mengambang jadi status aktif (dot hijau + glow pulsing)
         SetFloatStatus(true)
 
         for _, box in ipairs({ inputJoin, inputFish, inputStats, inputEvent, inputMutasi, inputCheckplayer }) do
             box.TextEditable = false
         end
-        toggleBtn.Active = false
+        saveToggle.hitbox.Active = false
+        -- NOTE: eventToggle SENGAJA tetap aktif setelah monitoring jalan,
+        -- biar notif Event Hunt bisa di-ON/OFF kapan aja tanpa stop monitoring.
 
         StartMonitoring()
     end)
