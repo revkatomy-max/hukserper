@@ -1122,7 +1122,6 @@ local function BuildPlayerCheckDescription()
     local players = Players:GetPlayers()
     local lines = {}
 
-    table.insert(lines, "**Server ID** : `" .. tostring(game.JobId) .. "`")
     table.insert(lines, "Total player aktif: **" .. #players .. "**")
     table.insert(lines, "")
 
@@ -1625,7 +1624,6 @@ local function StartMonitoring()
     SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif", TierColors.Join, {
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
-        { name = SEP .. " Server ID",     value = "```" .. currentServerId .. "```",             inline = false },
         { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
     })
 
