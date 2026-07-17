@@ -20,6 +20,11 @@ local WEBHOOK_AVATAR = ""
 local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
 local SCRIPT_ACTIVE  = false
 
+-- NEW: toggle ON/OFF buat notif Event Hunt & buat fitur kirim Check Player On Server,
+-- dikontrol lewat switch di panel UI. Default keduanya ON (nyala) biar perilaku sama kayak sebelumnya.
+local EVENT_ENABLED       = true
+local CHECKPLAYER_ENABLED = true
+
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
 
@@ -45,6 +50,7 @@ local TierColors = {
     Leave     = 16729344,
     NotBack   = 16711680,
     Idle      = 16750848,
+    Hop       = 10181046,
 }
 
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
@@ -64,9 +70,12 @@ local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
 local EMOJI_IDLE      = "⏳"
+local EMOJI_HOP       = "🔀"
 local EMOJI_CHECK     = "🔍"
 local EMOJI_COIN      = "🪙"
 local EMOJI_LOCATION  = "📍"
+local EMOJI_PING        = "📶"
+local EMOJI_FISHCAUGHT  = "🐟"
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -442,8 +451,7 @@ local EventHuntData = {
         emoji        = "⚡",
         thumbUrl     = FishImageURL["Thunderzilla"],
     },
-    --[[ FIX 7: dinonaktifkan -- Crystal Event (gak diminta tapi tetep dimatiin krn
-    -- request-nya "cuma ada treasure hunt dan thunderzilla hunt")
+    
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = EMOJI_CRYSTAL .. " Crystal Event Dimulai!",
@@ -452,7 +460,7 @@ local EventHuntData = {
         emoji        = "💎",
         thumbUrl     = FishImageURL["Crystal"],
     },
-    ]]
+    
     --[[ FIX 7: dinonaktifkan -- Aurora Borealis
     {
         textTriggers = { "aurora borealis", "aurora event" },
@@ -514,6 +522,46 @@ local function LoadConfig()
     local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
     if ok2 and type(data) == "table" then return data end
     return nil
+end
+
+-- ============================================================
+--  NEW: SERVER HOP DETECTOR
+--  game.JobId itu ID unik per-INSTANCE server (ini juga yang muncul
+--  di HUD game, tulisan "Your Server - xxxxxxxx-...."). Script gak
+--  bisa "melihat" hop kejadian sambil dia jalan (begitu pindah server,
+--  executor re-inject dari awal), jadi cara paling akurat: simpen
+--  JobId terakhir ke file, terus tiap kali script start, bandingin
+--  sama JobId sekarang. Beda = baru aja hop. Sama = cuma re-execute
+--  di server yang sama (misal abis reset auto-execute).
+-- ============================================================
+
+local LAST_SERVER_FILE = "bloxgank_lastserver.json"
+
+-- Baca JobId run sebelumnya, simpen JobId sekarang, balikin (prevId, currentId).
+-- prevId == nil kalau ini pertama kali script pernah jalan (belum ada history).
+local function CheckServerHop()
+    local currentId = tostring(game.JobId)
+    if not (writefile and readfile and isfile) then
+        -- executor gak support file I/O -> gak bisa cross-session, cuma balikin current
+        return nil, currentId
+    end
+
+    local prevId = nil
+    local ok, raw = pcall(function()
+        return isfile(LAST_SERVER_FILE) and readfile(LAST_SERVER_FILE) or nil
+    end)
+    if ok and raw and raw ~= "" then
+        local ok2, data = pcall(function() return HttpService:JSONDecode(raw) end)
+        if ok2 and type(data) == "table" and data.jobId and data.jobId ~= "" then
+            prevId = data.jobId
+        end
+    end
+
+    pcall(function()
+        writefile(LAST_SERVER_FILE, HttpService:JSONEncode({ jobId = currentId, time = os.time() }))
+    end)
+
+    return prevId, currentId
 end
 
 -- ============================================================
@@ -994,9 +1042,14 @@ local function DebugPrintGuiTexts()
     for _, v in ipairs(pg:GetDescendants()) do
         if (v:IsA("TextLabel") or v:IsA("TextButton")) and v.Text and v.Text ~= "" then
             local lower = v.Text:lower()
-            if lower:find("luck") or lower:find("map") or lower:find("location") then
+            if lower:find("luck") or lower:find("map") or lower:find("location")
+            or lower:find("ping") or lower:find("fish caught") then
                 found = found + 1
-                local tag = lower:find("luck") and "[GUI TEXT] [LUCK!] " or "[GUI TEXT] [MAP/LOC] "
+                local tag = "[GUI TEXT] [OTHER] "
+                if lower:find("luck") then tag = "[GUI TEXT] [LUCK!] "
+                elseif lower:find("ping") then tag = "[GUI TEXT] [PING!] "
+                elseif lower:find("fish caught") then tag = "[GUI TEXT] [FISHCAUGHT!] "
+                elseif lower:find("map") or lower:find("location") then tag = "[GUI TEXT] [MAP/LOC] " end
                 print(tag .. v:GetFullName() .. " => " .. v.Text)
             end
         end
@@ -1035,11 +1088,41 @@ local function ScanServerLuckInfo()
     return luckValue, luckEnds
 end
 
+-- NEW: scan HUD panel game ("Performance" -> Avg Ping, "Fish Caught: 127,811") sama
+-- persis cara ScanServerLuckInfo di atas -- heuristik dari teks GUI, karena ini juga
+-- gak ada sebagai stat/value, cuma teks di TextLabel. Kalau pattern-nya meleset,
+-- panggil DebugPrintGuiTexts() buat liat teks asli & sesuaikan pattern di bawah.
+local function ScanServerHudInfo()
+    local pingValue, fishCaughtValue = nil, nil
+    local pg = Players.LocalPlayer:FindFirstChild("PlayerGui")
+    if not pg then return pingValue, fishCaughtValue end
+
+    for _, v in ipairs(pg:GetDescendants()) do
+        if v:IsA("TextLabel") or v:IsA("TextButton") then
+            local t = v.Text or ""
+            if t ~= "" then
+                if not pingValue then
+                    local p = t:match("[Aa]vg%s*[Pp]ing%s*:?%s*(%d+)%s*ms") or t:match("[Pp]ing%s*:?%s*(%d+)%s*ms")
+                    if p then pingValue = p end
+                end
+                if not fishCaughtValue then
+                    local f = t:match("[Ff]ish%s*[Cc]aught%s*:?%s*([%d,]+)")
+                    if f then fishCaughtValue = f end
+                end
+            end
+        end
+        if pingValue and fishCaughtValue then break end
+    end
+
+    return pingValue, fishCaughtValue
+end
+
 -- Susun deskripsi embed persis format "Check Player On Server"
 local function BuildPlayerCheckDescription()
     local players = Players:GetPlayers()
     local lines = {}
 
+    table.insert(lines, "**Server ID** : `" .. tostring(game.JobId) .. "`")
     table.insert(lines, "Total player aktif: **" .. #players .. "**")
     table.insert(lines, "")
 
@@ -1055,6 +1138,9 @@ local function BuildPlayerCheckDescription()
     local luckVal, luckEnds = ScanServerLuckInfo()
     table.insert(lines, "• **Server Luck** : x" .. (luckVal or "?"))
     table.insert(lines, "• **End Server Luck** : Ends: " .. (luckEnds or "?"))
+    local pingVal, fishCaughtVal = ScanServerHudInfo()
+    table.insert(lines, "• **" .. EMOJI_PING .. " Avg Ping** : " .. (pingVal and (pingVal .. "ms") or "?"))
+    table.insert(lines, "• **" .. EMOJI_FISHCAUGHT .. " Fish Caught (Server)** : " .. (fishCaughtVal or "?"))
     table.insert(lines, "")
     table.insert(lines, "Updated: " .. os.date("%d/%m/%Y %H:%M:%S"))
 
@@ -1194,6 +1280,11 @@ end
 -- NEW: webhook "Check Player On Server" -- kirim daftar semua player + coin + lokasi + server luck.
 -- Fallback: kalau WEBHOOK_CHECKPLAYER kosong -> pakai WEBHOOK_STATS -> kalau itu juga kosong pakai WEBHOOK_URL.
 local function SendPlayerCheckWebhook()
+    if not CHECKPLAYER_ENABLED then
+        print("[BLOX Gank DEBUG] SendPlayerCheckWebhook batal: fitur Check Player lagi DIMATIKAN dari toggle panel.")
+        return
+    end
+
     local url = (WEBHOOK_CHECKPLAYER ~= "") and WEBHOOK_CHECKPLAYER
         or ((WEBHOOK_STATS ~= "") and WEBHOOK_STATS or WEBHOOK_URL)
 
@@ -1227,6 +1318,11 @@ end
 -- ============================================================
 
 local function SendEventWebhook(eventData, rawText)
+    if not EVENT_ENABLED then
+        print("[BLOX Gank DEBUG] SendEventWebhook batal: notif Event Hunt lagi DIMATIKAN dari toggle panel.")
+        return
+    end
+
     local url = (WEBHOOK_EVENT ~= "") and WEBHOOK_EVENT or WEBHOOK_URL
     if url == "" then return end
     PostWebhook(url, {
@@ -1511,6 +1607,17 @@ local function StartMonitoring()
     ServerStats.startTime = os.time()
     CacheSpawnLocations() -- NEW: scan folder "!!! SPAWN LOCATIONS" sekali di awal monitoring
 
+    -- NEW: cek apakah server sekarang beda dari server terakhir kali monitoring di-start
+    -- (dibaca dari file, jadi tetap kedetect walau script sempat mati/di-reinject).
+    local prevServerId, currentServerId = CheckServerHop()
+    if prevServerId and prevServerId ~= currentServerId then
+        SendWebhook(EMOJI_HOP .. " Server Hop Terdeteksi", "Host baru aja pindah ke server lain.", TierColors.Hop, {
+            { name = SEP .. " Host",           value = "**" .. Players.LocalPlayer.Name .. "**", inline = true },
+            { name = SEP .. " Server Lama",    value = "```" .. prevServerId    .. "```",         inline = false },
+            { name = SEP .. " Server Baru",    value = "```" .. currentServerId .. "```",         inline = false },
+        })
+    end
+
     local allPlayers = Players:GetPlayers()
     local names      = {}
     for _, p in ipairs(allPlayers) do table.insert(names, p.Name) end
@@ -1518,6 +1625,7 @@ local function StartMonitoring()
     SendWebhook(EMOJI_STARTER .. " Monitor Started", "Server monitor sudah aktif", TierColors.Join, {
         { name = SEP .. " Host",          value = "**" .. Players.LocalPlayer.Name .. "**",     inline = true  },
         { name = SEP .. " Total Player",  value = "**" .. tostring(#allPlayers) .. "** orang",   inline = true  },
+        { name = SEP .. " Server ID",     value = "```" .. currentServerId .. "```",             inline = false },
         { name = SEP .. " Daftar Player", value = "```\n" .. table.concat(names, ", ") .. "```", inline = false },
     })
 
@@ -1654,7 +1762,7 @@ local function CreateUI()
 
     local savedConfig = LoadConfig()
 
-    local FRAME_H = 500
+    local FRAME_H = 566
     local frame = Instance.new("Frame")
     frame.Name             = "Main"
     frame.Size             = UDim2.new(0, 300, 0, FRAME_H)
@@ -1906,6 +2014,64 @@ local function CreateUI()
 
     toggleBtn.MouseButton1Click:Connect(function() SetToggle(not saveEnabled) end)
 
+    -- ============================================================
+    --  NEW: reusable toggle-switch builder, dipakai buat toggle
+    --  "Notif Event Hunt" & "Kirim Check Player" di bawah.
+    --  Beda dari SetToggle di atas (itu spesifik utk saveEnabled),
+    --  ini generic: kasih label + callback, balikin fungsi setter.
+    -- ============================================================
+    local function MakeToggleSwitch(labelText, yPos, initialState, onChanged)
+        local lbl = Instance.new("TextLabel")
+        lbl.Text = labelText; lbl.Size = UDim2.new(1,-60,0,18); lbl.Position = UDim2.new(0,12,0,yPos)
+        lbl.BackgroundTransparency = 1; lbl.TextColor3 = Color3.fromRGB(130,130,130)
+        lbl.Font = Enum.Font.Gotham; lbl.TextSize = 10
+        lbl.TextXAlignment = Enum.TextXAlignment.Left; lbl.Parent = frame
+
+        local bg = Instance.new("Frame")
+        bg.Size = UDim2.new(0,36,0,18); bg.Position = UDim2.new(1,-48,0,yPos)
+        bg.BackgroundColor3 = Color3.fromRGB(60,60,60); bg.BorderSizePixel = 0; bg.Parent = frame
+        Instance.new("UICorner", bg).CornerRadius = UDim.new(1,0)
+
+        local knob = Instance.new("Frame")
+        knob.Size = UDim2.new(0,14,0,14); knob.Position = UDim2.new(0,2,0.5,-7)
+        knob.BackgroundColor3 = Color3.fromRGB(200,200,200); knob.BorderSizePixel = 0; knob.Parent = bg
+        Instance.new("UICorner", knob).CornerRadius = UDim.new(1,0)
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0,36,0,18); btn.Position = UDim2.new(1,-48,0,yPos)
+        btn.BackgroundTransparency = 1; btn.Text = ""; btn.BorderSizePixel = 0; btn.Parent = frame
+
+        local state = initialState
+
+        local function Apply(enabled, skipCallback)
+            state = enabled
+            TweenService:Create(knob, TweenInfo.new(0.15), {
+                Position         = enabled and UDim2.new(0,20,0.5,-7) or UDim2.new(0,2,0.5,-7),
+                BackgroundColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(200,200,200),
+            }):Play()
+            TweenService:Create(bg, TweenInfo.new(0.15), {
+                BackgroundColor3 = enabled and Color3.fromRGB(0,100,50) or Color3.fromRGB(60,60,60),
+            }):Play()
+            lbl.TextColor3 = enabled and Color3.fromRGB(0,220,100) or Color3.fromRGB(130,130,130)
+            if not skipCallback and onChanged then onChanged(enabled) end
+        end
+
+        btn.MouseButton1Click:Connect(function() Apply(not state) end)
+        Apply(initialState, true) -- set tampilan awal tanpa mancing callback
+
+        return Apply
+    end
+
+    -- Toggle ON/OFF notif Event Hunt (treasure hunt / thunderzilla hunt / crystal event, dst)
+    local SetEventToggle = MakeToggleSwitch(EMOJI_EVENTTAG .. " Notif Event Hunt", 392, EVENT_ENABLED, function(enabled)
+        EVENT_ENABLED = enabled
+    end)
+
+    -- Toggle ON/OFF fitur Check Player On Server (tombol manual & command !checkplayer)
+    local SetCheckplayerToggle = MakeToggleSwitch(EMOJI_CHECK .. " Kirim Check Player", 422, CHECKPLAYER_ENABLED, function(enabled)
+        CHECKPLAYER_ENABLED = enabled
+    end)
+
     if savedConfig then
         if savedConfig.webhook_join        and savedConfig.webhook_join        ~= "" then inputJoin.Text        = savedConfig.webhook_join        end
         if savedConfig.webhook_fish        and savedConfig.webhook_fish        ~= "" then inputFish.Text        = savedConfig.webhook_fish        end
@@ -1918,16 +2084,22 @@ local function CreateUI()
 
     -- NEW: tombol manual "CHECK PLAYER" -- kirim embed on-demand tanpa nunggu interval/command chat.
     local checkBtn = Instance.new("TextButton")
-    checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"; checkBtn.Size = UDim2.new(1,-24,0,26); checkBtn.Position = UDim2.new(0,12,0,392)
+    checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"; checkBtn.Size = UDim2.new(1,-24,0,26); checkBtn.Position = UDim2.new(0,12,0,452)
     checkBtn.BackgroundColor3 = Color3.fromRGB(45,45,45); checkBtn.TextColor3 = Color3.fromRGB(220,220,220)
     checkBtn.Font = Enum.Font.GothamBold; checkBtn.TextSize = 11; checkBtn.BorderSizePixel = 0; checkBtn.Parent = frame
     Instance.new("UICorner", checkBtn).CornerRadius = UDim.new(0,6)
     HoverTween(checkBtn, Color3.fromRGB(65,65,65), Color3.fromRGB(45,45,45))
 
     checkBtn.MouseButton1Click:Connect(function()
-        print("[BLOX Gank DEBUG] Tombol CHECK PLAYER diklik. SCRIPT_ACTIVE=" .. tostring(SCRIPT_ACTIVE))
+        print("[BLOX Gank DEBUG] Tombol CHECK PLAYER diklik. SCRIPT_ACTIVE=" .. tostring(SCRIPT_ACTIVE) .. " CHECKPLAYER_ENABLED=" .. tostring(CHECKPLAYER_ENABLED))
         if not SCRIPT_ACTIVE then
             checkBtn.Text = "⚠️ Start monitoring dulu"
+            task.wait(1.5)
+            checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"
+            return
+        end
+        if not CHECKPLAYER_ENABLED then
+            checkBtn.Text = "⚠️ Toggle Check Player OFF"
             task.wait(1.5)
             checkBtn.Text = EMOJI_CHECK .. " CHECK PLAYER"
             return
@@ -1942,7 +2114,7 @@ local function CreateUI()
     -- DebugPrintGuiTexts() dari UI, gak lewat chat sama sekali (jaga-jaga kalau command
     -- chat "!" diintersep/di-block duluan sama sistem chat custom game-nya).
     local debugBtn = Instance.new("TextButton")
-    debugBtn.Text = "🐛 DEBUG STATS + GUI (cek console)"; debugBtn.Size = UDim2.new(1,-24,0,26); debugBtn.Position = UDim2.new(0,12,0,422)
+    debugBtn.Text = "🐛 DEBUG STATS + GUI (cek console)"; debugBtn.Size = UDim2.new(1,-24,0,26); debugBtn.Position = UDim2.new(0,12,0,482)
     debugBtn.BackgroundColor3 = Color3.fromRGB(45,45,45); debugBtn.TextColor3 = Color3.fromRGB(220,220,220)
     debugBtn.Font = Enum.Font.GothamBold; debugBtn.TextSize = 10; debugBtn.BorderSizePixel = 0; debugBtn.Parent = frame
     Instance.new("UICorner", debugBtn).CornerRadius = UDim.new(0,6)
@@ -1959,7 +2131,7 @@ local function CreateUI()
     end)
 
     local startBtn = Instance.new("TextButton")
-    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,454)
+    startBtn.Text = "START MONITORING"; startBtn.Size = UDim2.new(1,-24,0,34); startBtn.Position = UDim2.new(0,12,0,514)
     startBtn.BackgroundColor3 = Color3.fromRGB(0,180,100); startBtn.TextColor3 = Color3.fromRGB(255,255,255)
     startBtn.Font = Enum.Font.GothamBold; startBtn.TextSize = 12; startBtn.BorderSizePixel = 0; startBtn.Parent = frame
     -- FIX: teks kepotong kalau kepanjangan (mis. "❌ WEBHOOK JOIN INVALID!") karena dulu gak TextScaled.
