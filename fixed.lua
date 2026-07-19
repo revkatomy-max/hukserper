@@ -204,11 +204,11 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "two-headed shark", "Skull",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "two-headed shark", Ragnarex",
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden", "Ragnarex",
 }
 
 local MutasiList = {
@@ -326,6 +326,8 @@ local FishChanceData = {
     ["Sunken Hadalith"]           = "1 in ??",
     ["Trench Warden"]             = "1 in 15M",
     ["Caeruleum Razerback"]       = "1 in 3M",
+    ["two-headed shark"] = "1 in 3M",
+    ["Ragnarex"] = "1 in 35M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -406,6 +408,7 @@ local FishImageURL = {
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
 ["Two-headed shark"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
+["Ragnarex"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/FG%20jungle.png",
     
 }
 
