@@ -26,7 +26,7 @@ local ROLE_NELAYAN_ID         = "1465243405591380023"
 
 -- FIX 5: konstanta buat idle detector (player gak catch ikan sama sekali selama sekian lama)
 -- FIX 7: idle threshold diturunin dari 2 jam ke 1 jam sesuai request.
-local IDLE_THRESHOLD_SECONDS = 7000 -- 1 jam
+local IDLE_THRESHOLD_SECONDS = 3000 -- 1 jam
 local IDLE_CHECK_INTERVAL    = 300  -- cek tiap 5 menit
 
 -- NEW: interval buat auto-send Check Player On Server (nebeng loop stats, tiap 20 menit)
@@ -204,7 +204,7 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "two-headed shark", "Ragnarex",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
 }
 
 local ForgottenList = {
@@ -213,7 +213,7 @@ local ForgottenList = {
 
 local MutasiList = {
     "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", 
-     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal", "orb",
+     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
     -- FIX 6: Aurora & Midnight itu mutasi beneran (sama kayak Abyssal), makanya harus tetap ada di sini.
     -- Masalahnya BUKAN di list ini, tapi di cara deteksi prefix-nya -- lihat MutasiFalsePositiveSpecies di bawah.
     "Aurora", "Midnight",
@@ -318,7 +318,7 @@ local FishChanceData = {
     ["Crystal Goliath"]           = "1 in 3M",
     ["Ketupat Whale"]             = "1 in ??",
     ["Scorching Veinmaw"]         = "1 in 5M",
-    ["Glacial Serpent"]           = "1 in 3M",
+    ["Glacial Serpent"]           = "1 in 6M",
     ["Elemental Tempestray"]      = "1 in 1M",
     ["Dark Megalodon"]            = "1 in 8M",
     ["Caustic Maw"]               = "1 in 4M",
@@ -326,8 +326,8 @@ local FishChanceData = {
     ["Sunken Hadalith"]           = "1 in ??",
     ["Trench Warden"]             = "1 in 15M",
     ["Caeruleum Razerback"]       = "1 in 3M",
-    ["two-headed shark"] = "1 in 3M",
-    ["Ragnarex"] = "1 in 35M",
+    ["two-headed shark"]          = "1 in 3M",
+    ["Ragnarex"]                  = "1 in 35M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -394,11 +394,15 @@ local FishImageURL = {
     ["Coral Whale"]              = NP .. "83.png",
     ["Love Nessie"]              = NP .. "85.png",
     ["Broken Heart Nessie"]      = NP .. "86.png",
-    ["Ketupat Whale"]            = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Ketupat%20Whale.png",
     ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Leviathan.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
     ["Ruby Gemstone"]            = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
-    ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/SC%20baru.png",
+    -- FIX (report user): sebelumnya URL Glacial Serpent ini pakai nama file "SC baru.png" yang
+    -- keliatan kayak placeholder/nama file sementara, bukan nama asli asetnya -- kalau file itu
+    -- gak persis ada di repo (raw.githubusercontent CASE-SENSITIVE ke nama file), gambar gak
+    -- akan pernah muncul walau key-nya di tabel ini udah bener. Cek lagi nama file yang BENERAN
+    -- ke-upload di repo revkatomy-max/asset-id, terus samain string di bawah ini persis sama itu.
+    ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Glacial%20serpent.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
     ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
@@ -407,10 +411,31 @@ local FishImageURL = {
     ["Coral Reaper"]             = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Coral%20Reaper.png",
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
-["Two-headed shark"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
-["Ragnarex"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/FG%20jungle.png",
+    -- FIX (report user): key ini sebelumnya "Two-headed shark" (T besar), padahal di SecretFishList
+    -- namanya "two-headed shark" (t kecil) -- lookup FishImageURL[baseName] itu case-sensitive,
+    -- jadi selama ini gak pernah ketemu & gambarnya gak pernah muncul. Key dibenerin biar cocok
+    -- persis sama SecretFishList. Selain itu sekarang lookup gambar juga dilewatin lewat
+    -- GetFishImageURL() (lihat di bawah) yang case-insensitive, jadi kalaupun beda huruf besar/
+    -- kecil lagi di masa depan, gambarnya tetap ketemu.
+    ["Two-headed shark"]        = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
+    ["Ragnarex"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Ragnarex.png.png",
+    ["sc mariana new"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Mariana%20Trench%20new%20secret.png",
     
 }
+
+-- FIX (report user): helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian
+-- kayak bug "two-headed shark" kejadian lagi di masa depan -- kalau ada typo beda huruf
+-- besar/kecil antara SecretFishList/ForgottenList/dll dengan key di FishImageURL, gambar
+-- tetap ketemu selama nama dasarnya sama.
+local FishImageURLLower = {}
+for k, v in pairs(FishImageURL) do
+    FishImageURLLower[string.lower(k)] = v
+end
+
+local function GetFishImageURL(baseName)
+    if not baseName then return nil end
+    return FishImageURL[baseName] or FishImageURLLower[string.lower(baseName)]
+end
 
 
 -- ============================================================
@@ -1136,24 +1161,50 @@ end
 
 local _hookedLabels = {}
 
-local function ProcessEventText(text)
+-- FIX (report user): dulu event Crystal (dan event lain yang teksnya nempel lama di GUI,
+-- misal ada countdown "Ends in 04:32" yang update tiap detik) bisa kekirim BERULANG-ULANG
+-- terus menerus. Penyebabnya: ProcessEventText dipanggil ulang tiap kali properti Text
+-- label berubah (termasuk cuma countdown-nya doang yang berubah, bukan event baru), dan
+-- itu cuma ditahan sama EVENT_COOLDOWN_SECONDS (120 detik) -- jadi begitu cooldown abis,
+-- teks yang SAMA (masih event yang sama, belum ada event baru) langsung kekirim lagi.
+-- Sekarang dipakai EDGE-TRIGGER per-label: notif cuma dikirim sekali pas teks label itu
+-- PERTAMA KALI berubah dari "gak match trigger" jadi "match trigger". Selama label itu
+-- masih nampilin teks yang match (termasuk pas countdown-nya jalan), gak akan re-trigger.
+-- EVENT_COOLDOWN_SECONDS + EventCooldown dibiarin sebagai pengaman tambahan (misal ada
+-- 2 label GUI berbeda buat event yang sama).
+local LabelEventState = {} -- [label] = { [eventTitle] = true/false (match state terakhir) }
+
+local function ProcessEventText(text, label)
     if not SCRIPT_ACTIVE then return end
     if not EVENT_NOTIF_ENABLED then return end -- NEW: toggle ON/OFF khusus notif Event Hunt
     if not text or text == "" then return end
     local lower = text:lower()
 
     local isRelevant = lower:find("hunt") or lower:find("crystal")
-    if not isRelevant then return end
+
+    local state = LabelEventState[label]
+    if not state then
+        state = {}
+        LabelEventState[label] = state
+    end
 
     for _, evData in ipairs(EventHuntData) do
-        for _, trigger in ipairs(evData.textTriggers) do
-            if lower:find(trigger, 1, true) then
-                local now = os.time()
-                if (now - (EventCooldown[evData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
-                    EventCooldown[evData.title] = now
-                    SendEventWebhook(evData, text)
-                end
-                return
+        local matched = false
+        if isRelevant then
+            for _, trigger in ipairs(evData.textTriggers) do
+                if lower:find(trigger, 1, true) then matched = true; break end
+            end
+        end
+
+        local wasMatched = state[evData.title] or false
+        state[evData.title] = matched
+
+        -- kirim CUMA pas transisi OFF -> ON (event baru mulai), bukan tiap kali teks berubah
+        if matched and not wasMatched then
+            local now = os.time()
+            if (now - (EventCooldown[evData.title] or 0)) >= EVENT_COOLDOWN_SECONDS then
+                EventCooldown[evData.title] = now
+                SendEventWebhook(evData, text)
             end
         end
     end
@@ -1162,9 +1213,13 @@ end
 local function HookLabel(label)
     if _hookedLabels[label] then return end
     _hookedLabels[label] = true
-    ProcessEventText(label.Text)
+    ProcessEventText(label.Text, label)
     label:GetPropertyChangedSignal("Text"):Connect(function()
-        ProcessEventText(label.Text)
+        ProcessEventText(label.Text, label)
+    end)
+    -- bersihin state pas label ke-destroy, biar gak numpuk memory kalau GUI sering bikin/hapus label
+    label.AncestryChanged:Connect(function(_, parent)
+        if not parent then LabelEventState[label] = nil end
     end)
 end
 
@@ -1234,7 +1289,7 @@ local function CheckAndSend(rawMsg)
 
     local legendaryBase = FindLegendaryCrystal(data.fish)
     if legendaryBase then
-        local imageUrl = FishImageURL[legendaryBase] or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
+        local imageUrl = GetFishImageURL(legendaryBase) or (FishImageCache[legendaryBase] and (PROXY .. "/asset/" .. FishImageCache[legendaryBase]))
         SendFishWebhook(EMOJI_LEGENDARY .. " Crystalized Legendary!", " " .. EMOJI_MUTASI, TierColors.Legendary, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
@@ -1245,7 +1300,7 @@ local function CheckAndSend(rawMsg)
 
     local rubyBase = FindRuby(data.fish)
     if rubyBase then
-        local imageUrl = FishImageURL[rubyBase] or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
+        local imageUrl = GetFishImageURL(rubyBase) or (FishImageCache[rubyBase] and (PROXY .. "/asset/" .. FishImageCache[rubyBase]))
         SendFishWebhook(EMOJI_RUBY .. " Ruby Gemstone!", "Goceng" .. EMOJI_RUBY, TierColors.Ruby, {
             { name = SEP .. " Pemain", value = "**" .. data.player .. "**", inline = true },
             { name = SEP .. " Item",   value = "**" .. data.fish .. "**",   inline = true },
@@ -1256,7 +1311,7 @@ local function CheckAndSend(rawMsg)
 
     local baseName, mutasi = FindSecretFish(data.fish)
     if baseName then
-        local imageUrl = FishImageURL[baseName] or (FishImageCache[baseName] and (PROXY .. "/asset/" .. FishImageCache[baseName]))
+        local imageUrl = GetFishImageURL(baseName) or (FishImageCache[baseName] and (PROXY .. "/asset/" .. FishImageCache[baseName]))
         local isForgotten = false
         for _, name in ipairs(ForgottenList) do
             if string.lower(baseName) == string.lower(name) then isForgotten = true; break end
@@ -1314,7 +1369,7 @@ local function WatchBackpack(bp)
     bp.ChildAdded:Connect(function(item)
         task.wait(0.1)
         local baseName = FindSecretFish(item.Name)
-        if baseName and not FishImageURL[baseName] and not FishImageCache[baseName] then
+        if baseName and not GetFishImageURL(baseName) and not FishImageCache[baseName] then
             local imgId = GetFishImageId(item)
             if imgId then FishImageCache[baseName] = imgId end
         end
