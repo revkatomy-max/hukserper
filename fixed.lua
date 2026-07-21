@@ -11,7 +11,9 @@ local TweenService        = game:GetService("TweenService")
 local Workspace           = game:GetService("Workspace")
 
 local WEBHOOK_URL    = ""
-local WEBHOOK_STATS  = ""
+local WEBHOOK_STATS  = "" -- NOTE: dipertahankan sebagai fallback URL buat "Check Player On Server"
+                          -- kalau WEBHOOK_CHECKPLAYER kosong. Embed rekap otomatis "Server Stats"
+                          -- yang dulu numpang di sini SUDAH DIHAPUS sesuai request.
 local WEBHOOK_FISH   = ""
 local WEBHOOK_EVENT  = ""
 local WEBHOOK_MUTASI = ""
@@ -23,11 +25,6 @@ local EVENT_NOTIF_ENABLED = true -- NEW: toggle ON/OFF khusus notifikasi Event H
 
 local EVENT_COOLDOWN_SECONDS  = 120
 local ROLE_NELAYAN_ID         = "1465243405591380023"
-
--- FIX 5: konstanta buat idle detector (player gak catch ikan sama sekali selama sekian lama)
--- FIX 7: idle threshold diturunin dari 2 jam ke 1 jam sesuai request.
-local IDLE_THRESHOLD_SECONDS = 3000 -- 1 jam
-local IDLE_CHECK_INTERVAL    = 300  -- cek tiap 5 menit
 
 -- NEW: interval buat auto-send Check Player On Server (nebeng loop stats, tiap 20 menit)
 local CHECKPLAYER_AUTO_INTERVAL = 1200
@@ -45,7 +42,6 @@ local TierColors = {
     Join      = 65280,
     Leave     = 16729344,
     NotBack   = 16711680,
-    Idle      = 16750848,
 }
 
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
@@ -64,7 +60,6 @@ local EMOJI_JOIN      = "<a:join:1517738095917924372>"
 local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
 local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
-local EMOJI_IDLE      = "⏳"
 local EMOJI_CHECK     = "🔍"
 local EMOJI_COIN      = "🪙"
 local EMOJI_LOCATION  = "📍"
@@ -397,11 +392,6 @@ local FishImageURL = {
     ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Leviathan.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
     ["Ruby Gemstone"]            = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
-    -- FIX (report user): sebelumnya URL Glacial Serpent ini pakai nama file "SC baru.png" yang
-    -- keliatan kayak placeholder/nama file sementara, bukan nama asli asetnya -- kalau file itu
-    -- gak persis ada di repo (raw.githubusercontent CASE-SENSITIVE ke nama file), gambar gak
-    -- akan pernah muncul walau key-nya di tabel ini udah bener. Cek lagi nama file yang BENERAN
-    -- ke-upload di repo revkatomy-max/asset-id, terus samain string di bawah ini persis sama itu.
     ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Glacial%20serpent.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
     ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
@@ -411,12 +401,6 @@ local FishImageURL = {
     ["Coral Reaper"]             = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Coral%20Reaper.png",
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
-    -- FIX (report user): key ini sebelumnya "Two-headed shark" (T besar), padahal di SecretFishList
-    -- namanya "two-headed shark" (t kecil) -- lookup FishImageURL[baseName] itu case-sensitive,
-    -- jadi selama ini gak pernah ketemu & gambarnya gak pernah muncul. Key dibenerin biar cocok
-    -- persis sama SecretFishList. Selain itu sekarang lookup gambar juga dilewatin lewat
-    -- GetFishImageURL() (lihat di bawah) yang case-insensitive, jadi kalaupun beda huruf besar/
-    -- kecil lagi di masa depan, gambarnya tetap ketemu.
     ["Two-headed shark"]        = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
     ["Ragnarex"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Ragnarex.png.png",
     ["sc mariana new"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Mariana%20Trench%20new%20secret.png",
@@ -519,14 +503,6 @@ local PlayerStats    = {}
 local PlayerNameToId = {}
 local SpawnPointCache = {} -- NEW: {name, position} hasil scan folder "!!! SPAWN LOCATIONS"
 
-local ServerStats = {
-    totalSecret    = 0,
-    totalForgotten = 0,
-    secretLog      = {},
-    forgottenLog   = {},
-    startTime      = 0,
-}
-
 -- ============================================================
 --  SAVE CONFIG
 -- ============================================================
@@ -574,10 +550,6 @@ end
 
 local function Trim(s)
     return s:match("^%s*(.-)%s*$") or s
-end
-
-local function UptimeString(seconds)
-    return math.floor(seconds / 3600) .. "h " .. math.floor((seconds % 3600) / 60) .. "m"
 end
 
 -- NEW: format angka besar jadi singkatan K/M/B (mis. 4500000 -> "4.5M"), buat embed Check Player
@@ -1026,7 +998,6 @@ local function BuildContent(mention, captionType)
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
     elseif captionType == "mutasi"  then return "cek mutasinya " .. m
-    elseif captionType == "idle"    then return "woy masih mancing gak " .. m
     end
     return m
 end
@@ -1053,14 +1024,6 @@ local function SendFishWebhook(title, description, color, fields, imageUrl, thum
     })
 end
 
-local function SendStatsWebhook(title, description, color, fields, imageUrl, thumbUrl)
-    local f = {}
-    for _, v in ipairs(fields) do table.insert(f, v) end
-    PostWebhook(WEBHOOK_STATS, {
-        embeds = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Stats") }
-    })
-end
-
 -- NEW: webhook khusus mutasi list, terpisah dari webhook secret fish.
 -- Fallback: kalau WEBHOOK_MUTASI kosong -> pakai WEBHOOK_FISH -> kalau itu juga kosong pakai WEBHOOK_URL.
 local function SendMutasiWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
@@ -1074,22 +1037,6 @@ local function SendMutasiWebhook(title, description, color, fields, imageUrl, th
         avatar_url = WEBHOOK_AVATAR,
         content    = BuildContent(mention, captionType),
         embeds     = { BuildEmbed(title, description, color, f, imageUrl, thumbUrl, "BLOX Gank Mutasi List") },
-    })
-end
-
--- FIX 5: webhook idle detector, numpang di WEBHOOK_URL (webhook join/leave) sesuai request.
-local function SendIdleWebhook(playerName, avatarUrl, mention, idleMinutes)
-    PostWebhook(WEBHOOK_URL, {
-        username   = "BLOX Gank",
-        avatar_url = WEBHOOK_AVATAR,
-        content    = BuildContent(mention, "idle"),
-        embeds     = { BuildEmbed(EMOJI_IDLE .. " Player Idle Terdeteksi",
-            "Pemain ini gak ada catch sama sekali selama 1 jam, tolong dicek apakah masih aktif mancing.",
-            TierColors.Idle,
-            {
-                { name = SEP .. " Username",   value = "**" .. playerName .. "**",            inline = true },
-                { name = SEP .. " Idle Sejak", value = tostring(idleMinutes) .. " menit lalu", inline = true },
-            }, nil, avatarUrl, "BLOX Gank Idle Monitor") },
     })
 end
 
@@ -1161,17 +1108,11 @@ end
 
 local _hookedLabels = {}
 
--- FIX (report user): dulu event Crystal (dan event lain yang teksnya nempel lama di GUI,
--- misal ada countdown "Ends in 04:32" yang update tiap detik) bisa kekirim BERULANG-ULANG
--- terus menerus. Penyebabnya: ProcessEventText dipanggil ulang tiap kali properti Text
--- label berubah (termasuk cuma countdown-nya doang yang berubah, bukan event baru), dan
--- itu cuma ditahan sama EVENT_COOLDOWN_SECONDS (120 detik) -- jadi begitu cooldown abis,
--- teks yang SAMA (masih event yang sama, belum ada event baru) langsung kekirim lagi.
--- Sekarang dipakai EDGE-TRIGGER per-label: notif cuma dikirim sekali pas teks label itu
--- PERTAMA KALI berubah dari "gak match trigger" jadi "match trigger". Selama label itu
--- masih nampilin teks yang match (termasuk pas countdown-nya jalan), gak akan re-trigger.
--- EVENT_COOLDOWN_SECONDS + EventCooldown dibiarin sebagai pengaman tambahan (misal ada
--- 2 label GUI berbeda buat event yang sama).
+-- Edge-trigger per-label: notif cuma dikirim sekali pas teks label itu PERTAMA KALI
+-- berubah dari "gak match trigger" jadi "match trigger". Selama label itu masih
+-- nampilin teks yang match (misal ada countdown "Ends in 04:32" yang update tiap
+-- detik), gak akan re-trigger. EVENT_COOLDOWN_SECONDS + EventCooldown dibiarin
+-- sebagai pengaman tambahan (misal ada 2 label GUI berbeda buat event yang sama).
 local LabelEventState = {} -- [label] = { [eventTitle] = true/false (match state terakhir) }
 
 local function ProcessEventText(text, label)
@@ -1280,11 +1221,9 @@ local function CheckAndSend(rawMsg)
 
     if uid then
         if not PlayerStats[uid] then
-            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = data.player, idleNotified = false }
+            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = data.player }
         end
-        PlayerStats[uid].catchCount   = PlayerStats[uid].catchCount + 1
-        PlayerStats[uid].lastFishTime = os.time()
-        PlayerStats[uid].idleNotified = false -- FIX 5: reset biar bisa ke-detect idle lagi abis ini
+        PlayerStats[uid].catchCount = PlayerStats[uid].catchCount + 1
     end
 
     local legendaryBase = FindLegendaryCrystal(data.fish)
@@ -1329,12 +1268,8 @@ local function CheckAndSend(rawMsg)
             { name = SEP .. " Chance", value = chanceInfo,                   inline = true },
         }
         if isForgotten then
-            ServerStats.totalForgotten = ServerStats.totalForgotten + 1
-            table.insert(ServerStats.forgottenLog, { fish = baseName, player = data.player, time = os.time() })
             SendFishWebhook(EMOJI_FORGOTTEN .. " Forgotten Tier Detected!", " " .. EMOJI_FORGOTTEN, TierColors.Forgotten, fields, nil, imageUrl, GetMention(data.player), "forgotten")
         else
-            ServerStats.totalSecret = ServerStats.totalSecret + 1
-            table.insert(ServerStats.secretLog, { fish = baseName, player = data.player, time = os.time() })
             SendFishWebhook(EMOJI_NOTIF .. " Secret Fish Detected!", " ", TierColors.Secret, fields, nil, imageUrl, GetMention(data.player), "secret")
         end
         return
@@ -1427,7 +1362,6 @@ end
 -- ============================================================
 
 local function StartMonitoring()
-    ServerStats.startTime = os.time()
     CacheSpawnLocations() -- NEW: scan folder "!!! SPAWN LOCATIONS" sekali di awal monitoring
 
     local allPlayers = Players:GetPlayers()
@@ -1443,62 +1377,16 @@ local function StartMonitoring()
     HookChat()
     StartEventMonitor()
 
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(1200)
-            if not SCRIPT_ACTIVE then break end
-            local uptime = os.time() - ServerStats.startTime
-            local recentSecret, recentForgotten = {}, {}
-            for i = math.max(1, #ServerStats.secretLog - 4), #ServerStats.secretLog do
-                local e = ServerStats.secretLog[i]
-                table.insert(recentSecret, e.fish .. " (" .. e.player .. ")")
-            end
-            for i = math.max(1, #ServerStats.forgottenLog - 4), #ServerStats.forgottenLog do
-                local e = ServerStats.forgottenLog[i]
-                table.insert(recentForgotten, e.fish .. " (" .. e.player .. ")")
-            end
-            SendStatsWebhook(EMOJI_SERVER .. " Server Stats", "Ringkasan aktivitas server", 3447003, {
-                { name = SEP .. " Uptime Monitor",     value = UptimeString(uptime),                                                  inline = true  },
-                { name = SEP .. " Total Secret Fish",  value = "**" .. tostring(ServerStats.totalSecret) .. "** ekor",               inline = true  },
-                { name = SEP .. " Total Forgotten",    value = "**" .. tostring(ServerStats.totalForgotten) .. "** ekor",            inline = true  },
-                { name = SEP .. " Secret Terakhir",    value = #recentSecret   > 0 and table.concat(recentSecret,   "\n") or "—",   inline = false },
-                { name = SEP .. " Forgotten Terakhir", value = #recentForgotten > 0 and table.concat(recentForgotten, "\n") or "—", inline = false },
-            })
-        end
-    end)
-
     -- DIMATIKAN sesuai request: dulu ada loop auto-send Check Player On Server tiap
     -- CHECKPLAYER_AUTO_INTERVAL detik. Sekarang webhook Check Player CUMA kekirim
     -- kalau di-trigger manual (klik tombol CHECK PLAYER di panel, atau ketik
     -- "!checkplayer" di chat game). CHECKPLAYER_AUTO_INTERVAL dibiarin di atas
     -- (gak dipake lagi) biar gampang diaktifin ulang kalau nanti berubah pikiran.
 
-    -- FIX 5/7: loop idle detector — cek berkala apakah ada player yang gak catch
-    -- sama sekali selama IDLE_THRESHOLD_SECONDS (sekarang 1 jam), kirim ke WEBHOOK_URL (join/leave).
-    task.spawn(function()
-        while SCRIPT_ACTIVE do
-            task.wait(IDLE_CHECK_INTERVAL)
-            if not SCRIPT_ACTIVE then break end
-            local now = os.time()
-            for _, p in ipairs(Players:GetPlayers()) do
-                local stat = PlayerStats[p.UserId]
-                if stat then
-                    local lastActivity = stat.lastFishTime or stat.joinTime
-                    local idleFor = now - lastActivity
-                    if idleFor >= IDLE_THRESHOLD_SECONDS and not stat.idleNotified then
-                        stat.idleNotified = true
-                        local avatarUrl = AvatarCache[p.UserId] or GetAvatarUrlById(p.UserId)
-                        SendIdleWebhook(p.Name, avatarUrl, GetMention(p.Name), math.floor(idleFor / 60))
-                    end
-                end
-            end
-        end
-    end)
-
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
         AvatarCache[p.UserId]                       = GetAvatarUrlById(p.UserId)
-        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = p.Name, idleNotified = false }
+        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), name = p.Name }
         PlayerNameToId[string.lower(p.Name)]        = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
         BuildMentionCache(p.Name, p.DisplayName)
@@ -1507,7 +1395,7 @@ local function StartMonitoring()
     Players.PlayerAdded:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
         LeaveTimers[player.UserId] = nil
-        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), lastFishTime = nil, name = player.Name, idleNotified = false }
+        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = player.Name }
         PlayerNameToId[string.lower(player.Name)]        = player.UserId
         PlayerNameToId[string.lower(player.DisplayName)] = player.UserId
         BuildMentionCache(player.Name, player.DisplayName)
@@ -1860,7 +1748,7 @@ local function CreateUI()
     local inputJoin  = MakeInput("Paste webhook join/leave...")
     MakeLabel("🐋 Webhook Secret Fish")
     local inputFish  = MakeInput("Paste webhook secret fish...")
-    MakeLabel("📊 Webhook Stats")
+    MakeLabel("📊 Webhook Stats (fallback Check Player)")
     local inputStats = MakeInput("Paste webhook stats...")
     MakeLabel("🎯 Webhook Event Hunt (Role Nelayan)")
     local inputEvent = MakeInput("Kosong = pakai webhook join/leave...")
