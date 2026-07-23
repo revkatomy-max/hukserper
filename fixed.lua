@@ -392,7 +392,7 @@ local FishImageURL = {
     ["Leviathan"]                = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Leviathan.png",
     ["Rainbow Comet Shark"]      = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/Rainbow%20Comet%20Shark.png",
     ["Ruby Gemstone"]            = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/1.png",
-    ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Glacial%20serpent.png",
+    ["Glacial Serpent"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/81.png",
     ["Machodon"]                 = "https://raw.githubusercontent.com/revkatomy-max/pisit-image/main/42.png",
     ["Crystal"]                  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/crystal.png",
     ["treasure hunt"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/treasure.png",
@@ -402,8 +402,8 @@ local FishImageURL = {
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
     ["Two-headed shark"]        = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
-    ["Ragnarex"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Ragnarex.png.png",
-    ["sc mariana new"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Mariana%20Trench%20new%20secret.png",
+    ["Ragnarex"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
+    ["sc mariana new"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
     
 }
 
