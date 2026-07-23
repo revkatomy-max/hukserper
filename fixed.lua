@@ -2,32 +2,29 @@
 --  BLOX Gank Server Monitor  |  Discord: @bloxgank
 -- ============================================================
 
-local HttpService        = game:GetService("HttpService")
-local Players             = game:GetService("Players")
-local TextChatService     = game:GetService("TextChatService")
-local ReplicatedStorage   = game:GetService("ReplicatedStorage")
-local CoreGui             = game:GetService("CoreGui")
-local TweenService        = game:GetService("TweenService")
-local Workspace           = game:GetService("Workspace")
+local HttpService       = game:GetService("HttpService")
+local Players           = game:GetService("Players")
+local TextChatService    = game:GetService("TextChatService")
+local ReplicatedStorage  = game:GetService("ReplicatedStorage")
+local CoreGui            = game:GetService("CoreGui")
+local TweenService       = game:GetService("TweenService")
+local Workspace          = game:GetService("Workspace")
 
-local WEBHOOK_URL    = ""
-local WEBHOOK_STATS  = "" -- NOTE: dipertahankan sebagai fallback URL buat "Check Player On Server"
-                          -- kalau WEBHOOK_CHECKPLAYER kosong. Embed rekap otomatis "Server Stats"
-                          -- yang dulu numpang di sini SUDAH DIHAPUS sesuai request.
-local WEBHOOK_FISH   = ""
-local WEBHOOK_EVENT  = ""
-local WEBHOOK_MUTASI = ""
+local WEBHOOK_URL         = ""
+local WEBHOOK_STATS       = "" -- NOTE: dipertahankan sebagai fallback URL buat "Check Player On Server"
+                                -- kalau WEBHOOK_CHECKPLAYER kosong. Embed rekap otomatis "Server Stats"
+                                -- yang dulu numpang di sini SUDAH DIHAPUS sesuai request.
+local WEBHOOK_FISH        = ""
+local WEBHOOK_EVENT       = ""
+local WEBHOOK_MUTASI      = ""
 local WEBHOOK_CHECKPLAYER = ""
-local WEBHOOK_AVATAR = ""
-local PROXY          = "https://square-haze-a007.remediashop.workers.dev"
-local SCRIPT_ACTIVE  = false
-local EVENT_NOTIF_ENABLED = true -- NEW: toggle ON/OFF khusus notifikasi Event Hunt
+local WEBHOOK_AVATAR      = ""
+local PROXY               = "https://square-haze-a007.remediashop.workers.dev"
+local SCRIPT_ACTIVE       = false
+local EVENT_NOTIF_ENABLED = true -- toggle ON/OFF khusus notifikasi Event Hunt
 
-local EVENT_COOLDOWN_SECONDS  = 120
-local ROLE_NELAYAN_ID         = "1465243405591380023"
-
--- NEW: interval buat auto-send Check Player On Server (nebeng loop stats, tiap 20 menit)
-local CHECKPLAYER_AUTO_INTERVAL = 1200
+local EVENT_COOLDOWN_SECONDS = 120
+local ROLE_NELAYAN_ID        = "1465243405591380023"
 
 local BRAND_NAME        = "BLOX GANK"
 local BRAND_ICON        = "https://raw.githubusercontent.com/revkatomy-max/asset-id/main/blox%20logo.png"
@@ -49,20 +46,18 @@ local EMOJI_SEPARATOR = "<a:arrow:1517730055323652106>"
 local EMOJI_STARTER   = "<a:mancing:1517730589091041433>"
 local EMOJI_FORGOTTEN = "<a:wiu:1517740584763265094>"
 local EMOJI_MUTASI    = "<a:mutasi:1517730565225447616>"
-local EMOJI_RUBY      = "<a:ruby:1517740619794092153>"
-local EMOJI_LEGENDARY = "<a:apiijo:1517778951223902239>"
-local EMOJI_TREASURE  = "<a:treasure:1517740647119847516>"
-local EMOJI_MEGALODON = "<a:megablink:1517740677814030437>"
-local EMOJI_THUNDER   = "<a:thunder:1517730620250390589>"
-local EMOJI_CRYSTAL   = "<a:ruby:1517740619794092153>" -- NOTE: sama persis dgn EMOJI_RUBY, cek lagi apakah emoji crystal-nya beneran ini
-local EMOJI_EVENTTAG  = "📢"
-local EMOJI_JOIN      = "<a:join:1517738095917924372>"
-local EMOJI_LEAVE     = "<a:leave:1517738147914711190>"
-local EMOJI_NOTBACK   = "<a:jam:1517740557445894194>"
-local EMOJI_SERVER    = "<a:muter:1517778915836563596>"
-local EMOJI_CHECK     = "🔍"
-local EMOJI_COIN      = "🪙"
-local EMOJI_LOCATION  = "📍"
+local EMOJI_RUBY       = "<a:ruby:1517740619794092153>"
+local EMOJI_LEGENDARY  = "<a:apiijo:1517778951223902239>"
+local EMOJI_TREASURE   = "<a:treasure:1517740647119847516>"
+local EMOJI_MEGALODON  = "<a:megablink:1517740677814030437>" -- masih dipakai di EventHuntData yang di-comment (Dark/Megalodon Hunt), jaga-jaga buat reaktivasi
+local EMOJI_THUNDER    = "<a:thunder:1517730620250390589>"
+local EMOJI_CRYSTAL    = "<a:ruby:1517740619794092153>" -- NOTE: sama persis dgn EMOJI_RUBY, cek lagi apakah emoji crystal-nya beneran ini
+local EMOJI_EVENTTAG   = "📢"
+local EMOJI_JOIN       = "<a:join:1517738095917924372>"
+local EMOJI_LEAVE      = "<a:leave:1517738147914711190>"
+local EMOJI_NOTBACK    = "<a:jam:1517740557445894194>"
+local EMOJI_CHECK      = "🔍"
+local EMOJI_LOCATION   = "📍"
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -70,110 +65,109 @@ local SEP = EMOJI_SEPARATOR
 -- ============================================================
 
 local MemberList = {
-    { username = "zupzupzuppasup",   display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" },
-    { username = "natadecxco",       display = "natarebus",            id = "638355599574171668" },
-    { username = "kdryvka",          display = "YIYA",                 id = "1312729486067761162" },
-    { username = "cjmin131",         display = "Karaadino",            id = "1506715872612585606" },
-    { username = "x_ibo21",          display = "wowo",                 id = "954296542406246400" },
-    { username = "evosudin",         display = "Bluuism",              id = "875656564931956766" },
-    { username = "minxing_kim",      display = "Minxing",              id = "484295718765461515" },
-    { username = "w4terhyacinth",    display = "waterrr",              id = "1309945598409048076" },
-    { username = "rexlepwz",         display = "Reeamore",             id = "1205780304753725492" },
-    { username = "dekadekadekk",     display = "dekadee",              id = "692735562817470494" },
-    { username = "ceriseciscake",    display = "ciscake",              id = "786950836034994216" },
-    { username = "mnikndy",          display = "prettyv",              id = "1478607686345035880" },
-    { username = "BEJOD06",          display = "MasW",                 id = "1222390041951600640" },
-    { username = "flucidious",       display = "fluc",                 id = "279691238494699530" },
-    { username = "nahaaa01",         display = "naffz",                id = "1392909983678595244" },
-    { username = "AcidReign07",      display = "kiixlau",              id = "1393120438594437161" },
-    { username = "minyaktalon9990",  display = "Revv2",                id = "870201488218157107" },
-    { username = "alleThetwin",      display = "LikeAvillain",         id = "870201488218157107" },
-    { username = "fzallzall",        display = "Ziell",                id = "462346945441038337" },
-    { username = "cecillionz1",      display = "ceceyy",               id = "1404117087303110877" },
-    { username = "zeylith162",       display = "vexara",               id = "1284490745515999282" },
-    { username = "theromantasy",     display = "star",                 id = "1461593359318650880" },
-    { username = "choalyn_2",        display = "Alyn_ikaa",            id = "1467390946357416060" },
-    { username = "Matchafav17",      display = "Macaaa",               id = "1478634976990859304" },
-    { username = "0_Aurorain",       display = "Aurorain",             id = "574581489912643603" },
-    { username = "cobadulumogaseru", display = "lah",                  id = "1451975194397638676" },
-    { username = "fuxwing",          display = "hanna",                id = "1284490745515999282" },
-    { username = "renjunundip",      display = "aleale",               id = "1428266616763977811" },
-    { username = "iloafieus",        display = "mavis",                id = "1440589079086628998" },
-    { username = "i95jminn",         display = "azkara",               id = "1506715872612585606" },
-    { username = "trianayaa23",      display = "tiarkive",             id = "1425223281686085713" },
-    { username = "longisimusdorsii", display = "strawberry",           id = "1506324307423526913" },
-    { username = "Thismeann",        display = "Oceann",               id = "1463858926394015838" },
-    { username = "hynad27",          display = "jisoo",                id = "1217043654909366323" },
-    { username = "Bintanggg_1111",   display = "niss",                 id = "574581489912643603" },
-    { username = "Baeforlife",       display = "Jaemin_choa",          id = "1467390946357416060" },
-    { username = "hawaish01",        display = "ilywaa",               id = "1392909983678595244" },
-    { username = "kathzeu",          display = "katzu",                id = "669806652375040022" },
-    { username = "tantecungkring",   display = "Lavvy",                id = "757111417919766648" },
-    { username = "prada2296",        display = "Prada",                id = "1461862687343378468" },
-    { username = "bluesjjong",       display = "raxye",                id = "1205780304753725492" },
-    { username = "Rambo_4200",       display = "RTBxRamboMYST",        id = "1472822553830621362" },
-    { username = "PumpPump369",      display = "PumpPump",             id = "602890650345537555"  },
-    { username = "Rainoruby",        display = "rain",                 id = "1395401789561507952"  },
-    { username = "Reinoruby",        display = "ujan",                 id = "1395401789561507952"  },
-    { username = "Binxxx22",         display = "BinxPVNK77",           id = "952992106421579796"  },
-    { username = "Lacherve",         display = "RaraPVNK77",           id = "952992106421579796"  },
-    { username = "biruneptunus",     display = "BiruKC",               id = "962866204203167774"  },
-    { username = "univastic",        display = "ciel",                 id = "1356280326548230274" },
-    { username = "Rambo_4209",       display = "SHOPEFOOD",            id = "1472822553830621362" },
-    { username = "ZatzaMMay",        display = "TuyulGomenarai",       id = "892353508160970773"  },
-    { username = "WaifunyaGomenarai",display = "aci",                  id = "892353508160970773"  },
-    { username = "furinyawn",        display = "cipii",                id = "1312729486067761162" },
-    { username = "bbackburney",      display = "neyyina",              id = "1443066200945852477" },
-    { username = "Leale716",         display = "Leaa",                 id = "1408658812424028182" },
-    { username = "aca_ri17",         display = "ricarica",             id = "1471486371377053768" },
-    { username = "keyrannn1",        display = "key",                  id = "1458430632370769972" },
-    { username = "cccaciaa",         display = "chacia",               id = "1427694245455859715" },
-    { username = "Ninym_22N",        display = "Chipii",               id = "688544588830343274" },
-    { username = "23Skuy2",          display = "BLAZE",                id = "786950836034994216" },
-    { username = "waynecalloipe",    display = "ubuungi",              id = "1407648190580133948" },
-    { username = "odegaard030",      display = "Kyye",                 id = "1427694245455859715" },
-    { username = "zielsalvatore",    display = "salva",                id = "1205780304753725492" },
-    { username = "Roikiee1",        display = "Roikiee1",              id = "1447227099206385745" },
-    { username = "Mhrshina",         display = "shina",                id = "1125668364489080933" },
-    { username = "we4thernnoon",     display = "weather",              id = "1125668364489080933" },
-    { username = "andokecheh",       display = "AS×ABMystique_1",      id = "1395401789561507952" },
-    { username = "zakeykim",         display = "moonkim",              id = "1391744350714855425" },
-    { username = "moonlqghts",       display = "moonkim",              id = "1391744350714855425" },
-    { username = "dipyyy",           display = "karyawandripy",        id = "454238781168418826" },
-    { username = "caribbeanight",    display = "holly",                id = "869841474332811274" },
-    { username = "luwepol",          display = "pakmala",              id = "757111417919766648" },
-    { username = "rykalys06",        display = "bebew06",              id = "1488495609961906247" },
-    { username = "thewtrmlnz",       display = "karinateary",          id = "1450346429867622480" },
-    { username = "pwetyyrlie",       display = "lalaloveu",            id = "1402311023918059520" },
-    { username = "Uwellll2",         display = "narumi",               id = "1395401789561507952" }, 
-    { username = "callmeflaviaa",    display = "Piaa",                 id = "757111417919766648" }, 
-    { username = "valalily",         display = "valalily",             id = "706512230627278908" },
-    {username = "princekudoo",       display = "shinichi",             id = "757609752149754027"},
-    {username = "pettrichoor",       display = "sugengspakbor",        id = "977807235906404422"},
-    {username = "nicika204",         display = "ikaa",                 id = "1414865637829906544"},
-    {username = "velorisee",         display = "velorisee",            id = "692735562817470494"},
-    {username = "userrxyz2",         display = "alaydf",               id = "1425223281686085713"},
-    {username = "worldofwis",        display = "FUNxWis",              id = "1185617757446873199"},
-    {username = "Ipungkerta7",           display = "Faruq83NXS",       id = "719154955943936090"},
-    {username = "Hyrooboy99",        display = "481HyrooSalvatore",    id = "1309945598409048076"},
-    {username = "ch0colveuuu",       display = "chocoo",               id = "1410918804036390995"},
-    {username = "Th3SwordIsReal",      display = "Yor",                id = "370151022628175872"},
-    {username = "Blckwv3",             display = "Blackwave",          id = "494856245023604736"},
-    {username = "sheenaraa13",         display = "shennn",             id = "1427694245455859715"},
-    {username = "TalonGiveMeSecret86", display = "Ajudanipung01",      id = "719154955943936090"},
-    {username = "Gomenarai",           display = "Gomenarai",          id = "892353508160970773"},
-    {username = "ninindiy",             display= "cookiedy",           id = "1414865637829906544"},
-{ username = "OliverBMTH98", display = "Olive", id = "870201488218157107" },
-{ username = "cherryibloss0m", display = "calaa", id = "1408407306579869820" },
-{ username = "Avochildoo", display = "Avo", id = "1203622473955024896" },
-{ username = "raisamaysha", display = "raisa", id = "638355599574171668" },
-{ username = "sotyaimoet00", display = "rawr", id = "638355599574171668" },
-{ username = "archivistie", display = "archie", id = "1138846592800129057" },
-{ username = "ichinoese", display = "adza", id = "1138846592800129057" },
-{ username = "loryn2509", display = "oyiN", id = "1138846592800129057" },
-{ username = "xxxkidbloxian1", display = "coco", id = "1138846592800129057" },
-{ username = "aumiora", display = "acil", id = "1138846592800129057" },
-
+    { username = "zupzupzuppasup",    display = "KEPALASPPGDKIJAKARTA", id = "766292778501275678" },
+    { username = "natadecxco",        display = "natarebus",            id = "638355599574171668" },
+    { username = "kdryvka",           display = "YIYA",                 id = "1312729486067761162" },
+    { username = "cjmin131",          display = "Karaadino",            id = "1506715872612585606" },
+    { username = "x_ibo21",           display = "wowo",                 id = "954296542406246400" },
+    { username = "evosudin",          display = "Bluuism",              id = "875656564931956766" },
+    { username = "minxing_kim",       display = "Minxing",              id = "484295718765461515" },
+    { username = "w4terhyacinth",     display = "waterrr",              id = "1309945598409048076" },
+    { username = "rexlepwz",          display = "Reeamore",             id = "1205780304753725492" },
+    { username = "dekadekadekk",      display = "dekadee",              id = "692735562817470494" },
+    { username = "ceriseciscake",     display = "ciscake",              id = "786950836034994216" },
+    { username = "mnikndy",           display = "prettyv",              id = "1478607686345035880" },
+    { username = "BEJOD06",           display = "MasW",                 id = "1222390041951600640" },
+    { username = "flucidious",        display = "fluc",                 id = "279691238494699530" },
+    { username = "nahaaa01",          display = "naffz",                id = "1392909983678595244" },
+    { username = "AcidReign07",       display = "kiixlau",              id = "1393120438594437161" },
+    { username = "minyaktalon9990",   display = "Revv2",                id = "870201488218157107" },
+    { username = "alleThetwin",       display = "LikeAvillain",         id = "870201488218157107" },
+    { username = "fzallzall",         display = "Ziell",                id = "462346945441038337" },
+    { username = "cecillionz1",       display = "ceceyy",               id = "1404117087303110877" },
+    { username = "zeylith162",        display = "vexara",               id = "1284490745515999282" },
+    { username = "theromantasy",      display = "star",                 id = "1461593359318650880" },
+    { username = "choalyn_2",         display = "Alyn_ikaa",            id = "1467390946357416060" },
+    { username = "Matchafav17",       display = "Macaaa",               id = "1478634976990859304" },
+    { username = "0_Aurorain",        display = "Aurorain",             id = "574581489912643603" },
+    { username = "cobadulumogaseru",  display = "lah",                  id = "1451975194397638676" },
+    { username = "fuxwing",           display = "hanna",                id = "1284490745515999282" },
+    { username = "renjunundip",       display = "aleale",               id = "1428266616763977811" },
+    { username = "iloafieus",         display = "mavis",                id = "1440589079086628998" },
+    { username = "i95jminn",          display = "azkara",               id = "1506715872612585606" },
+    { username = "trianayaa23",       display = "tiarkive",             id = "1425223281686085713" },
+    { username = "longisimusdorsii",  display = "strawberry",           id = "1506324307423526913" },
+    { username = "Thismeann",         display = "Oceann",               id = "1463858926394015838" },
+    { username = "hynad27",           display = "jisoo",                id = "1217043654909366323" },
+    { username = "Bintanggg_1111",    display = "niss",                 id = "574581489912643603" },
+    { username = "Baeforlife",        display = "Jaemin_choa",          id = "1467390946357416060" },
+    { username = "hawaish01",         display = "ilywaa",               id = "1392909983678595244" },
+    { username = "kathzeu",           display = "katzu",                id = "669806652375040022" },
+    { username = "tantecungkring",    display = "Lavvy",                id = "757111417919766648" },
+    { username = "prada2296",         display = "Prada",                id = "1461862687343378468" },
+    { username = "bluesjjong",        display = "raxye",                id = "1205780304753725492" },
+    { username = "Rambo_4200",        display = "RTBxRamboMYST",        id = "1472822553830621362" },
+    { username = "PumpPump369",       display = "PumpPump",             id = "602890650345537555" },
+    { username = "Rainoruby",         display = "rain",                 id = "1395401789561507952" },
+    { username = "Reinoruby",         display = "ujan",                 id = "1395401789561507952" },
+    { username = "Binxxx22",          display = "BinxPVNK77",           id = "952992106421579796" },
+    { username = "Lacherve",          display = "RaraPVNK77",           id = "952992106421579796" },
+    { username = "biruneptunus",      display = "BiruKC",               id = "962866204203167774" },
+    { username = "univastic",         display = "ciel",                 id = "1356280326548230274" },
+    { username = "Rambo_4209",        display = "SHOPEFOOD",            id = "1472822553830621362" },
+    { username = "ZatzaMMay",         display = "TuyulGomenarai",       id = "892353508160970773" },
+    { username = "WaifunyaGomenarai", display = "aci",                  id = "892353508160970773" },
+    { username = "furinyawn",         display = "cipii",                id = "1312729486067761162" },
+    { username = "bbackburney",       display = "neyyina",              id = "1443066200945852477" },
+    { username = "Leale716",          display = "Leaa",                 id = "1408658812424028182" },
+    { username = "aca_ri17",          display = "ricarica",             id = "1471486371377053768" },
+    { username = "keyrannn1",         display = "key",                  id = "1458430632370769972" },
+    { username = "cccaciaa",          display = "chacia",               id = "1427694245455859715" },
+    { username = "Ninym_22N",         display = "Chipii",               id = "688544588830343274" },
+    { username = "23Skuy2",           display = "BLAZE",                id = "786950836034994216" },
+    { username = "waynecalloipe",     display = "ubuungi",              id = "1407648190580133948" },
+    { username = "odegaard030",       display = "Kyye",                 id = "1427694245455859715" },
+    { username = "zielsalvatore",     display = "salva",                id = "1205780304753725492" },
+    { username = "Roikiee1",          display = "Roikiee1",             id = "1447227099206385745" },
+    { username = "Mhrshina",          display = "shina",                id = "1125668364489080933" },
+    { username = "we4thernnoon",      display = "weather",              id = "1125668364489080933" },
+    { username = "andokecheh",        display = "AS×ABMystique_1",      id = "1395401789561507952" },
+    { username = "zakeykim",          display = "moonkim",              id = "1391744350714855425" },
+    { username = "moonlqghts",        display = "moonkim",              id = "1391744350714855425" },
+    { username = "dipyyy",            display = "karyawandripy",        id = "454238781168418826" },
+    { username = "caribbeanight",     display = "holly",                id = "869841474332811274" },
+    { username = "luwepol",           display = "pakmala",              id = "757111417919766648" },
+    { username = "rykalys06",         display = "bebew06",              id = "1488495609961906247" },
+    { username = "thewtrmlnz",        display = "karinateary",          id = "1450346429867622480" },
+    { username = "pwetyyrlie",        display = "lalaloveu",            id = "1402311023918059520" },
+    { username = "Uwellll2",          display = "narumi",               id = "1395401789561507952" },
+    { username = "callmeflaviaa",     display = "Piaa",                 id = "757111417919766648" },
+    { username = "valalily",          display = "valalily",             id = "706512230627278908" },
+    { username = "princekudoo",       display = "shinichi",             id = "757609752149754027" },
+    { username = "pettrichoor",       display = "sugengspakbor",        id = "977807235906404422" },
+    { username = "nicika204",         display = "ikaa",                 id = "1414865637829906544" },
+    { username = "velorisee",         display = "velorisee",            id = "692735562817470494" },
+    { username = "userrxyz2",         display = "alaydf",               id = "1425223281686085713" },
+    { username = "worldofwis",        display = "FUNxWis",              id = "1185617757446873199" },
+    { username = "Ipungkerta7",       display = "Faruq83NXS",           id = "719154955943936090" },
+    { username = "Hyrooboy99",        display = "481HyrooSalvatore",    id = "1309945598409048076" },
+    { username = "ch0colveuuu",       display = "chocoo",               id = "1410918804036390995" },
+    { username = "Th3SwordIsReal",    display = "Yor",                  id = "370151022628175872" },
+    { username = "Blckwv3",           display = "Blackwave",            id = "494856245023604736" },
+    { username = "sheenaraa13",       display = "shennn",               id = "1427694245455859715" },
+    { username = "TalonGiveMeSecret86", display = "Ajudanipung01",      id = "719154955943936090" },
+    { username = "Gomenarai",         display = "Gomenarai",            id = "892353508160970773" },
+    { username = "ninindiy",          display = "cookiedy",             id = "1414865637829906544" },
+    { username = "OliverBMTH98",      display = "Olive",                id = "870201488218157107" },
+    { username = "cherryibloss0m",    display = "calaa",                id = "1408407306579869820" },
+    { username = "Avochildoo",        display = "Avo",                  id = "1203622473955024896" },
+    { username = "raisamaysha",       display = "raisa",                id = "638355599574171668" },
+    { username = "sotyaimoet00",      display = "rawr",                 id = "638355599574171668" },
+    { username = "archivistie",       display = "archie",               id = "1138846592800129057" },
+    { username = "ichinoese",         display = "adza",                 id = "1138846592800129057" },
+    { username = "loryn2509",         display = "oyiN",                 id = "1138846592800129057" },
+    { username = "xxxkidbloxian1",    display = "coco",                 id = "1138846592800129057" },
+    { username = "aumiora",           display = "acil",                 id = "1138846592800129057" },
 }
 
 -- ============================================================
@@ -199,16 +193,18 @@ local SecretFishList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
-    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper", "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
+    "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper",
+    "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
 }
 
 local ForgottenList = {
-    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane", "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden", "Ragnarex",
+    "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
+    "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden", "Ragnarex",
 }
 
 local MutasiList = {
-    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn", 
-     "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
+    "Noob", "Fairy Dust", "Holographic", "Gemstone", "Fire", "Color Burn",
+    "BloodMoon", "Binary", "Lightning", "Disco", "Festive", "Radioactive", "Moon Fragment", "Abyssal",
     -- FIX 6: Aurora & Midnight itu mutasi beneran (sama kayak Abyssal), makanya harus tetap ada di sini.
     -- Masalahnya BUKAN di list ini, tapi di cara deteksi prefix-nya -- lihat MutasiFalsePositiveSpecies di bawah.
     "Aurora", "Midnight",
@@ -321,7 +317,10 @@ local FishChanceData = {
     ["Sunken Hadalith"]           = "1 in ??",
     ["Trench Warden"]             = "1 in 15M",
     ["Caeruleum Razerback"]       = "1 in 3M",
-    ["two-headed shark"]          = "1 in 3M",
+    -- FIX (rapihkan): key ini sebelumnya "two-headed shark" (t kecil), padahal SecretFishList
+    -- & FishImageURL pakai "Two-headed shark" (T besar) -- akibatnya field Chance di embed
+    -- selalu nongol "Unknown" walau datanya ada, gara-gara lookup case-sensitive gak ketemu.
+    ["Two-headed shark"]          = "1 in 3M",
     ["Ragnarex"]                  = "1 in 35M",
 }
 
@@ -401,16 +400,14 @@ local FishImageURL = {
     ["Coral Reaper"]             = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Coral%20Reaper.png",
     ["Trench Warden"]            = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Trench%20Warden.png",
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
-    ["Two-headed shark"]        = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
-    ["Ragnarex"]                = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
-    ["sc mariana new"]          = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
-    
+    ["Two-headed shark"]         = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
+    ["Ragnarex"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
+    ["sc mariana new"]           = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
 }
 
--- FIX (report user): helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian
--- kayak bug "two-headed shark" kejadian lagi di masa depan -- kalau ada typo beda huruf
--- besar/kecil antara SecretFishList/ForgottenList/dll dengan key di FishImageURL, gambar
--- tetap ketemu selama nama dasarnya sama.
+-- Helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian kayak bug
+-- "two-headed shark" -- kalau ada typo beda huruf besar/kecil antara SecretFishList/
+-- ForgottenList/dll dengan key di FishImageURL, gambar tetap ketemu selama nama dasarnya sama.
 local FishImageURLLower = {}
 for k, v in pairs(FishImageURL) do
     FishImageURLLower[string.lower(k)] = v
@@ -421,13 +418,12 @@ local function GetFishImageURL(baseName)
     return FishImageURL[baseName] or FishImageURLLower[string.lower(baseName)]
 end
 
-
 -- ============================================================
 --  EVENT HUNT DATABASE
---  FIX 7: Megalodon Hunt, Dark Megalodon Hunt, dan Aurora Borealis
---  DINONAKTIFKAN sesuai request. Sekarang tinggal Treasure Hunt
---  dan Thunderzilla Hunt aja yang bakal kirim notif event.
---  Entry lama dibiarin ke-comment biar gampang diaktifin lagi kalau perlu.
+--  Megalodon Hunt, Dark Megalodon Hunt, dan Aurora Borealis DINONAKTIFKAN
+--  sesuai request. Sekarang tinggal Treasure Hunt dan Thunderzilla Hunt
+--  aja yang bakal kirim notif event. Entry lama dibiarin ke-comment
+--  biar gampang diaktifin lagi kalau perlu.
 -- ============================================================
 
 local EventHuntData = {
@@ -439,7 +435,7 @@ local EventHuntData = {
         emoji        = "💰",
         thumbUrl     = FishImageURL["treasure hunt"],
     },
-    --[[ FIX 7: dinonaktifkan -- Dark Megalodon Hunt
+    --[[ dinonaktifkan -- Dark Megalodon Hunt
     {
         textTriggers = { "dark megalodon hunt", "dark megalodon" },
         title        = "🌑 Dark Megalodon Hunt Dimulai!",
@@ -449,7 +445,7 @@ local EventHuntData = {
         thumbUrl     = FishImageURL["Dark Megalodon"],
     },
     ]]
-    --[[ FIX 7: dinonaktifkan -- Megalodon Hunt
+    --[[ dinonaktifkan -- Megalodon Hunt
     {
         textTriggers = { "megalodon hunt" },
         title        = EMOJI_MEGALODON .. " Megalodon Hunt Dimulai!",
@@ -467,7 +463,6 @@ local EventHuntData = {
         emoji        = "⚡",
         thumbUrl     = FishImageURL["Thunderzilla"],
     },
-    
     {
         textTriggers = { "crystals have spawned", "crystals have", "crystal" },
         title        = EMOJI_CRYSTAL .. " Crystal Event Dimulai!",
@@ -476,8 +471,7 @@ local EventHuntData = {
         emoji        = "💎",
         thumbUrl     = FishImageURL["Crystal"],
     },
-    
-    --[[ FIX 7: dinonaktifkan -- Aurora Borealis
+    --[[ dinonaktifkan -- Aurora Borealis
     {
         textTriggers = { "aurora borealis", "aurora event" },
         title        = "💫 Aurora Borealis!",
@@ -495,13 +489,13 @@ local EventCooldown = {}
 --  STATE / CACHE
 -- ============================================================
 
-local MentionCache   = {}
-local FishImageCache = {}
-local AvatarCache    = {}
-local LeaveTimers    = {}
-local PlayerStats    = {}
-local PlayerNameToId = {}
-local SpawnPointCache = {} -- NEW: {name, position} hasil scan folder "!!! SPAWN LOCATIONS"
+local MentionCache    = {}
+local FishImageCache  = {}
+local AvatarCache     = {}
+local LeaveTimers     = {}
+local PlayerStats     = {}
+local PlayerNameToId  = {}
+local SpawnPointCache = {} -- {name, position} hasil scan folder "!!! SPAWN LOCATIONS"
 
 -- ============================================================
 --  SAVE CONFIG
@@ -552,7 +546,7 @@ local function Trim(s)
     return s:match("^%s*(.-)%s*$") or s
 end
 
--- NEW: format angka besar jadi singkatan K/M/B (mis. 4500000 -> "4.5M"), buat embed Check Player
+-- Format angka besar jadi singkatan K/M/B (mis. 4500000 -> "4.5M"), buat embed Check Player
 local function FormatNumber(n)
     n = tonumber(n)
     if not n then return "N/A" end
@@ -708,7 +702,7 @@ local function GetFishImageId(item)
 end
 
 -- ============================================================
---  CHECK PLAYER ON SERVER (NEW)
+--  CHECK PLAYER ON SERVER
 --  Ambil Caught & Map (lokasi) dari leaderstats tiap player,
 --  plus scan Server Luck & timer sisa dari teks GUI game.
 -- ============================================================
@@ -738,7 +732,7 @@ local function FindValueRecursive(instance, names)
     return nil
 end
 
--- NEW: cari value Map/Location di dalam WORKSPACE, bukan cuma di dalam Player itu sendiri.
+-- Cari value Map/Location di dalam WORKSPACE, bukan cuma di dalam Player itu sendiri.
 -- Beberapa game nyimpen data per-player di folder terpisah di workspace
 -- (misal workspace.PlayerName.Map), bukan di leaderstats.
 local function FindPlayerValueInWorkspace(player, names)
@@ -801,7 +795,7 @@ local function CacheSpawnLocations()
             local areaName
 
             if lowerName == "spawnlocation" or lowerName == "spawn" then
-                -- FIX: struktur aslinya "!!! SPAWN LOCATIONS" > "<Nama Area>" > "SpawnLocation"
+                -- struktur aslinya "!!! SPAWN LOCATIONS" > "<Nama Area>" > "SpawnLocation"
                 -- (part-nya sendiri namanya generik "SpawnLocation"), jadi nama area
                 -- diambil dari PARENT folder-nya, bukan dari nama part itu sendiri.
                 areaName = obj.Parent and obj.Parent.Name or nil
@@ -864,13 +858,13 @@ local function GetPlayerStatsAndLocation(player)
     if locStat then
         location = tostring(locStat.Value)
     else
-        -- NEW: coba baca dari Attribute (bukan child Instance)
+        -- coba baca dari Attribute (bukan child Instance)
         local attrLoc = player:GetAttribute("Map") or player:GetAttribute("map")
             or player:GetAttribute("Location") or player:GetAttribute("Zone")
         if attrLoc ~= nil then
             location = tostring(attrLoc)
         else
-            -- NEW: fallback terakhir -- game ini gak nge-track lokasi lewat stat,
+            -- fallback terakhir -- game ini gak nge-track lokasi lewat stat,
             -- jadi hitung sendiri dari posisi player vs SpawnLocation terdekat.
             local nearest = GetNearestSpawnArea(player)
             if nearest then location = nearest .. " (est.)" end
@@ -879,7 +873,6 @@ local function GetPlayerStatsAndLocation(player)
 
     return caught, location
 end
-
 
 -- NOTE: ini scanner HEURISTIK (nebak dari pola teks), karena Server Luck &
 -- End Server Luck cuma ada di GUI game (bukan value/stat). Kalau hasilnya
@@ -1024,7 +1017,7 @@ local function SendFishWebhook(title, description, color, fields, imageUrl, thum
     })
 end
 
--- NEW: webhook khusus mutasi list, terpisah dari webhook secret fish.
+-- Webhook khusus mutasi list, terpisah dari webhook secret fish.
 -- Fallback: kalau WEBHOOK_MUTASI kosong -> pakai WEBHOOK_FISH -> kalau itu juga kosong pakai WEBHOOK_URL.
 local function SendMutasiWebhook(title, description, color, fields, imageUrl, thumbUrl, mention, captionType)
     local url = (WEBHOOK_MUTASI ~= "") and WEBHOOK_MUTASI
@@ -1040,7 +1033,7 @@ local function SendMutasiWebhook(title, description, color, fields, imageUrl, th
     })
 end
 
--- NEW: webhook "Check Player On Server" -- kirim daftar semua player + coin + lokasi + server luck.
+-- Webhook "Check Player On Server" -- kirim daftar semua player + coin + lokasi + server luck.
 -- Fallback: kalau WEBHOOK_CHECKPLAYER kosong -> pakai WEBHOOK_STATS -> kalau itu juga kosong pakai WEBHOOK_URL.
 local function SendPlayerCheckWebhook()
     local url = (WEBHOOK_CHECKPLAYER ~= "") and WEBHOOK_CHECKPLAYER
@@ -1117,7 +1110,7 @@ local LabelEventState = {} -- [label] = { [eventTitle] = true/false (match state
 
 local function ProcessEventText(text, label)
     if not SCRIPT_ACTIVE then return end
-    if not EVENT_NOTIF_ENABLED then return end -- NEW: toggle ON/OFF khusus notif Event Hunt
+    if not EVENT_NOTIF_ENABLED then return end
     if not text or text == "" then return end
     local lower = text:lower()
 
@@ -1275,8 +1268,7 @@ local function CheckAndSend(rawMsg)
         return
     end
 
-    -- NEW: mutasi (di luar secret fish) sekarang dikirim ke webhook mutasi sendiri,
-    -- pakai fields yg konsisten dengan embed lain. Tanpa mention (FIX: mention dihapus).
+    -- Mutasi (di luar secret fish) dikirim ke webhook mutasi sendiri, tanpa mention.
     local mutasiDetected = FindMutasi(data.fish)
     if not mutasiDetected then return end
 
@@ -1362,7 +1354,7 @@ end
 -- ============================================================
 
 local function StartMonitoring()
-    CacheSpawnLocations() -- NEW: scan folder "!!! SPAWN LOCATIONS" sekali di awal monitoring
+    CacheSpawnLocations() -- scan folder "!!! SPAWN LOCATIONS" sekali di awal monitoring
 
     local allPlayers = Players:GetPlayers()
     local names      = {}
@@ -1377,11 +1369,9 @@ local function StartMonitoring()
     HookChat()
     StartEventMonitor()
 
-    -- DIMATIKAN sesuai request: dulu ada loop auto-send Check Player On Server tiap
-    -- CHECKPLAYER_AUTO_INTERVAL detik. Sekarang webhook Check Player CUMA kekirim
-    -- kalau di-trigger manual (klik tombol CHECK PLAYER di panel, atau ketik
-    -- "!checkplayer" di chat game). CHECKPLAYER_AUTO_INTERVAL dibiarin di atas
-    -- (gak dipake lagi) biar gampang diaktifin ulang kalau nanti berubah pikiran.
+    -- NOTE: webhook "Check Player On Server" cuma kekirim kalau di-trigger manual
+    -- (klik tombol CHECK PLAYER di panel, atau ketik "!checkplayer" di chat game).
+    -- Gak ada loop auto-send / rekap otomatis lagi.
 
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
@@ -1461,12 +1451,9 @@ local function CreateUI()
 
     local savedConfig = LoadConfig()
 
-    -- FIX (optimasi layout): dulu semua elemen (6 input webhook + 2 toggle + 3 tombol)
-    -- diposisikan manual pakai koordinat Y tetap satu-satu. Ini gampang banget numpuk/overlap
-    -- tiap kali nambah field baru (udah kejadian berkali-kali). Sekarang bagian tengah
-    -- (webhook inputs + toggle) dipindah ke ScrollingFrame + UIListLayout yang otomatis
+    -- Webhook inputs + toggle ditaruh di ScrollingFrame + UIListLayout supaya otomatis
     -- nyusun elemen berurutan tanpa nabrak, dan bisa di-scroll kalau kepanjangan.
-    -- Tombol aksi (CHECK PLAYER / DEBUG / START) tetap fixed di bawah, di luar scroll,
+    -- Tombol aksi (CHECK PLAYER / START) tetap fixed di bawah, di luar scroll,
     -- biar selalu keliatan & gampang dijangkau.
     local FRAME_H = 430
     local frame = Instance.new("Frame")
@@ -1659,11 +1646,8 @@ local function CreateUI()
     listLayout.Padding       = UDim.new(0, 4)
     listLayout.Parent        = content
 
-    -- FIX: "AutomaticCanvasSize" itu properti yang relatif baru di Roblox dan gak semua
-    -- executor/game client mendukungnya -- kalau di-set dan gak dikenali, ini nge-error
-    -- dan bikin SISA CreateUI() gak sempat jalan (makanya panel jadi blank abis topbar).
-    -- Sekarang canvas size dihitung MANUAL tiap kali AbsoluteContentSize berubah,
-    -- jadi kompatibel di executor manapun.
+    -- "AutomaticCanvasSize" gak semua executor/game client dukung, jadi canvas size
+    -- dihitung MANUAL tiap kali AbsoluteContentSize berubah -- kompatibel di executor manapun.
     local function UpdateCanvasSize()
         content.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 10)
     end
@@ -1762,7 +1746,7 @@ local function CreateUI()
         saveEnabled = enabled
     end)
 
-    -- NEW: toggle ON/OFF khusus buat notifikasi Event Hunt (treasure/thunderzilla/crystal).
+    -- Toggle ON/OFF khusus buat notifikasi Event Hunt (treasure/thunderzilla/crystal).
     -- Gak ngaruh ke fitur lain, bisa diubah kapan aja termasuk pas monitoring udah aktif.
     local eventToggle = MakeToggleRow("🔔 Notif Event Hunt", true, function(enabled)
         EVENT_NOTIF_ENABLED = enabled
