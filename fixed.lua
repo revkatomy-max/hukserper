@@ -194,7 +194,7 @@ local SecretFishList = {
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
     "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper",
-    "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
+    "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex", "Colossal Shipwreck Crab",
 }
 
 local ForgottenList = {
@@ -322,6 +322,7 @@ local FishChanceData = {
     -- selalu nongol "Unknown" walau datanya ada, gara-gara lookup case-sensitive gak ketemu.
     ["Two-headed shark"]          = "1 in 3M",
     ["Ragnarex"]                  = "1 in 35M",
+    ["Colossal Shipwreck Crab"]   = "1 in 5M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -402,7 +403,7 @@ local FishImageURL = {
     ["Caeruleum Razerback"]      = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/cureleam%20barbak%20(1).png",
     ["Two-headed shark"]         = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
     ["Ragnarex"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
-    ["sc mariana new"]           = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
+    ["Colossal Shipwreck Crab"]  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
 }
 
 -- Helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian kayak bug
