@@ -420,6 +420,7 @@ local FishImageURL = {
     ["Two-headed shark"]         = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
     ["Ragnarex"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
     ["Colossal Shipwreck Crab"]  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
+    ["Astrelle"] = https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Astrelle.png",
 }
 
 -- Helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian kayak bug
