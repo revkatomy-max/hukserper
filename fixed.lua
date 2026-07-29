@@ -168,21 +168,23 @@ local MemberList = {
     { username = "loryn2509",         display = "oyiN",                 id = "1138846592800129057" },
     { username = "xxxkidbloxian1",    display = "coco",                 id = "1138846592800129057" },
     { username = "aumiora",           display = "acil",                 id = "1138846592800129057" },
-{ username = "dinolutsyu131", display = "dinoyaaa", id = "1398328850793889872" },
-{ username = "theagcd0", display = "Shirohige", id = "1401956495788085411" },
-{ username = "Kurohige241206", display = "Kurohige", id = "1401956495788085411" },
-{ username = "Klerra_Asu", display = "Klerra_SYAIF", id = "1171410071092215888" },
-{ username = "OomKlerra2", display = "OomKlerra2", id = "1171410071092215888" },
-{ username = "Aisyqu77", display = "SPVxAizzz", id = "924386459283230750" },
-{ username = "Sptdjars", display = "Sptdjars", id = "1447227099206385745" },
-{ username = "3to3meow", display = "3to3meow", id = "1428804537061212173" },
-{ username = "shinarugi", display = "shinarugi", id = "1428804537061212173" },
-{ username = "sintiadche", display = "sintiadche", id = "1428804537061212173" },
-{ username = "panjulll63", display = "OSCARxBojonggede", id = "1382874484448694312" },
-{ username = "amerissano", display = "amerissano", id = "1420931573905100920" },
-{ username = "Alyn_ikaa", display = "Choalyn_2", id = "1467390946357416060" },
-{ username = "Rainzy214", display = "Rigell", id = "1428750848724566149" },
-
+    { username = "dinolutsyu131",     display = "dinoyaaa",              id = "1398328850793889872" },
+    { username = "theagcd0",          display = "Shirohige",             id = "1401956495788085411" },
+    { username = "Kurohige241206",    display = "Kurohige",              id = "1401956495788085411" },
+    { username = "Klerra_Asu",        display = "Klerra_SYAIF",          id = "1171410071092215888" },
+    { username = "OomKlerra2",        display = "OomKlerra2",            id = "1171410071092215888" },
+    { username = "Aisyqu77",          display = "SPVxAizzz",             id = "924386459283230750" },
+    { username = "Sptdjars",          display = "Sptdjars",              id = "1447227099206385745" },
+    { username = "3to3meow",          display = "3to3meow",              id = "1428804537061212173" },
+    { username = "shinarugi",         display = "shinarugi",             id = "1428804537061212173" },
+    { username = "sintiadche",        display = "sintiadche",            id = "1428804537061212173" },
+    { username = "panjulll63",        display = "OSCARxBojonggede",      id = "1382874484448694312" },
+    { username = "amerissano",        display = "amerissano",            id = "1420931573905100920" },
+    { username = "Alyn_ikaa",         display = "Choalyn_2",             id = "1467390946357416060" },
+    { username = "Rainzy214",         display = "Rigell",                id = "1428750848724566149" },
+    { username = "bodrexin1904", display = "codotparker",                id = "1462151652688662549" },
+    { username = "Cameron_G85", display = "ayess",                       id = "1451548051255726303" },
+    { username = "adniida", display = "piskyy",                          id = "1396834655889653790" },
 }
 
 -- ============================================================
@@ -209,7 +211,8 @@ local SecretFishList = {
     "Cerulean Dragon", "Machodon", "Scorching Veinmaw", "Crystalline Behemoth",
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
     "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper",
-    "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex", "Colossal Shipwreck Crab", "Astrelle",
+    "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
+    "Colossal Shipwreck Crab", "Astrelle",
 }
 
 local ForgottenList = {
@@ -338,7 +341,7 @@ local FishChanceData = {
     ["Two-headed shark"]          = "1 in 3M",
     ["Ragnarex"]                  = "1 in 35M",
     ["Colossal Shipwreck Crab"]   = "1 in 5M",
-    ["Astrelle"] = "1 in 6M",
+    ["Astrelle"]                  = "1 in 6M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
@@ -420,6 +423,9 @@ local FishImageURL = {
     ["Two-headed shark"]         = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Two-headed%20shark.png",
     ["Ragnarex"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/104.png",
     ["Colossal Shipwreck Crab"]  = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/106.png",
+    -- NOTE: nama file "Astrlele.png" ini keliatan kayak typo (harusnya "Astrelle.png"?) --
+    -- cek lagi nama file yang beneran ke-upload di repo new-pisit-image, kalau salah nanti
+    -- gambarnya gak muncul kayak kasus Glacial Serpent kemarin.
     ["Astrelle"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Astrlele.png",
 }
 
