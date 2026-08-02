@@ -212,12 +212,12 @@ local SecretFishList = {
     "Frostmoon Whale", "Crystal Goliath", "Eggy Enchant Stone", "Dark Megalodon",
     "Elemental Tempestray", "Glacial Serpent", "Caustic Maw", "Coral Reaper",
     "Sunken Hadalith", "Trench Warden", "Caeruleum Razerback", "Two-headed shark", "Ragnarex",
-    "Colossal Shipwreck Crab", "Astrelle",
+    "Colossal Shipwreck Crab", "Astrelle", "Moonwake Ray", "Astralune",
 }
 
 local ForgottenList = {
     "Sea Eater", "Thunderzilla", "Iridesca", "Frostbite Leviathan", "Fluorivane",
-    "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden", "Ragnarex",
+    "Cerulean Dragon", "Crystalline Behemoth", "Trench Warden", "Ragnarex", "Astralune",
 }
 
 local MutasiList = {
@@ -342,6 +342,8 @@ local FishChanceData = {
     ["Ragnarex"]                  = "1 in 35M",
     ["Colossal Shipwreck Crab"]   = "1 in 5M",
     ["Astrelle"]                  = "1 in 6M",
+    ["Moonwake Ray"] = "1 in 5M",
+    ["Astralune"] = "1 in 20M",
 }
 
 local NP = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/"
