@@ -429,6 +429,8 @@ local FishImageURL = {
     -- cek lagi nama file yang beneran ke-upload di repo new-pisit-image, kalau salah nanti
     -- gambarnya gak muncul kayak kasus Glacial Serpent kemarin.
     ["Astrelle"]                 = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/Astrlele.png",
+["Astralune"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/1000188338.png",
+["Moonwake Ray"] = "https://raw.githubusercontent.com/revkatomy-max/new-pisit-image/main/1000188340.png",
 }
 
 -- Helper case-insensitive buat ambil URL gambar ikan. Ini nyegah kejadian kayak bug
