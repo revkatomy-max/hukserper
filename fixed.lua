@@ -178,7 +178,7 @@ local MemberList = {
     { username = "Aisyqu77",          display = "SPVxAizzz",             id = "924386459283230750" },
     { username = "Sptdjars",          display = "Sptdjars",              id = "1447227099206385745" },
     { username = "3to3meow",          display = "3to3meow",              id = "1428804537061212173" },
-    { username = "shinarugi",         display = "gie",             id = "748417496020942869" },
+    { username = "shinarugi",         display = "gie",                   id = "748417496020942869" },
     { username = "sintiadche",        display = "sintiadche",            id = "1428804537061212173" },
     { username = "panjulll63",        display = "OSCARxBojonggede",      id = "1382874484448694312" },
     { username = "amerissano",        display = "amerissano",            id = "1420931573905100920" },
@@ -187,6 +187,16 @@ local MemberList = {
     { username = "bodrexin1904", display = "codotparker",                id = "1462151652688662549" },
     { username = "Cameron_G85", display = "ayess",                       id = "1451548051255726303" },
     { username = "adniida", display = "piskyy",                          id = "1396834655889653790" },
+    { username = "ivamup",       display = "Jay",                        id = "1412755178310078566" },
+    { username = "Szyakilaa",    display = "Szyakilaa",                  id = "327481967761424394" },
+    { username = "makhlvkghoib", display = "AETNxSamael",                id = "1334549812317524081" },
+    { username = "Lotusaura5", display = "LotusAura5",                   id = "1467390946357416060" },
+    { username = "relfarel17", display = "rellAS",                       id = "1447227099206385745" },
+    { username = "Ciimoyy12", display = "Moyy",                          id = "1439442292996837417" },
+    { username = "orangejuicha", display = "orenjulicay",                id = "1420931573905100920" },
+    { username = "cristyynnna", display = "DADARGULUNG",                 id = "763467366733840404" },
+  
+   
 }
 
 -- ============================================================
