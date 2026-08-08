@@ -39,6 +39,7 @@ local TierColors = {
     Join      = 65280,
     Leave     = 16729344,
     NotBack   = 16711680,
+    AFK       = 8421504,
 }
 
 local EMOJI_NOTIF     = "<a:notif:1517730648545034390>"
@@ -58,6 +59,7 @@ local EMOJI_LEAVE      = "<a:leave:1517738147914711190>"
 local EMOJI_NOTBACK    = "<a:jam:1517740557445894194>"
 local EMOJI_CHECK      = "🔍"
 local EMOJI_LOCATION   = "📍"
+local EMOJI_AFK        = "💤"
 local SEP = EMOJI_SEPARATOR
 
 -- ============================================================
@@ -524,6 +526,13 @@ local LeaveTimers     = {}
 local PlayerStats     = {}
 local PlayerNameToId  = {}
 local SpawnPointCache = {} -- {name, position} hasil scan folder "!!! SPAWN LOCATIONS"
+
+-- ============================================================
+--  AFK / IDLE DETECTION (tidak memancing / gak ada catch selama 1 jam)
+-- ============================================================
+
+local AFK_THRESHOLD_SECONDS  = 3600 -- 1 jam tanpa catch dianggap idle
+local AFK_CHECK_INTERVAL     = 60   -- interval scan pengecekan idle (detik)
 
 -- ============================================================
 --  SAVE CONFIG
@@ -1019,6 +1028,7 @@ local function BuildContent(mention, captionType)
     elseif captionType == "join"    then return "alhamdulilah kembali " .. m
     elseif captionType == "notback" then return "lah kok ngilang " .. m
     elseif captionType == "mutasi"  then return "cek mutasinya " .. m
+    elseif captionType == "afk"     then return "woy pada tidur ya " .. m
     end
     return m
 end
@@ -1118,6 +1128,19 @@ local function SendEventWebhook(eventData, rawText)
             { name = EMOJI_EVENTTAG .. " Event Hunt Alert", icon_url = WEBHOOK_AVATAR ~= "" and WEBHOOK_AVATAR or nil }
         )},
     })
+end
+
+-- ============================================================
+--  AFK / IDLE WEBHOOK SENDER
+--  Dikirim ke webhook JOIN/LEAVE (WEBHOOK_URL) saat player gak
+--  ada catch sama sekali selama AFK_THRESHOLD_SECONDS (1 jam).
+-- ============================================================
+
+local function SendAfkWebhook(pName, mentionStr, avatarUrl)
+    SendWebhook(EMOJI_AFK .. " Player Idle Terdeteksi", "Pemain ini kayaknya lagi gak mancing (gak ada catch sama sekali).", TierColors.AFK, {
+        { name = SEP .. " Username", value = "**" .. pName .. "**",                          inline = true },
+        { name = SEP .. " Info",     value = "Tidak ada catch selama **60 menit**",           inline = true },
+    }, nil, avatarUrl, mentionStr, "afk")
 end
 
 -- ============================================================
@@ -1228,6 +1251,38 @@ local function GetAvatarUrlById(userId)
     return PROXY .. "/avatar/" .. tostring(userId) .. "?t=" .. tostring(os.time())
 end
 
+-- ============================================================
+--  AFK / IDLE MONITOR LOOP
+--  Scan berkala tiap AFK_CHECK_INTERVAL detik: kalau ada player
+--  yang udah >= AFK_THRESHOLD_SECONDS gak pernah keluar catch-nya
+--  (lastCatchTime), kirim notif SEKALI ke webhook join/leave.
+--  Notif reset lagi (afkNotified = false) begitu player itu catch lagi.
+-- ============================================================
+
+local function StartAfkMonitor()
+    task.spawn(function()
+        while SCRIPT_ACTIVE do
+            task.wait(AFK_CHECK_INTERVAL)
+            if not SCRIPT_ACTIVE then break end
+
+            local now = os.time()
+            for uid, stats in pairs(PlayerStats) do
+                local baseline = stats.lastCatchTime or stats.joinTime or now
+                if not stats.afkNotified and (now - baseline) >= AFK_THRESHOLD_SECONDS then
+                    stats.afkNotified = true
+
+                    local player     = Players:GetPlayerByUserId(uid)
+                    local pName      = (player and player.Name) or stats.name or "Unknown"
+                    local avatarUrl  = AvatarCache[uid] or GetAvatarUrlById(uid)
+                    local mentionStr = GetMention(pName)
+
+                    SendAfkWebhook(pName, mentionStr, avatarUrl)
+                end
+            end
+        end
+    end)
+end
+
 local function CheckAndSend(rawMsg)
     if not SCRIPT_ACTIVE then return end
     if not string.find(string.lower(rawMsg), "obtained") then return end
@@ -1242,9 +1297,12 @@ local function CheckAndSend(rawMsg)
 
     if uid then
         if not PlayerStats[uid] then
-            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = data.player }
+            PlayerStats[uid] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = data.player, lastCatchTime = os.time(), afkNotified = false }
         end
         PlayerStats[uid].catchCount = PlayerStats[uid].catchCount + 1
+        -- Ada catch baru -> reset timer idle & flag notifikasi AFK-nya.
+        PlayerStats[uid].lastCatchTime = os.time()
+        PlayerStats[uid].afkNotified   = false
     end
 
     local legendaryBase = FindLegendaryCrystal(data.fish)
@@ -1396,6 +1454,7 @@ local function StartMonitoring()
 
     HookChat()
     StartEventMonitor()
+    StartAfkMonitor() -- mulai loop deteksi idle/gak mancing (1 jam tanpa catch)
 
     -- NOTE: webhook "Check Player On Server" cuma kekirim kalau di-trigger manual
     -- (klik tombol CHECK PLAYER di panel, atau ketik "!checkplayer" di chat game).
@@ -1404,7 +1463,7 @@ local function StartMonitoring()
     for _, p in ipairs(allPlayers) do
         WatchForFish(p)
         AvatarCache[p.UserId]                       = GetAvatarUrlById(p.UserId)
-        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), name = p.Name }
+        PlayerStats[p.UserId]                       = { catchCount = 0, secretList = {}, joinTime = os.time(), name = p.Name, lastCatchTime = os.time(), afkNotified = false }
         PlayerNameToId[string.lower(p.Name)]        = p.UserId
         PlayerNameToId[string.lower(p.DisplayName)] = p.UserId
         BuildMentionCache(p.Name, p.DisplayName)
@@ -1413,7 +1472,7 @@ local function StartMonitoring()
     Players.PlayerAdded:Connect(function(player)
         if not SCRIPT_ACTIVE then return end
         LeaveTimers[player.UserId] = nil
-        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = player.Name }
+        PlayerStats[player.UserId] = { catchCount = 0, secretList = {}, joinTime = os.time(), name = player.Name, lastCatchTime = os.time(), afkNotified = false }
         PlayerNameToId[string.lower(player.Name)]        = player.UserId
         PlayerNameToId[string.lower(player.DisplayName)] = player.UserId
         BuildMentionCache(player.Name, player.DisplayName)
