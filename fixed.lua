@@ -196,7 +196,10 @@ local MemberList = {
     { username = "orangejuicha", display = "orenjulicay",                id = "1420931573905100920" },
     { username = "cristyynnna", display = "DADARGULUNG",                 id = "763467366733840404" },
     { username = "pinkybioliqua", display = "Clarine",                   id = "759913266297176074" },
-  
+    { username = "the12xyn",   display = "Awychu",                       id = "779267305736765440" },
+    { username = "eldaaaww",   display = "ceyyi",                        id = "779267305736765440" },
+    { username = "cayuuimutt", display = "cceayyu",                      id = "779267305736765440" },
+
    
 }
 
